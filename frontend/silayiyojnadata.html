@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahila Silai Prasikshan Data Admin</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container-custom {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            color: #333;
+            border-bottom: 3px solid #d32f2f;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-dashboard-btn {
+            text-decoration: none;
+            background: #d32f2f;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .back-dashboard-btn:hover {
+            background: #b71c1c;
+            color: #fff;
+        }
+
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+        #searchInput { width: 100%; max-width: 500px; padding: 10px; font-size: 15px; border: 1px solid #ccc; border-radius: 5px; outline: none; }
+        #searchInput:focus { border-color: #d32f2f; }
+
+        /* --- Table Styling --- */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 1200px; }
+        thead { background-color: #f1f1f1; color: #333; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 13px; vertical-align: middle; }
+        th { font-weight: bold; text-transform: uppercase; font-size: 12px; }
+        
+        tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        tbody tr:hover { background-color: #ffebee; }
+
+        .user-photo { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #ccc; }
+        .no-photo { width: 50px; height: 50px; border-radius: 8px; background-color: #ddd; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; }
+
+        /* Badges & Small Text */
+        .info-cell small { display: block; color: #555; margin-top: 3px; font-size: 11.5px;}
+        .badge-success { background-color: #2e7d32; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;}
+        .badge-pending { background-color: #f57c00; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;}
+
+        .page-item.active .page-link { background-color: #d32f2f; border-color: #d32f2f; color: white; }
+        .page-link { color: #d32f2f; }
+        .btn-delete { padding: 6px 12px; font-size: 12px; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            h2 {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-custom">
+        <h2>
+            <span>Mahila Silai Prasikshan Yojana - Admin Panel</span>
+            <a href="admin-dashboard.html" class="back-dashboard-btn">Back to Dashboard</a>
+        </h2>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by Name, Mobile, Aadhar or Txn ID...">
+        </div>
+
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="5%">Photo</th>
+                        <th width="15%">Applicant Details</th>
+                        <th width="15%">Contact Info</th>
+                        <th width="15%">Aadhar & Demo</th>
+                        <th width="15%">Address</th>
+                        <th width="15%">Training Info</th>
+                        <th width="15%">Payment Details</th>
+                        <th width="5%">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="8" class="text-center p-4 font-weight-bold text-muted">Loading Data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <nav class="mt-3">
+            <ul class="pagination justify-content-center" id="paginationControls"></ul>
+        </nav>
+    </div>
+
+    <script>
+        let allData = [];
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 15;
+
+        // ✅ 1. Fetch Data from API
+        async function fetchData() {
+            try {
+                // Ensure backend is running on port 5000
+                const response = await fetch(CONFIG.API_URL + '/schemes/all-beneficiaries?yojana=Mahila Silai Prasikshan Yojana');
+                const result = await response.json();
+
+                if (result.success) {
+                    allData = result.data; 
+                    currentFilteredData = allData; 
+                    renderTable(currentFilteredData);
+                } else {
+                    document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Error loading data</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Server Connection Failed.</td></tr>`;
+            }
+        }
+
+        // ✅ 2. Render Data to Table
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = ''; 
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">No Records Found</td></tr>`;
+                document.getElementById('paginationControls').innerHTML = ''; 
+                return;
+            }
+
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(user => {
+                const tr = document.createElement('tr');
+                
+                // Photo
+                let photoHtml = `<div class="no-photo">N/A</div>`;
+                if (user.photoUrl) {
+                    const imgPath = user.photoUrl.startsWith('http') ? user.photoUrl : `${CONFIG.API_URL}${user.photoUrl}`;
+                    photoHtml = `<img src="${imgPath}" class="user-photo" alt="Img">`;
+                }
+
+                // Dates
+                const regDate = new Date(user.createdAt).toLocaleDateString('en-IN');
+                
+                // Payment Status Badge
+                const statusBadge = user.paymentStatus === 'Paid' 
+                    ? `<span class="badge-success">PAID</span>` 
+                    : `<span class="badge-pending">PENDING</span>`;
+
+                const recordId = user._id || user.id;
+
+                tr.innerHTML = `
+                    <td>${photoHtml}</td>
+                    <td class="info-cell">
+                        <b>${user.name || '-'}</b>
+                        <small>Grd: ${user.guardianName || '-'}</small>
+                        <small style="color:#d32f2f">S.No: ${user.serialNumber || '-'}</small>
+                    </td>
+                    <td class="info-cell">
+                        📞 ${user.mobileNumber || '-'}
+                        <small>✉️ ${user.email || 'N/A'}</small>
+                    </td>
+                    <td class="info-cell">
+                        <b>Aadhar: ${user.aadharNumber || '-'}</b>
+                        <small>Age: ${user.age || '-'} | Gender: ${user.gender || '-'}</small>
+                        <small>Caste: ${user.caste || '-'}</small>
+                    </td>
+                    <td class="info-cell">
+                        ${user.address || '-'}
+                    </td>
+                    <td class="info-cell">
+                        <b>${user.trainingName || 'Silai Prasikshan'}</b>
+                        <small>Duration: ${user.trainingDuration || '45 Days'}</small>
+                        <small>Tr. Date: ${user.trainingDate || '-'}</small>
+                    </td>
+                    <td class="info-cell">
+                        ${statusBadge}
+                        <small><b>Txn ID:</b> ${user.paymentId || 'N/A'}</small>
+                        <small><b>Apply Date:</b> ${regDate}</small>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-delete" onclick="deleteRecord('${recordId}')">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPagination(totalPages);
+        }
+
+        // ✅ 3. Delete Record Function
+        async function deleteRecord(id) {
+            if (!id || id === 'undefined') return;
+            if (!confirm("Are you sure you want to permanently delete this record?")) return;
+
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/schemes/delete/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Record deleted successfully.");
+                    fetchData(); 
+                } else {
+                    alert("Failed to delete record: " + (result.message || "Unknown error"));
+                }
+            } catch (error) {
+                alert("Server error while trying to delete the record.");
+            }
+        }
+
+        // ✅ 4. Pagination
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if(endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for(let i=startPage; i<=endPage; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        window.changePage = function(page) { currentPage = page; renderTable(currentFilteredData); }
+
+        // ✅ 5. Search Filter Function
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            
+            currentFilteredData = allData.filter(user => {
+                const name = (user.name || "").toLowerCase();
+                const mobile = (user.mobileNumber || "").toString();
+                const aadhar = (user.aadharNumber || "").toString();
+                const txn = (user.paymentId || "").toLowerCase();
+
+                return name.includes(term) || mobile.includes(term) || aadhar.includes(term) || txn.includes(term);
+            });
+
+            currentPage = 1;
+            renderTable(currentFilteredData);
+        });
+
+        window.onload = fetchData;
+    </script>
+    <script src="config.js"></script>
+</body>
+</html>

@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आगाज फाउंडेशन - महिला स्वरोजगार अनुबंध</title>
+    <style>
+        /* CSS: डिजाइन और लेआउट */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .page {
+            background: #fff;
+            padding: 40px 60px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 1100px;
+        }
+
+        .header-text {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            /* ऊपर से और अधिक जगह छोड़ी गई है */
+            margin-top: 280px; 
+            margin-bottom: 50px;
+            line-height: 1.5;
+        }
+
+        .guidelines {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        .guidelines li {
+            margin-bottom: 20px;
+            text-align: justify;
+            font-size: 1.05rem;
+        }
+
+        .form-fill-area {
+            line-height: 2.2;
+            margin-bottom: 20px;
+        }
+
+        .group-name {
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        /* इनपुट स्टाइल ताकि ये सादे टेक्स्ट की तरह दिखें */
+        .editable-input {
+            border: none;
+            border-bottom: 1px dotted #000;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0 5px;
+            outline: none;
+            background: transparent;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-size: 0.9rem;
+        }
+
+        .photo-cell {
+            width: 80px;
+            height: 100px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            background-color: #fcfcfc;
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        .photo-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-icon-btn {
+            position: absolute;
+            right: 4px;
+            top: 4px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.7);
+            color: #fff;
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 3;
+            line-height: 1;
+        }
+
+        .camera-preview-wrap {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 15px;
+        }
+
+        .camera-preview-box {
+            background: #fff;
+            width: 100%;
+            max-width: 360px;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .camera-preview-box video {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .camera-actions button {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .btn-capture { background: #2e7d32; }
+        .btn-close { background: #d32f2f; }
+
+        /* टेबल के अंदर लिखने योग्य जगह */
+        .editable-td {
+            width: 100%;
+            height: 100%;
+            min-height: 80px;
+            outline: none;
+        }
+
+        .inner-cell {
+            border-bottom: 1px solid #ccc;
+            height: 30px;
+            margin-bottom: 5px;
+            outline: none;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 80px;
+            font-weight: bold;
+        }
+
+        .print-btn {
+            display: block;
+            width: 250px; /* थोड़ा चौड़ा किया */
+            margin: 20px auto;
+            padding: 15px;
+            background: #d32f2f; /* लाल रंग पेमेंट के लिए */
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .home-btn {
+            display: none;
+            width: 250px;
+            margin: 10px auto 20px;
+            padding: 12px;
+            background: #0d6efd;
+            color: #fff;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+            body { 
+                background: #fff; 
+                padding: 0; 
+                margin: 0;
+            }
+            .container { width: 100%; max-width: 100%; margin: 0; }
+            .page { 
+                box-shadow: none; 
+                margin: 0; 
+                width: 100%;
+                height: 297mm; 
+                page-break-after: always; 
+                padding: 40px 50px;
+                box-sizing: border-box;
+            }
+            .page:last-of-type { page-break-after: auto; }
+            .print-btn { display: none; }
+            .home-btn { display: none !important; }
+            .no-print { display: none; }
+            .editable-input { border-bottom: none; }
+            .camera-icon-btn, .camera-preview-wrap { display: none !important; }
+        }
+        /* Placeholder दिखने के लिए CSS */
+        [contenteditable]:empty:before {
+            content: attr(placeholder);
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <section class="page">
+            <div class="header-text">
+                यह अनुबंध आगाज फाउंडेशन और महिला समूह के बीच महिला स्वरोजगार हेतु किया जा रहा है।
+            </div>
+
+            <ul class="guidelines">
+                <li>यह महिलाओं द्वारा एकत्रित होकर किया जाने वाला कार्य है। जिसे हम स्वयं सहायता समूह स्वरोजगार कहते है। इस ग्रुप पर आगाज फाउ���डेशन द्वारा निर्धारित स्वयं सहायता समूह के सभी नियम लागू होंगे।</li>
+                <li>प्रत्येक समूह में 10 महिला होगी।</li>
+                <li>प्रत्येक समूह के एक अध्यक्ष, एक सचिव और एक कोषाध्यक्ष होंगे।</li>
+                <li>महिला अपनी निजी रकम निजी जरूरत में न लगाकर कपड़े के व्यापार में लगाएगी, कपड़े के काम से जुड़ी सभी चीजों की जानकारी व मार्गदर्शन आगाज फाउंडेशन करेगी।</li>
+                <li>आगाज फाउंडेशन महिलाओं को समूह कार्य का प्रोत्साहन दे रही है जिसमें कपड़े की सिलाई, कढ़ाई, बुनाई, धुलाई, प्रेस, सजना संवारना प्रिंटिंग बेचना व बिकवाना आदि सम्मिलित हैं।</li>
+                <li>समूह सदस्य स्वरोजगार स्थापना हेतु 50,000 / पचास हजार रुपए का इंतजाम स्वयं करेंगे।</li>
+                <li>महिलाओं के समूह को पूंजी उपलब्ध कराने में आगाज फाउंडेशन के सहयोग से बैंक या वित्तीय संस्थान से लोन प्राप्त कर सकेंगे।</li>
+                <li>महिलाओं द्वारा प्राप्त रकम महिला के स्वरोजगार हेतु कच्चे माल खरीदने, जरूरत का सामान लाने व मार्केटिंग आदि में इस्तेमाल की जाएगी।</li>
+                <li>महिला अपनी क्षमता व दक्षता के अनुसार तथा समूह की सहमति से महिला अपने कार्य काल को व्यावहारिक कर सकती हैं।</li>
+                <li>महिला समूह में जो भी कपड़ा सिलेगी उस पर प्रत्येक उत्पाद प्रति लागत (पीस रेट) के आधार पर पैसा अदा किया जाएगा।</li>
+            </ul>
+        </section>
+
+        <section class="page">
+            <ul class="guidelines" style="margin-top: 50px;">
+                <li>महिला समूह की सभी सदस्य सिलाई यूनिट की सामग्री आदि खरीदने हेतु रकम बैंक से आहरण के लिए चेक या ए टी एम या नेट बैंकिंग या मोबाइल बैंकिंग हेतु सहमत है।</li>
+                <li>आगाज फाउंडेशन के सहयोग से मुहैया कराया गया पैसा महिला कपड़े के स्वरोजगार में ही लगाएगी। यदि महिला पैसे को आगाज फाउंडेशन के साथ स्वरोजगार में नहीं लगाती है तो यह वादा खिलाफी कहलाएगी।</li>
+                <li>जिस महिला समूह के द्वारा पैसा गबन किया जाएगा उनपर कानूनी कार्रवाई की जाएगी।</li>
+                <li>महिला समूह के द्वारा अर्जित किया गया पैसा का 10% आगाज फाउंडेशन के पास जमा रहेगा।</li>
+                <li>आगाज फाउंडेशन व महिला की सहमति से महिलाओं के पद निर्धारित किए जाएंगे तथा पदाधिकारी सभी तरह के रजिस्टर जैसे हाजिरी, स्टोर कीपिंग, स्टॉक मैनेजमेंट आदि बनाएगी।</li>
+                <li>समूह में मौजूद कोई भी सामान व कागजात बेमेल होने पर समूह की आय पर इसका प्र���ाव पड़ सकता है।</li>
+            </ul>
+        </section>
+
+        <section class="page">
+            <div class="form-fill-area">
+                <p>• आगाज फाउंडेशन के अथक प्रयास से 
+                <input type="text" id="village" class="editable-input" style="width: 150px;"> गांव, 
+                <input type="text" id="panchayat" class="editable-input" style="width: 150px;"> पंचायत 
+                <input type="text" id="anumandal" class="editable-input" style="width: 150px;"> अनुमंडल 
+                <input type="text" id="district" class="editable-input" style="width: 150px;"> जिला में महिलाओं का समूह बनाकर रोजगार मुहैया कराया जा रहा है।</p>
+            </div>
+
+            <div class="group-name">
+                महिला समूह का नाम : <input type="text" id="groupName" class="editable-input" style="width: 400px;">
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">महिलाओं का नाम व पता :</th>
+                        <th style="width: 40%;">(आधार कार्ड / पैन कार्ड / मोबाइल नं)</th>
+                        <th>PHOTO</th>
+                    </tr>
+                </thead>
+                <tbody id="table-rows-part1">
+                </tbody>
+            </table>
+        </section>
+
+        <section class="page">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">महिलाओं का नाम व पता :</th>
+                        <th style="width: 40%;">(आधार कार्ड / पैन कार्ड / मोबाइल नं)</th>
+                        <th>PHOTO</th>
+                    </tr>
+                </thead>
+                <tbody id="table-rows-part2">
+                </tbody>
+            </table>
+
+            <div class="signature-section">
+                <span>आधिकारिक हस्ताक्षर</span>
+                <span>एरिया को ऑर्डिनेटर</span>
+                <span>आधिकारिक हस्ताक्षर</span>
+            </div>
+        </section>
+
+        <div class="no-print" style="text-align: center; margin-bottom: 15px;">
+            <label style="font-weight: bold; font-size: 1.1rem;">भुगतान राशि (₹): </label>
+            <input type="number" id="customAmount" style="padding: 10px; width: 150px; font-size: 1rem; border: 2px solid #d32f2f; border-radius: 5px;" placeholder="Enter Amount">
+        </div>
+
+        <button class="print-btn" onclick="saveAndPrint()">Pay & Save Document</button>
+        <button id="backHomeBtn" class="home-btn" onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;">
+
+    <!-- Live camera modal -->
+    <div id="cameraPreviewWrap" class="camera-preview-wrap">
+        <div class="camera-preview-box">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <div class="camera-actions">
+                <button class="btn-capture" type="button" onclick="captureFromCamera()">Capture</button>
+                <button class="btn-close" type="button" onclick="closeCameraModal()">Close</button>
+            </div>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // ✅ Handle payment success callback
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const orderId = urlParams.get('orderId');
+            const paymentId = urlParams.get('paymentId');
+            
+            if (status === 'success' && orderId) {
+                fetchAndRestoreGroup(orderId, paymentId);
+            } else if (status === 'failed') {
+                alert("���ुगतान विफल। कृपया दोबारा कोशिश करें।");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        // ✅ Fetch group data and restore form after payment success
+        async function fetchAndRestoreGroup(orderId, paymentId) {
+            try {
+                const query = paymentId ? `?paymentId=${encodeURIComponent(paymentId)}` : '';
+                const response = await fetch(CONFIG.API_URL + `/swarojgaar/get-by-order/${encodeURIComponent(orderId)}${query}`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const group = result.data;
+                    
+                    // Restore location fields
+                    document.getElementById('village').value = group.location?.village || '';
+                    document.getElementById('panchayat').value = group.location?.panchayat || '';
+                    document.getElementById('anumandal').value = group.location?.subDivision || '';
+                    document.getElementById('district').value = group.location?.district || '';
+                    document.getElementById('groupName').value = group.groupName || '';
+                    
+                    // Restore members - get all rows from both tables
+                    const rows1 = document.getElementById('table-rows-part1').querySelectorAll('tr');
+                    const rows2 = document.getElementById('table-rows-part2').querySelectorAll('tr');
+                    const allRows = Array.from(rows1).concat(Array.from(rows2));
+                    
+                    if (group.members && group.members.length > 0) {
+                        group.members.forEach((member, idx) => {
+                            if (idx < allRows.length) {
+                                const row = allRows[idx];
+                                row.cells[0].querySelector('.name-input').innerText = member.fullName || '';
+                                row.cells[0].querySelector('.address-input').innerText = member.address || '';
+                                
+                                const detailsCells = row.cells[1].querySelectorAll('.inner-cell');
+                                detailsCells[0].innerText = member.aadharCard || '';
+                                detailsCells[1].innerText = member.panCard || '';
+                                detailsCells[2].innerText = member.mobileNumber || '';
+                                
+                                // Restore photo
+                                if (member.photoUrl) {
+                                    const photoCell = row.cells[2];
+                                    photoCell.innerHTML = `<img src="${member.photoUrl}" alt="photo"><button type="button" class="camera-icon-btn" onclick="openCameraForCell(event, this.parentElement, ${idx})" title="Live Camera">📷</button>`;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Show success message
+                    alert(`✅ भुगतान सफल!\n\nग्रुप: ${group.groupName}\nसदस्य: ${group.members?.length || 0}\nभुगतान स्थिति: ${group.paymentStatus}\n\nफॉर्म प्रिंट करने के लिए Ctrl+P दबाएं।`);
+                    
+                    // Clear URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    // Auto-print after short delay
+                    setTimeout(() => {
+                        window.print();
+                    }, 1000);
+                    
+                    // Update button
+                    const btn = document.querySelector('.print-btn');
+                    btn.innerText = "✓ भुगतान पूर्ण - फिर से प्रिंट करें";
+                    btn.onclick = () => window.print();
+
+                    // Show back to home button after successful payment restore
+                    const backHomeBtn = document.getElementById('backHomeBtn');
+                    if (backHomeBtn) {
+                        backHomeBtn.style.display = 'block';
+                    }
+                } else {
+                    alert("डेटा प्राप्त करने में त्रुटि। कृपया दोबारा कोशिश करें।");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert("त्रुटि: " + error.message);
+            }
+        }
+
+        const tbody1 = document.getElementById('table-rows-part1');
+        const tbody2 = document.getElementById('table-rows-part2');
+        const fileInput = document.getElementById('fileInput');
+        let currentCell = null;
+        let memberPhotos = {}; // Store files: { rowIndex: File }
+
+        // Camera state
+        let cameraStream = null;
+        let currentCameraCell = null;
+        let currentCameraIndex = null;
+
+        for (let i = 0; i < 10; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="height: 100px;">
+                    <div class="inner-cell name-input" contenteditable="true" placeholder="Name"></div>
+                    <div class="inner-cell address-input" style="border:none;" contenteditable="true" placeholder="Address"></div>
+                </td>
+                <td>
+                    <div class="inner-cell" contenteditable="true" placeholder="Aadhar"></div>
+                    <div class="inner-cell" contenteditable="true" placeholder="Pan"></div>
+                    <div class="inner-cell" style="border:none;" contenteditable="true" placeholder="Mobile"></div>
+                </td>
+                <td class="photo-cell" onclick="selectPhoto(this, ${i})">
+                    <button type="button" class="camera-icon-btn" onclick="openCameraForCell(event, this.parentElement, ${i})" title="Live Camera">📷</button>
+                </td>
+            `;
+            
+            // Add to part1 (0-4) or part2 (5-9)
+            if (i < 5) {
+                tbody1.appendChild(row);
+            } else {
+                tbody2.appendChild(row);
+            }
+
+            // --- Input Restriction: Only Numbers for Aadhar & Mobile ---
+            const allCells = row.querySelectorAll('.inner-cell');
+            const nameCell = allCells[0];   // Name is at index 0
+            const aadharCell = allCells[2]; // Aadhar is at index 2
+            const panCell = allCells[3];    // Pan is at index 3
+            const mobileCell = allCells[4]; // Mobile is at index 4
+
+            function restrictNumberInput(e, maxLength) {
+                const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Enter'];
+                if (allowedKeys.includes(e.key)) return;
+                if (!/^[0-9]$/.test(e.key)) { e.preventDefault(); return; }
+                const currentText = e.target.innerText.replace(/\D/g, '');
+                const selection = window.getSelection();
+                const isTextSelected = selection.toString().length > 0;
+                if (currentText.length >= maxLength && !isTextSelected) { e.preventDefault(); }
+            }
+
+            function restrictNameInput(e) {
+                const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Enter', ' '];
+                if (allowedKeys.includes(e.key)) return;
+                if (!/^[a-zA-Z\s]$/.test(e.key)) { e.preventDefault(); }
+            }
+
+            function restrictPanInput(e) {
+                const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Enter'];
+                if (allowedKeys.includes(e.key)) return;
+                if (!/^[a-zA-Z0-9]$/.test(e.key)) { e.preventDefault(); return; }
+                const currentText = e.target.innerText.replace(/[\n\r]/g, '');
+                const selection = window.getSelection();
+                const isTextSelected = selection.toString().length > 0;
+                if (currentText.length >= 10 && !isTextSelected) { e.preventDefault(); }
+            }
+
+            nameCell.addEventListener('keydown', restrictNameInput);
+            aadharCell.addEventListener('keydown', (e) => restrictNumberInput(e, 12));
+            panCell.addEventListener('keydown', restrictPanInput);
+            mobileCell.addEventListener('keydown', (e) => restrictNumberInput(e, 10));
+        }
+
+        function selectPhoto(cell, index) {
+            currentCell = cell;
+            currentCell.dataset.rowIndex = index;
+            fileInput.click();
+        }
+
+        function openCameraForCell(event, cell, index) {
+            event.stopPropagation(); // ताकि icon click पर file picker न खुले
+            currentCameraCell = cell;
+            currentCameraIndex = index;
+            openCameraModal();
+        }
+
+        async function openCameraModal() {
+            const wrap = document.getElementById('cameraPreviewWrap');
+            const video = document.getElementById('cameraVideo');
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" } },
+                    audio: false
+                });
+                video.srcObject = cameraStream;
+                wrap.style.display = 'flex';
+            } catch (err1) {
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    video.srcObject = cameraStream;
+                    wrap.style.display = 'flex';
+                } catch (err2) {
+                    console.error(err2);
+                    alert("कैमरा उपलब्ध नहीं है। कृपया सामान्य फोटो अपलोड करें।");
+                }
+            }
+        }
+
+        function closeCameraModal() {
+            const wrap = document.getElementById('cameraPreviewWrap');
+            const video = document.getElementById('cameraVideo');
+
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            cameraStream = null;
+            wrap.style.display = 'none';
+        }
+
+        function captureFromCamera() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+
+            if (!video.videoWidth || !video.videoHeight) {
+                alert("कैमरा तैयार होने दें, फिर Capture करें।");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    alert("Photo capture failed.");
+                    return;
+                }
+                if (blob.size > 1024 * 1024) {
+                    alert("कृपया 1MB से कम साइज की फोटो लें।");
+                    return;
+                }
+
+                const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+                if (currentCameraCell != null && currentCameraIndex != null) {
+                    memberPhotos[currentCameraIndex] = file;
+                    currentCameraCell.innerHTML = `<img src="${URL.createObjectURL(file)}" alt="photo"><button type="button" class="camera-icon-btn" onclick="openCameraForCell(event, this.parentElement, ${currentCameraIndex})" title="Live Camera">📷</button>`;
+                }
+
+                closeCameraModal();
+            }, 'image/jpeg', 0.9);
+        }
+
+        // modal के बाहर क्लिक = close
+        document.getElementById('cameraPreviewWrap').addEventListener('click', function(e) {
+            if (e.target.id === 'cameraPreviewWrap') {
+                closeCameraModal();
+            }
+        });
+
+        window.addEventListener('beforeunload', closeCameraModal);
+
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file && currentCell) {
+                if (file.size > 1024 * 1024) { 
+                    alert("कृपया 1MB से कम साइज की फोटो अपलोड करें।");
+                    this.value = ''; 
+                    return;
+                }
+                const rowIndex = currentCell.dataset.rowIndex;
+                memberPhotos[rowIndex] = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentCell.innerHTML = `<img src="${e.target.result}" alt="photo"><button type="button" class="camera-icon-btn" onclick="openCameraForCell(event, this.parentElement, ${rowIndex})" title="Live Camera">📷</button>`;
+                };
+                reader.readAsDataURL(file);
+            }
+            this.value = '';
+        });
+
+        ['village', 'panchayat', 'anumandal', 'district'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+
+        // ============================================
+        // ✅ NEW: PAYMENT + SAVE FUNCTION (GETEPAY)
+        // ============================================
+        async function saveAndPrint() {
+            // --- 1. Validation First ---
+            const village = document.getElementById('village').value.trim();
+            const panchayat = document.getElementById('panchayat').value.trim();
+            const anumandal = document.getElementById('anumandal').value.trim();
+            const district = document.getElementById('district').value.trim();
+            const groupName = document.getElementById('groupName').value.trim();
+
+            let hasMember = false;
+            const rows1 = document.getElementById('table-rows-part1').querySelectorAll('tr');
+            const rows2 = document.getElementById('table-rows-part2').querySelectorAll('tr');
+            const allRows = Array.from(rows1).concat(Array.from(rows2));
+            
+            for(let i=0; i<allRows.length; i++) {
+                const row = allRows[i];
+                const name = row.cells[0].querySelector('.name-input').innerText.trim();
+                const detailsCells = row.cells[1].querySelectorAll('.inner-cell');
+                const aadhar = detailsCells[0].innerText.trim();
+                const pan = detailsCells[1].innerText.trim();
+                const mobile = detailsCells[2].innerText.trim();
+                
+                if(name || aadhar || pan || mobile) {
+                    if(!name) { alert(`पंक्ति ${i+1}: कृपया सदस्य का नाम भरें।`); return; }
+                    hasMember = true;
+                    if (!/^\d{12}$/.test(aadhar)) { alert(`सदस्य ${i+1} (${name}) का आधार नंबर 12 अंकों का होना चाहिए।`); return; }
+                    if (pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(pan.toUpperCase())) { alert(`सदस्य ${i+1} (${name}) का पैन कार्ड मान्य नहीं है।`); return; }
+                    if (!/^\d{10}$/.test(mobile)) { alert(`सदस्य ${i+1} (${name}) का मोबाइल नंबर 10 अंकों का होना चाहिए।`); return; }
+                }
+            }
+
+            if (!village || !panchayat || !anumandal || !district || !groupName) {
+                alert("कृपया सभी अनिवार्य फ़ील्ड भरें।"); return;
+            }
+            if (!hasMember) { alert("कृपया कम से कम एक सदस्य का विवरण भरें।"); return; }
+            
+            // --- 2. Get Custom Amount ---
+            const amountInput = document.getElementById('customAmount').value;
+            if (!amountInput || amountInput <= 0) {
+                alert("कृपया मान्य भुगतान राशि दर्ज करें (Please enter valid amount).");
+                return;
+            }
+
+            // --- 3. Send to create-order (Getepay) ---
+            const btn = document.querySelector('.print-btn');
+            btn.innerText = "Processing Payment...";
+            btn.disabled = true;
+
+            try {
+                // Build FormData with all fields and photos
+                const formData = new FormData();
+                formData.append('village', village);
+                formData.append('panchayat', panchayat);
+                formData.append('anumandal', anumandal);
+                formData.append('district', district);
+                formData.append('groupName', groupName);
+                formData.append('registrationFee', amountInput);
+                formData.append(
+                    'registeredBy',
+                    sessionStorage.getItem('loggedInRole') === 'Admin'
+                        ? 'Admin/Self'
+                        : (sessionStorage.getItem('loggedInUserEmail') || sessionStorage.getItem('loggedInUser') || 'Self')
+                );
+
+                // Add member photos
+                const allRows2 = Array.from(document.getElementById('table-rows-part1').querySelectorAll('tr')).concat(
+                    Array.from(document.getElementById('table-rows-part2').querySelectorAll('tr'))
+                );
+                const membersArray = [];
+                allRows2.forEach((row, index) => {
+                    const name = row.cells[0].querySelector('.name-input').innerText.trim();
+                    const address = row.cells[0].querySelector('.address-input').innerText.trim();
+                    const detailsCells = row.cells[1].querySelectorAll('.inner-cell');
+                    const details = Array.from(detailsCells).map(c => c.innerText.trim()).join(' | ');
+
+                    if(name) {
+                        membersArray.push({
+                            index: index,
+                            name: name,
+                            address: address,
+                            details: details
+                        });
+                        if (memberPhotos[index]) {
+                            formData.append(`member_photo_${index}`, memberPhotos[index]);
+                        }
+                    }
+                });
+                
+                formData.append('members', JSON.stringify(membersArray));
+
+                // Send to Getepay create-order endpoint
+                const response = await fetch(CONFIG.API_URL + '/swarojgaar/create-order', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    alert("Error: " + (result.message || "Payment gateway error"));
+                    btn.innerText = "Pay & Save Document";
+                    btn.disabled = false;
+                    return;
+                }
+
+                const options = {
+                    key: result.key,
+                    amount: result.amount,
+                    currency: result.currency,
+                    order_id: result.orderId,
+                    name: 'Aagaj Foundation',
+                    description: 'Swarojgaar Registration Fee',
+                    prefill: {
+                        name: groupName,
+                        contact: membersArray.length ? (membersArray[0].details.split('|')[2] || '').trim() : ''
+                    },
+                    theme: {
+                        color: '#d32f2f'
+                    },
+                    handler: async function (rzpResponse) {
+                        const verifyResponse = await fetch(CONFIG.API_URL + '/swarojgaar/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: rzpResponse.razorpay_order_id,
+                                razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                                razorpay_signature: rzpResponse.razorpay_signature,
+                                pendingOrderId: result.pendingOrderId
+                            })
+                        });
+
+                        const verifyResult = await verifyResponse.json();
+                        if (verifyResult.success) {
+                            window.location.href = `/swarojgaar_register.html?status=success&orderId=${encodeURIComponent(verifyResult.orderId)}&paymentId=${encodeURIComponent(verifyResult.paymentId)}`;
+                        } else {
+                            window.location.href = '/swarojgaar_register.html?status=failed';
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            btn.innerText = 'Pay & Save Document';
+                            btn.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                console.error(error);
+                alert("Error: " + error.message);
+                btn.innerText = "Pay & Save Document";
+                btn.disabled = false;
+            }
+        }
+
+
+    </script>
+    <script src="config.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>

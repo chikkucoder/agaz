@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation History - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("⚠️ Unauthorized Access! Please Login first.");
+            window.location.href = "admin_login_employe.html";
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --sidebar-bg: #051630;
+            --text-light: #f8f9fa;
+        }
+
+        body { font-family: sans-serif; background-color: #f4f6f9; overflow-x: hidden; }
+
+        /* Sidebar Styling */
+        .sidebar { 
+            height: 100vh; background-color: var(--sidebar-bg); color: white; 
+            position: fixed; width: 250px; overflow-y: auto; z-index: 1050; 
+            transition: 0.3s; left: 0;
+        }
+        
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { height: 60px; background: white; padding: 5px; border-radius: 5px; }
+        .sidebar ul { padding: 0; list-style: none; margin-top: 20px; }
+        .sidebar ul li a { display: block; padding: 15px 25px; color: #b8c7ce; text-decoration: none; transition: 0.3s; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { background-color: rgba(255,255,255,0.1); color: var(--primary-yellow); border-left: 4px solid var(--primary-red); }
+        
+        /* Dropdown Styling */
+        .sidebar ul li a[data-bs-toggle="collapse"] { position: relative; }
+        .sidebar ul li a[data-bs-toggle="collapse"]::after {
+            content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: 20px; font-size: 0.8rem; transition: 0.3s;
+        }
+        .sidebar ul li a[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+        .main-content { margin-left: 250px; padding: 20px; transition: 0.3s; width: auto; }
+
+        /* Stats Card */
+        .stat-card {
+            background: white; border-radius: 10px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary-yellow);
+        }
+
+        /* Table Styling */
+        .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .amount-text { color: #198754; font-weight: bold; font-size: 1.1rem; }
+        
+        /* Mobile Nav */
+        .mobile-nav { display: none; background: var(--sidebar-bg); color: white; padding: 10px 20px; justify-content: space-between; align-items: center; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1040; }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -250px; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; }
+            .mobile-nav { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-nav">
+        <h5 class="mb-0 fw-bold">Aagaj Admin</h5>
+        <button class="btn btn-outline-light btn-sm" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../public/logo.jpg" alt="Logo"> 
+            <h5 class="mb-0 mt-2 fw-bold">Aagaj Admin</h5>
+        </div>
+        <ul>
+            <li><a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
+            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Jobs Data</a></li>
+            <li><a href="Normal_Jobs_Data.html"><i class="fa-solid fa-briefcase me-2"></i> Normal Jobs Data</a></li>
+            
+            <li>
+                <a href="#paymentSubmenu" data-bs-toggle="collapse" aria-expanded="true" class="active">
+                    <i class="fa-solid fa-money-bill me-2"></i> Payments
+                </a>
+                <ul class="collapse show list-unstyled" id="paymentSubmenu" style="background: rgba(0,0,0,0.2);">
+                    <li><a href="all_transactions.html" style="padding-left: 50px;"><i class="fa-solid fa-receipt me-2"></i> All Transactions</a></li>
+                    <li><a href="donation_history.html" class="active" style="padding-left: 50px; color: var(--primary-yellow);"><i class="fa-solid fa-hand-holding-heart me-2"></i> Donation History</a></li>
+                </ul>
+            </li>
+
+            <li><a href="index.html" class="mt-5 border-top pt-3"><i class="fa-solid fa-house me-2"></i> Back to Website</a></li>
+            <li><a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-dark">Donation History</h3>
+            <button class="btn btn-dark btn-sm" onclick="fetchDonations()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h6 class="text-muted">Total Donations</h6>
+                    <h3 class="fw-bold mb-0 text-warning" id="totalDonationAmount">₹ 0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" style="border-left-color: #0d6efd;">
+                    <h6 class="text-muted">Total Donors</h6>
+                    <h3 class="fw-bold mb-0 text-primary" id="totalDonors">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Name, Mobile or City...">
+                </div>
+                <div class="col-md-6 text-end">
+                    <button class="btn btn-success btn-sm" onclick="exportCSV()"><i class="fa-solid fa-download"></i> Export CSV</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Donor Name</th>
+                            <th>Contact Info</th>
+                            
+                            <th>State / Address</th>
+                            
+                            <th>PAN No.</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="donationBody">
+                        <tr><td colspan="7" class="text-center p-4">Loading Donations...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="paginationControls"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let allDonations = [];
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchDonations();
+        });
+
+        async function fetchDonations() {
+            try {
+                // Backend Route Call
+                const response = await fetch(CONFIG.API_URL + '/donation/get-history');
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    allDonations = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+                    
+                    // Calculate Total
+                    let totalAmt = allDonations.reduce((sum, d) => sum + (d.amount || 0), 0);
+                    document.getElementById('totalDonationAmount').innerText = "₹ " + totalAmt.toLocaleString('en-IN');
+                    document.getElementById('totalDonors').innerText = allDonations.length;
+
+                    renderTable(allDonations);
+                } else {
+                    document.getElementById('donationBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load data</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Error fetching donations:", error);
+                document.getElementById('donationBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Server Error! Make sure Backend is running.</td></tr>`;
+            }
+        }
+
+        function renderTable(data) {
+            currentFilteredData = data;
+            const tbody = document.getElementById('donationBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No Donations Found</td></tr>';
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            // Pagination Logic
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(d => {
+                const dateObj = new Date(d.date);
+                const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+                // ✅ Check for state (Use '-' if undefined)
+                const stateDisplay = d.state ? d.state : '-'; 
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>
+                            <div class="fw-bold">${dateStr}</div>
+                            <small class="text-muted">${timeStr}</small>
+                        </td>
+                        <td class="fw-bold">${d.donor_name || 'Anonymous'}</td>
+                        <td>
+                            <div><i class="fa-solid fa-phone me-1 text-primary"></i> ${d.phone || '-'}</div>
+                            <small class="text-muted">${d.email || '-'}</small>
+                        </td>
+                        
+                        <td>
+                            <div class="text-primary fw-bold text-uppercase" style="font-size: 0.9rem;">
+                                <i class="fa-solid fa-map-pin me-1"></i> ${stateDisplay}
+                            </div>
+                            <small class="text-muted">${d.address || 'N/A'}</small>
+                        </td>
+
+                        <td class="text-uppercase small">${d.pan || '-'}</td>
+                        <td class="amount-text">₹ ${d.amount}</td>
+                        <td><span class="badge bg-success">Success</span></td>
+                    </tr>
+                `;
+            });
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            for(let i=1; i<=totalPages; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        window.changePage = function(page) { currentPage = page; renderTable(currentFilteredData); }
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            const filtered = allDonations.filter(d => 
+                (d.donor_name && d.donor_name.toLowerCase().includes(term)) || 
+                (d.phone && d.phone.includes(term)) ||
+                (d.address && d.address.toLowerCase().includes(term))
+            );
+            currentPage = 1;
+            renderTable(filtered);
+        });
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function logout() { 
+            localStorage.removeItem("authToken");
+            sessionStorage.removeItem("loggedInUser");
+            sessionStorage.removeItem("loggedInUserEmail");
+            sessionStorage.removeItem("loggedInRole");
+            sessionStorage.removeItem("adminEmail");
+            window.location.href = 'index.html'; 
+        }
+
+        function exportCSV() {
+            // ✅ Added State to CSV Export
+            let csvContent = "data:text/csv;charset=utf-8,Date,Name,Phone,Email,State,Address,Amount,PAN,PaymentID\n";
+            allDonations.forEach(d => {
+                const row = [
+                    new Date(d.date).toLocaleDateString(),
+                    d.donor_name,
+                    d.phone,
+                    d.email,
+                    d.state || '-', // State Added
+                    `"${d.address}"`, 
+                    d.amount,
+                    d.pan,
+                    d.payment_id
+                ].join(",");
+                csvContent += row + "\r\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Donation_History.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+    </script>
+    <script src="config.js"></script>
+</body>
+</html>

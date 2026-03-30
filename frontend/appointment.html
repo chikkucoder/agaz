@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAGAJ FOUNDATION | Med-Cloud</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #10b981;
+            --dark: #0f172a;
+            --slate: #64748b;
+            --bg-body: #f1f5f9;
+            --radius-lg: 20px;
+        }
+
+        * { box-sizing: border-box; transition: 0.2s; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-body); color: var(--dark); margin: 0; }
+
+        /* Navbar and Logo Adjustments */
+        nav { 
+            background: white; padding: 0 30px; display: flex; justify-content: space-between; 
+            align-items: center; height: 80px; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .brand-container { display: flex; align-items: center; gap: 15px; }
+        
+        /* Logo Image Style */
+        .main-logo {
+            height: 55px; 
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand { font-size: 22px; font-weight: 800; color: var(--primary); line-height: 1.1; }
+        .brand span { color: var(--dark); }
+        .yojna-tag { font-size: 14px; color: #dc2626; font-weight: 700; display: block; margin-top: 2px; }
+
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .glass-card { background: white; border-radius: var(--radius-lg); padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        .section-view { display: none; }
+        .section-view.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .form-header { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .health-id-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: end; }
+        .health-input-wrap { width: 250px; } 
+        .upload-input-wrap { width: 180px; }
+
+        label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--slate); text-transform: uppercase; }
+        input, select { 
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0; 
+            font-size: 14px; outline: none; background: #f8fafc;
+        }
+        input:focus, select:focus { border-color: var(--primary); background: white; }
+
+        .upload-box {
+            display: flex; align-items: center; justify-content: center; gap: 8px; background: #f1f5f9;
+            padding: 11px; border-radius: 10px; cursor: pointer; border: 1px dashed var(--slate); height: 43px;
+        }
+        .file-name { font-size: 11px; color: var(--success); font-weight: 700; display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .btn { padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-nav { width: auto; background: #f1f5f9; color: var(--slate); padding: 8px 15px; font-size: 13px; }
+        .btn-nav.active { background: var(--primary); color: white; }
+
+        .search-filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .excel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; font-size: 16px; border: 1px solid #e2e8f0; }
+        .excel-table th { background: #f1f5f9; color: var(--slate); text-align: left; padding: 12px; font-weight: 700; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid #e2e8f0; }
+        .excel-table td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; color: var(--dark); vertical-align: middle; }
+        .excel-table tr:hover { background: #fffbeb; }
+        .excel-table strong { font-size: 18px; color: var(--dark); }
+
+        .placeholder-msg { text-align: center; padding: 40px; color: var(--slate); font-weight: 600; background: #f8fafc; border-radius: 15px; border: 2px dashed #e2e8f0; }
+
+        #print-area { display: none; background: white; padding: 25px; border-radius: 15px; border: 1px solid #ddd;}
+        .receipt-header { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
+        .receipt-body { display: flex; gap: 20px; }
+        #receipt-img { width: 140px; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
+
+        @media print { .no-print { display: none !important; } #print-area { display: block !important; } }
+    </style>
+</head>
+<body>
+
+<nav class="no-print">
+    <div class="brand-container">
+        <img src="../public/logo.jpg" alt="Logo" class="main-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2864/2864323.png'">
+        <div class="brand">
+            AAGAJ <br><span>FOUNDATION</span>
+            <small class="yojna-tag">SWASTH SURAKSHA YOJNA</small>
+        </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn btn-nav active" onclick="switchTab('reg-tab', this)">Registration</button>
+        <button class="btn btn-nav" onclick="switchTab('net-tab', this)">Network</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div id="reg-tab" class="section-view active">
+        <div id="print-area">
+            <div class="receipt-header">
+                <img src="../public/logo.jpg" alt="Logo" style="height: 60px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2864/2864323.png'">
+                <div>
+                    <h2 style="color:var(--primary); margin:0;">AAGAJ FOUNDATION</h2>
+                    <p style="color:#dc2626; margin:0; font-weight:bold; font-size:14px;">SWASTH SURAKSHA YOJNA</p>
+                </div>
+            </div>
+            <div class="receipt-body">
+                <div id="receipt-details" style="flex:1; font-size:14px; line-height:1.8;"></div>
+                <div style="text-align:center;">
+                    <img id="receipt-img" src="">
+                    <p style="font-size:10px; font-weight:bold; margin-top:5px;">ID/HEALTH CARD</p>
+                </div>
+            </div>
+            <div class="no-print" style="margin-top:20px; display:flex; gap:10px;">
+                <button class="btn btn-primary" onclick="window.print()">Print</button>
+                <button class="btn" onclick="location.reload()" style="background:#eee;">New Enrollment</button>
+            </div>
+        </div>
+
+        <div class="glass-card no-print" id="form-card">
+            <div class="form-header"><h2>Patient Enrollment</h2></div>
+            <form id="appointmentForm" onsubmit="handleAppointmentSubmit(event)">
+                <div class="grid-row">
+                    <div><label>Full Name</label><input type="text" id="p-name" name="name" placeholder="Enter name" oninput="vPureText(this)" required></div>
+                    <div><label>Gender</label><select id="p-gender" name="gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
+                    <div><label>Age</label><input type="text" id="p-age" name="age" maxlength="3" oninput="vNum(this)"></div>
+                </div>
+
+                <div class="grid-row">
+                    <div><label>Aadhar (12 Digit)</label><input type="text" id="p-aadhar" name="aadhar" maxlength="12" oninput="vNum(this)" required></div>
+                    <div><label>Mobile Number</label><input type="tel" id="p-phone" name="phone" maxlength="10" oninput="vNum(this)" required></div>
+                    <div><label>Blood Group</label>
+                        <select id="p-blood" name="bloodGroup">
+                            <option>Unknown</option>
+                            <option>A+</option>
+                            <option>A-</option>
+                            <option>B+</option>
+                            <option>B-</option>
+                            <option>O+</option>
+                            <option>O-</option>
+                            <option>AB+</option>
+                            <option>AB-</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="health-id-row">
+                    <div class="health-input-wrap">
+                        <label>Health ID (6 Digit)</label>
+                        <input type="text" id="p-health-id" name="healthId" maxlength="6" oninput="vNum(this)" placeholder="123456" required>
+                    </div>
+                    <div class="upload-input-wrap">
+                        <label>Upload Card</label>
+                        <div class="upload-box" onclick="document.getElementById('p-file').click()">
+                            <i class="fas fa-id-card"></i>
+                            <span id="upload-txt">Select File</span>
+                            <span id="file-done" class="file-name"></span>
+                        </div>
+                        <input type="file" id="p-file" name="healthCard" hidden accept=".jpg,.jpeg,.png,.pdf" onchange="previewFile(this)">
+                    </div>
+                </div>
+
+                <div class="form-header" style="margin-top:20px; border-bottom:none; margin-bottom:10px;"><h3>Address Details</h3></div>
+                <div class="grid-row">
+                    <div style="grid-column: span 2;"><label>Street / Village</label><input type="text" id="p-street" name="street" placeholder="Street name..." oninput="vPureText(this)" required></div>
+                    <div><label>City / District</label><input type="text" id="p-city" name="city" placeholder="Patna" oninput="vPureText(this)" required></div>
+                    <div><label>Pincode</label><input type="text" id="p-pin" name="pin" maxlength="6" oninput="vNum(this)" required></div>
+                </div>
+
+                <div class="grid-row" style="margin-top:20px;">
+                    <div><label>Specialization</label>
+                        <select id="p-spec" name="department">
+                            <option>General Medicine</option>
+                            <option>Cardiology ❤️</option>
+                            <option>Orthopedics 🦴</option>
+                            <option>Neurology 🧠</option>
+                            <option>Pediatrics 👶</option>
+                            <option>Dermatology ✨</option>
+                            <option>Gynecology 🤰</option>
+                        </select>
+                    </div>
+                    <div><label>Tie-up Facility</label>
+                        <select id="p-hosp" name="doctor" style="border-color:#f59e0b;" onchange="displayFacilityServices()"></select>
+                    </div>
+                    <div><label>Appt. Date</label><input type="date" id="p-date" name="date" required></div>
+                </div>
+
+                <div id="facility-services-section" style="display:none; margin-top:15px;">
+                    <label>Available Services at Selected Facility</label>
+                    <div id="services-display" style="background:#f8fafc; padding:15px; border-radius:10px; border:1px solid #e2e8f0;">
+                        <!-- Services यहाँ dynamically show होंगी -->
+                    </div>
+                </div>
+
+                <div style="margin-top:10px;">
+                    <label>Patient Problem</label>
+                    <input type="text" id="p-desc" name="message" placeholder="Describe symptoms..." oninput="vPureText(this)" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="margin-top:25px;">
+                    <i class="fas fa-check-circle"></i> Book Appointment
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="net-tab" class="section-view">
+        <div class="glass-card">
+            <h3><i class="fas fa-network-wired"></i> Official Partner Network</h3>
+            <div class="search-filter-row">
+                <div>
+                    <label>Select Category</label>
+                    <select id="net-category" onchange="filterNetwork()">
+                        <option value="">-- Choose Category --</option>
+                        <option value="Hospital">Hospitals</option>
+                        <option value="Lab">Diagnostic Labs</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Select State</label>
+                    <select id="net-state" onchange="filterNetwork()">
+                        <option value="">-- Choose State --</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Jharkhand">Jharkhand</option>
+                    </select>
+                </div>
+            </div>
+            <div id="network-results">
+                <div class="placeholder-msg">
+                    <i class="fas fa-search-location" style="font-size:30px; margin-bottom:10px; display:block;"></i>
+                    Please select both Category and State to view our partners.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+    let imgData = "";
+    function vNum(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
+    function vPureText(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
+    
+    let partnersData = []; // ✅ Store fetched data
+
+    function switchTab(id, btn) {
+        document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ✅ Fetch Partners from Database
+    async function fetchPartners() {
+        if (!window.CONFIG || !CONFIG.API_URL) {
+            console.error("CONFIG.API_URL missing. Ensure config.js is loaded before appointment script.");
+            document.getElementById('p-hosp').innerHTML = '<option value="">Config error</option>';
+            document.getElementById('network-results').innerHTML = '<div class="placeholder-msg">Configuration missing. Please contact admin.</div>';
+            return;
+        }
+        try {
+            const res = await fetch(CONFIG.API_URL + '/swasthya/partners');
+            const result = await res.json();
+            if(result.success) {
+                partnersData = result.data;
+                renderPartnersDropdown(); // Update dropdown in registration form
+            }
+        } catch(e) { console.error("Error fetching partners:", e); }
+    }
+
+    function filterNetwork() {
+        const catFilter = document.getElementById('net-category').value;
+        const stateFilter = document.getElementById('net-state').value;
+        const resultDiv = document.getElementById('network-results');
+        if(!catFilter || !stateFilter) return;
+
+        // ✅ Filter from Database Data
+        const filtered = partnersData.filter(item => 
+            item.category === catFilter && 
+            (item.address && item.address.state && item.address.state.toLowerCase().includes(stateFilter.toLowerCase()))
+        );
+
+        let html = `<table class="excel-table"><thead><tr><th>Partner Name</th><th>Location</th></tr></thead><tbody>`;
+        
+        if (filtered.length === 0) {
+            html += `<tr><td colspan="2" style="text-align:center; color:red; padding:20px;">No partner found.</td></tr>`;
+        } else {
+            filtered.forEach(item => {
+                // ✅ Show Business Name and Address
+                const loc = (item.address && item.address.fullAddress) ? item.address.fullAddress : ((item.address && item.address.city) + ", " + (item.address && item.address.state));
+                html += `<tr><td><strong>${item.businessName}</strong></td><td>${loc}</td></tr>`;
+            });
+        }
+        html += `</tbody></table>`;
+        resultDiv.innerHTML = html;
+    }
+
+    function previewFile(input) {
+        if (input.files && input.files[0]) {
+            document.getElementById('upload-txt').style.display = 'none';
+            document.getElementById('file-done').innerText = "✓ " + input.files[0].name;
+            document.getElementById('file-done').style.display = 'block';
+            let reader = new FileReader();
+            reader.onload = (e) => { imgData = e.target.result; };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function renderPartnersDropdown() {
+        const select = document.getElementById('p-hosp');
+        if (partnersData.length === 0) {
+            select.innerHTML = '<option value="">Loading...</option>';
+            document.getElementById('facility-services-section').style.display = 'none';
+            return;
+        }
+
+        const optionsHtml = [
+            '<option value="">-- Select Tie-up Facility --</option>',
+            ...partnersData.map((p, idx) =>
+                `<option value="${p.businessName}" data-index="${idx}">${p.businessName}</option>`
+            )
+        ].join('');
+
+        select.innerHTML = optionsHtml;
+
+        if (partnersData.length === 1) {
+            select.selectedIndex = 1;
+            displayFacilityServices();
+        } else {
+            document.getElementById('facility-services-section').style.display = 'none';
+        }
+
+        select.onchange = displayFacilityServices;
+        select.onclick = displayFacilityServices;
+        select.onfocus = displayFacilityServices;
+    }
+
+    function displayFacilityServices() {
+        const select = document.getElementById('p-hosp');
+        const servicesSection = document.getElementById('facility-services-section');
+        const servicesDisplay = document.getElementById('services-display');
+
+        if (!select || select.selectedIndex <= 0) {
+            servicesSection.style.display = 'none';
+            return;
+        }
+
+        const selectedOption = select.options[select.selectedIndex];
+        const partnerIndex = Number(selectedOption.dataset.index);
+
+        if (Number.isNaN(partnerIndex) || !partnersData[partnerIndex]) {
+            servicesSection.style.display = 'none';
+            return;
+        }
+
+        const services = Array.isArray(partnersData[partnerIndex].services)
+            ? partnersData[partnerIndex].services
+            : [];
+
+        servicesSection.style.display = 'block';
+
+        if (services.length > 0) {
+            servicesDisplay.innerHTML = `
+                <strong style="color:var(--primary); font-size:14px;">✅ Total Services: ${services.length}</strong>
+                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px;">
+                    ${services.map(s => `<div style="padding:8px; background:white; border-radius:8px; border:1px solid #e2e8f0; font-size:13px;"><i class="fas fa-check-circle" style="color:var(--success);"></i> ${s}</div>`).join('')}
+                </div>
+            `;
+        } else {
+            servicesDisplay.innerHTML = '<p style="color:#dc2626; margin:0;">⚠️ No services information available</p>';
+        }
+    }
+
+    function processRegistration() {
+        const name = document.getElementById('p-name').value;
+        const healthId = document.getElementById('p-health-id').value;
+        const phone = document.getElementById('p-phone').value;
+        const street = document.getElementById('p-street').value;
+        const city = document.getElementById('p-city').value;
+        const pin = document.getElementById('p-pin').value;
+        const hosp = document.getElementById('p-hosp').value;
+        const date = document.getElementById('p-date').value;
+        const spec = document.getElementById('p-spec').value;
+        const desc = document.getElementById('p-desc').value;
+
+        if(!name || !imgData) return alert("Fill all details & Upload ID!");
+
+        // Find selected partner for WhatsApp number
+        const selectedPartner = partnersData.find(p => p.businessName === hosp);
+        const waNumber = (selectedPartner && selectedPartner.contact) ? selectedPartner.contact.whatsappNumber : "9431430464"; // Default fallback
+
+        if(waNumber) {
+            const waMsg = `*AAGAJ FOUNDATION - BOOKING*%0A` +
+                          `--------------------------%0A` +
+                          `*Patient:* ${name.toUpperCase()}%0A` +
+                          `*Health ID:* ${healthId}%0A` +
+                          `*Mobile:* ${phone}%0A` +
+                          `*Specialization:* ${spec}%0A` +
+                          `*Problem:* ${desc}%0A` +
+                          `*Facility:* ${hosp}%0A` +
+                          `*Appt. Date:* ${date}%0A` +
+                          `*Address:* ${street}, ${city} - ${pin}`;
+            
+            window.open(`https://wa.me/${waNumber}?text=${waMsg}`, '_blank');
+        }
+
+        document.getElementById('form-card').style.display = 'none';
+        document.getElementById('print-area').style.display = 'block';
+        
+        document.getElementById('receipt-details').innerHTML = `
+            <strong>Patient:</strong> ${name.toUpperCase()}<br>
+            <strong>Health ID:</strong> ${healthId}<br>
+            <strong>Mobile:</strong> ${phone}<br>
+            <strong>Facility:</strong> ${hosp}<br>
+            <strong>Date:</strong> ${date}<br>
+            <strong>Address:</strong> ${street}, ${city} - ${pin}
+        `;
+        document.getElementById('receipt-img').src = imgData;
+    }
+
+    fetchPartners(); // ✅ Load data on page load
+
+    async function handleAppointmentSubmit(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('appointmentForm');
+        const formData = new FormData(form);
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(CONFIG.API_URL + '/appointment/book', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert("Registered Successfully!");
+                form.reset();
+                document.getElementById('file-done').style.display = 'none';
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Server Error. Please check connection.");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

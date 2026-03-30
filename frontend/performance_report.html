@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Report - Aagaj Foundation</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --sidebar-bg: #051630;
+            --text-light: #f8f9fa;
+            --muted: #64748b;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --line: #e2e8f0;
+        }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            overflow-x: hidden;
+            color: #0f172a;
+        }
+
+        /* Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--sidebar-bg) 0%, #0d3b66 100%);
+            color: white;
+            padding: 24px;
+            border-bottom: 4px solid var(--primary-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            gap: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.9rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            background: white;
+            color: var(--sidebar-bg);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-yellow);
+            color: var(--sidebar-bg);
+        }
+
+        /* Main Layout */
+        .container-main {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 16px 24px;
+        }
+
+        .report-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            margin: 0 0 14px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-item {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .summary-item .label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .summary-item .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+
+        .table-wrap {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead {
+            background: #0b4d84;
+            color: #fff;
+        }
+
+        .table th {
+            font-weight: 700;
+            border: none;
+            padding: 12px 10px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .employee-row:hover {
+            background-color: #f8fbff;
+        }
+
+        .rank-badge {
+            background: linear-gradient(135deg, var(--primary-red), #d2142f);
+            color: white;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .email-text {
+            color: #0d6efd;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .total-badge {
+            background: #10b981;
+            color: white;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .details-btn {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.83rem;
+            padding: 6px 10px;
+            color: #1e293b;
+            transition: 0.2s ease;
+        }
+
+        .details-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .details-row td {
+            text-align: left;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .detail-box {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .detail-box h6 {
+            font-size: 0.9rem;
+            margin: 0 0 8px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .detail-list {
+            margin: 0;
+            padding-left: 18px;
+            color: #334155;
+            font-size: 0.88rem;
+        }
+
+        .detail-list li {
+            margin-bottom: 6px;
+        }
+
+        .empty-note {
+            font-size: 0.86rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .mobile-list {
+            display: none;
+            gap: 12px;
+        }
+
+        .employee-card {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px;
+            background: #fff;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-email {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1d4ed8;
+            word-break: break-all;
+        }
+
+        .counts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .count-chip {
+            border: 1px solid #dbe4ef;
+            border-radius: 8px;
+            padding: 6px 8px;
+            text-align: center;
+            background: #f8fafc;
+        }
+
+        .count-chip .k {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .count-chip .v {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .card-details {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 10px;
+        }
+
+        .card-details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .card-detail-block {
+            margin-bottom: 8px;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .card-detail-block strong {
+            display: block;
+            font-size: 0.84rem;
+            margin-bottom: 4px;
+            color: #1e293b;
+        }
+
+        .pagination-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .page-meta {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .pagination {
+            margin: 0;
+            gap: 4px;
+        }
+
+        .page-link {
+            border-radius: 8px !important;
+            border-color: #cbd5e1;
+            color: #1e293b;
+        }
+
+        .page-item.active .page-link {
+            background-color: #0b4d84;
+            border-color: #0b4d84;
+            color: #fff;
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .error-text {
+            color: #dc2626;
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        @media (max-width: 992px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .desktop-table {
+                display: none;
+            }
+
+            .mobile-list {
+                display: grid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: center;
+            }
+
+            .page-header h1 {
+                font-size: 1.45rem;
+            }
+
+            .container-main {
+                padding: 0 12px 20px;
+            }
+
+            .report-card {
+                padding: 14px;
+            }
+
+            .counts-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .pagination-wrap {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .pagination {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                padding: 18px 14px;
+            }
+
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fa-solid fa-chart-line"></i> Performance Report
+        </h1>
+        <a href="admin-dashboard.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-main">
+        <div class="report-card">
+            <h2 class="section-title">Employee Performance Summary</h2>
+
+            <div class="summary-grid" id="summaryGrid">
+                <div class="summary-item">
+                    <span class="label">Total Employees</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Silayi Total</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Swarojgaar Total</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Swasthya Total</span>
+                    <span class="value">0</span>
+                </div>
+            </div>
+
+            <div class="table-wrap desktop-table">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 9%;">Rank</th>
+                                <th style="width: 34%;">Email</th>
+                                <th style="width: 10%;">Silayi</th>
+                                <th style="width: 12%;">Swarojgaar</th>
+                                <th style="width: 10%;">Swasthya</th>
+                                <th style="width: 10%;">Total</th>
+                                <th style="width: 15%;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="performanceTableBody">
+                            <tr>
+                                <td colspan="7" class="loading-text">
+                                    <i class="fa-solid fa-spinner fa-spin"></i> Loading Data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mobile-list" id="mobileList">
+                <p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Loading Data...</p>
+            </div>
+
+            <div class="pagination-wrap">
+                <p class="page-meta" id="pageMeta">Showing 0 of 0 employees</p>
+                <ul class="pagination" id="pagination"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // ✅ Authentication Check
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("⚠️ Unauthorized Access! Please Login first.");
+            window.location.href = "admin_login_employe.html";
+        } else {
+            // Check Token Expiry
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                const now = Math.floor(Date.now() / 1000);
+                if (payload.exp < now) {
+                    alert("⚠️ Session Expired! Please Login again.");
+                    localStorage.removeItem("authToken");
+                    window.location.href = "admin_login_employe.html";
+                }
+            } catch (e) { console.error("Token Error", e); }
+        }
+
+        const state = {
+            employees: [],
+            currentPage: 1,
+            pageSize: 8
+        };
+
+        function normalizeEmployee(emp) {
+            const silayi = (emp.silayi && typeof emp.silayi === 'object')
+                ? emp.silayi
+                : { count: Number(emp.silayi) || 0, details: [] };
+
+            const swarojgaar = (emp.swarojgaar && typeof emp.swarojgaar === 'object')
+                ? emp.swarojgaar
+                : { count: Number(emp.swarojgaar) || 0, details: [] };
+
+            const health = (emp.health && typeof emp.health === 'object')
+                ? emp.health
+                : { count: Number(emp.health) || 0, details: [] };
+
+            const total = Number(emp.total) || (silayi.count + swarojgaar.count + health.count);
+
+            return {
+                email: emp.email || 'Admin/Self',
+                silayi,
+                swarojgaar,
+                health,
+                total
+            };
+        }
+
+        function createSilayiList(details) {
+            if (!Array.isArray(details) || details.length === 0) return '<p class="empty-note">No Silayi records.</p>';
+            return `<ul class="detail-list">${details.map(item => `<li>Serial: ${item.serialNumber || 'N/A'} | Name: ${item.name || 'N/A'}</li>`).join('')}</ul>`;
+        }
+
+        function createSwarojgaarList(details) {
+            if (!Array.isArray(details) || details.length === 0) return '<p class="empty-note">No Swarojgaar records.</p>';
+            return `<ul class="detail-list">${details.map(item => `<li>Group: ${item.groupName || 'N/A'} | Members: ${Number(item.memberCount) || 0}</li>`).join('')}</ul>`;
+        }
+
+        function createHealthList(details) {
+            if (!Array.isArray(details) || details.length === 0) return '<p class="empty-note">No Swasthya records.</p>';
+            return `<ul class="detail-list">${details.map(item => `<li>ID: ${item.uniqueId || 'N/A'} | Business: ${item.businessName || 'N/A'}</li>`).join('')}</ul>`;
+        }
+
+        function updateSummary(allData) {
+            const summary = {
+                employees: allData.length,
+                silayi: 0,
+                swarojgaar: 0,
+                swasthya: 0
+            };
+
+            allData.forEach(emp => {
+                summary.silayi += Number(emp.silayi.count) || 0;
+                summary.swarojgaar += Number(emp.swarojgaar.count) || 0;
+                summary.swasthya += Number(emp.health.count) || 0;
+            });
+
+            const boxes = document.querySelectorAll('#summaryGrid .summary-item .value');
+            if (boxes.length === 4) {
+                boxes[0].textContent = summary.employees;
+                boxes[1].textContent = summary.silayi;
+                boxes[2].textContent = summary.swarojgaar;
+                boxes[3].textContent = summary.swasthya;
+            }
+        }
+
+        function getPageData() {
+            const start = (state.currentPage - 1) * state.pageSize;
+            const end = start + state.pageSize;
+            return {
+                start,
+                end,
+                items: state.employees.slice(start, end)
+            };
+        }
+
+        function renderDesktopRows() {
+            const tbody = document.getElementById('performanceTableBody');
+            const page = getPageData();
+
+            if (state.employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No data available</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = page.items.map((emp, idx) => {
+                const rank = page.start + idx + 1;
+                const detailsRowId = `detailsRow${rank}`;
+
+                return `
+                    <tr class="employee-row">
+                        <td><span class="rank-badge">#${rank}</span></td>
+                        <td><span class="email-text">${emp.email}</span></td>
+                        <td>${emp.silayi.count}</td>
+                        <td>${emp.swarojgaar.count}</td>
+                        <td>${emp.health.count}</td>
+                        <td><span class="total-badge">${emp.total}</span></td>
+                        <td>
+                            <button class="details-btn" data-target="${detailsRowId}">
+                                <i class="fa-solid fa-circle-info"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="details-row d-none" id="${detailsRowId}">
+                        <td colspan="7">
+                            <div class="details-grid">
+                                <div class="detail-box">
+                                    <h6><i class="fa-solid fa-person-dress"></i> Silayi Details</h6>
+                                    ${createSilayiList(emp.silayi.details)}
+                                </div>
+                                <div class="detail-box">
+                                    <h6><i class="fa-solid fa-people-group"></i> Swarojgaar Details</h6>
+                                    ${createSwarojgaarList(emp.swarojgaar.details)}
+                                </div>
+                                <div class="detail-box">
+                                    <h6><i class="fa-solid fa-hospital-user"></i> Swasthya Details</h6>
+                                    ${createHealthList(emp.health.details)}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderMobileCards() {
+            const mobileList = document.getElementById('mobileList');
+            const page = getPageData();
+
+            if (state.employees.length === 0) {
+                mobileList.innerHTML = '<p class="text-center text-muted py-3 mb-0">No data available</p>';
+                return;
+            }
+
+            mobileList.innerHTML = page.items.map((emp, idx) => {
+                const rank = page.start + idx + 1;
+
+                return `
+                    <article class="employee-card">
+                        <div class="card-top">
+                            <span class="rank-badge">#${rank}</span>
+                            <h3 class="card-email">${emp.email}</h3>
+                        </div>
+
+                        <div class="counts-grid">
+                            <div class="count-chip"><span class="k">Silayi</span><span class="v">${emp.silayi.count}</span></div>
+                            <div class="count-chip"><span class="k">Swarojgaar</span><span class="v">${emp.swarojgaar.count}</span></div>
+                            <div class="count-chip"><span class="k">Swasthya</span><span class="v">${emp.health.count}</span></div>
+                            <div class="count-chip"><span class="k">Total</span><span class="v">${emp.total}</span></div>
+                        </div>
+
+                        <details class="card-details">
+                            <summary><i class="fa-solid fa-circle-info"></i> View Details</summary>
+                            <div class="card-detail-block">
+                                <strong>Silayi</strong>
+                                ${createSilayiList(emp.silayi.details)}
+                            </div>
+                            <div class="card-detail-block">
+                                <strong>Swarojgaar</strong>
+                                ${createSwarojgaarList(emp.swarojgaar.details)}
+                            </div>
+                            <div class="card-detail-block">
+                                <strong>Swasthya</strong>
+                                ${createHealthList(emp.health.details)}
+                            </div>
+                        </details>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const pageMeta = document.getElementById('pageMeta');
+
+            const totalItems = state.employees.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / state.pageSize));
+            const start = totalItems === 0 ? 0 : ((state.currentPage - 1) * state.pageSize) + 1;
+            const end = Math.min(state.currentPage * state.pageSize, totalItems);
+
+            pageMeta.textContent = `Showing ${start}-${end} of ${totalItems} employees`;
+
+            if (totalItems === 0) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let items = `
+                <li class="page-item ${state.currentPage === 1 ? 'disabled' : ''}">
+                    <button class="page-link" data-page="prev">Prev</button>
+                </li>
+            `;
+
+            for (let page = 1; page <= totalPages; page += 1) {
+                items += `
+                    <li class="page-item ${state.currentPage === page ? 'active' : ''}">
+                        <button class="page-link" data-page="${page}">${page}</button>
+                    </li>
+                `;
+            }
+
+            items += `
+                <li class="page-item ${state.currentPage === totalPages ? 'disabled' : ''}">
+                    <button class="page-link" data-page="next">Next</button>
+                </li>
+            `;
+
+            pagination.innerHTML = items;
+        }
+
+        function renderAll() {
+            renderDesktopRows();
+            renderMobileCards();
+            renderPagination();
+        }
+
+        function setupInteractions() {
+            const tbody = document.getElementById('performanceTableBody');
+            const pagination = document.getElementById('pagination');
+
+            tbody.addEventListener('click', function(event) {
+                const btn = event.target.closest('.details-btn');
+                if (!btn) return;
+
+                const rowId = btn.getAttribute('data-target');
+                const row = document.getElementById(rowId);
+                if (!row) return;
+
+                row.classList.toggle('d-none');
+                btn.innerHTML = row.classList.contains('d-none')
+                    ? '<i class="fa-solid fa-circle-info"></i> View'
+                    : '<i class="fa-solid fa-eye-slash"></i> Hide';
+            });
+
+            pagination.addEventListener('click', function(event) {
+                const button = event.target.closest('.page-link');
+                if (!button) return;
+
+                const totalPages = Math.max(1, Math.ceil(state.employees.length / state.pageSize));
+                const target = button.getAttribute('data-page');
+
+                if (target === 'prev' && state.currentPage > 1) {
+                    state.currentPage -= 1;
+                } else if (target === 'next' && state.currentPage < totalPages) {
+                    state.currentPage += 1;
+                } else if (!Number.isNaN(Number(target))) {
+                    state.currentPage = Number(target);
+                }
+
+                renderAll();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Load Performance Report on Page Load
+        document.addEventListener('DOMContentLoaded', async function() {
+            const tbody = document.getElementById('performanceTableBody');
+
+            try {
+                const res = await fetch(CONFIG.API_URL + '/admin/employee-detailed-stats', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem("authToken") }
+                });
+
+                if (!res.ok) throw new Error("Failed to fetch data");
+
+                const data = await res.json();
+
+                state.employees = Array.isArray(data) ? data.map(normalizeEmployee) : [];
+                state.currentPage = 1;
+
+                updateSummary(state.employees);
+                setupInteractions();
+                renderAll();
+            } catch (e) {
+                console.error("Error:", e);
+                tbody.innerHTML = '<tr><td colspan="7" class="error-text"><i class="fa-solid fa-triangle-exclamation"></i> Error loading data</td></tr>';
+                document.getElementById('mobileList').innerHTML = '<p class="error-text"><i class="fa-solid fa-triangle-exclamation"></i> Error loading data</p>';
+                document.getElementById('pageMeta').textContent = 'Showing 0-0 of 0 employees';
+                document.getElementById('pagination').innerHTML = '';
+            }
+        });
+    </script>
+
+</body>
+</html>

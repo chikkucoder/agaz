@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swasthya Suraksha Data Portal</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2e3192;
+            --accent: #ed1c24;
+            --bg-light: #f4f7fe;
+            --text-dark: #1b2559;
+            --border: #e0e5f2;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-light);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container-custom {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* --- Header Section --- */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+        }
+        .header-title p {
+            margin: 5px 0 0 0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-left: auto;
+        }
+
+        .count-box {
+            text-align: right;
+        }
+
+        .back-dashboard-btn {
+            text-decoration: none;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: background-color 0.2s ease;
+        }
+
+        .back-dashboard-btn:hover {
+            background: #c7141b;
+            color: #fff;
+        }
+
+        /* --- Filters & Search --- */
+        .controls-area {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        /* Tabs for Categories */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            background: #f0f3ff;
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            border: none;
+            background: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            font-size: 14px;
+            white-space: nowrap; /* Prevent text break on mobile */
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 2px 5px rgba(46, 49, 146, 0.3);
+        }
+
+        .search-box {
+            display: flex;
+            position: relative;
+            flex-grow: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        /* --- Smart Table Styles --- */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        thead {
+            background-color: #f8f9fc;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 15px;
+            vertical-align: top;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tr:hover { background-color: #fcfcfc; }
+
+        /* --- Dynamic Content Styling --- */
+        .biz-identity {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .biz-name { font-weight: 700; font-size: 15px; color: var(--text-dark); }
+        
+        .badge-custom {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            width: fit-content;
+        }
+        .b-hospital { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .b-lab { background: #fae8ff; color: #86198f; border: 1px solid #f0abfc; }
+        .b-pharmacy { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .b-default { background: #f3f4f6; color: #374151; }
+
+        /* Data Key-Value Pairs inside cells */
+        .data-pair {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 5px;
+        }
+        .data-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .data-val {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* Services Tags */
+        .service-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .tag {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #555;
+        }
+
+        .loading-state { text-align: center; padding: 40px; color: #777; font-weight: 600; }
+
+        /* Pagination Override to match Theme */
+        .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .page-link {
+            color: var(--primary);
+        }
+
+        /* --- ✅ Responsive Design (Mobile & Tablet) --- */
+        @media (max-width: 992px) {
+            .container-custom {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-section > div:last-child {
+                align-self: flex-end; /* Count moves to right */
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container-custom { padding: 15px; }
+
+            .header-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .count-box {
+                text-align: left;
+            }
+
+            .back-dashboard-btn {
+                text-align: center;
+            }
+            
+            .controls-area {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .category-tabs {
+                overflow-x: auto; /* Allow horizontal scroll for tabs */
+                padding-bottom: 10px;
+                width: 100%;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .search-box {
+                max-width: 100%; /* Full width search on mobile */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container-custom">
+        <div class="header-section">
+            <div class="header-title">
+                <h2>Partner Network Data</h2>
+                <p>Swasthya Suraksha Yojana Beneficiaries</p>
+            </div>
+            <div class="header-actions">
+                <a href="admin-dashboard.html" class="back-dashboard-btn">Back to Dashboard</a>
+                <div class="count-box">
+                    <span style="font-size: 24px; font-weight: bold; color: var(--primary);" id="total-count">0</span>
+                    <div style="font-size: 12px; color: #666;">Total Registered</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-area">
+            <div class="category-tabs">
+                <button class="tab-btn active" onclick="filterByCategory('All')">All</button>
+                <button class="tab-btn" onclick="filterByCategory('Hospital')">Hospitals</button>
+                <button class="tab-btn" onclick="filterByCategory('Lab')">Labs</button>
+                <button class="tab-btn" onclick="filterByCategory('Pharmacy')">Pharmacy</button>
+            </div>
+
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search Name, City, Owner or Mobile...">
+            </div>
+        </div>
+
+        <div class="table-responsive" style="margin-top: 20px;">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th width="20%">Entity Details</th>
+                        <th width="15%">Owner & Contact</th>
+                        <th width="15%">Location</th>
+                        <th width="20%">Specific Info (Dynamic)</th>
+                        <th width="20%">Services</th>
+                        <th width="10%">Meta Data</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="6" class="loading-state">Fetching Data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="paginationControls"></ul>
+        </nav>
+
+    </div>
+
+    <script>
+        // Global Data Variables
+        let allData = []; 
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        // ✅ Configuration for Dynamic Labels
+        const categoryConfig = {
+            'Hospital': { extraInfoLabel: 'Total Beds/Doctors', licenseLabel: 'Medical Reg. No', badgeClass: 'b-hospital' },
+            'Lab': { extraInfoLabel: 'Accreditation', licenseLabel: 'Lab License No', badgeClass: 'b-lab' },
+            'Pharmacy': { extraInfoLabel: 'License Expiry', licenseLabel: 'Drug License No', badgeClass: 'b-pharmacy' },
+            'Default': { extraInfoLabel: 'Additional Details', licenseLabel: 'Registration ID', badgeClass: 'b-default' }
+        };
+
+        // ✅ 1. Fetch Data
+        async function fetchData() {
+            try {
+                const response = await fetch(CONFIG.API_URL + '/admin/get-all-beneficiaries', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem("authToken") }
+                });
+                let result = await response.json();
+                
+                if (result.success && Array.isArray(result.data)) {
+                    result = result.data;
+                } else if (!Array.isArray(result)) {
+                    result = [];
+                }
+                
+                // Filter only Swasthya Suraksha Data
+                allData = result.filter(item => item.yojanaName === 'Swasthya Suraksha Yojana' || (item.biz && item.type));
+                
+                // ✅ SORT BY DATE (Newest First)
+                allData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                document.getElementById('total-count').innerText = allData.length;
+                
+                // Initialize View
+                currentFilteredData = allData;
+                renderTable(currentFilteredData);
+
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="6" class="loading-state" style="color:red;">Failed to Load Data. Check Backend.</td></tr>`;
+            }
+        }
+
+        // ✅ 2. Render Table with Pagination
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="loading-state">No Records Found.</td></tr>`;
+                document.getElementById('paginationControls').innerHTML = ''; // Clear pagination
+                return;
+            }
+
+            // Pagination Logic
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(item => {
+                const tr = document.createElement('tr');
+                
+                // Normalize Data
+                const type = item.type || item.trainingName || 'Unknown';
+                const bizName = item.biz || item.name || 'N/A';
+                const owner = item.owner || item.guardianName || 'N/A';
+                const phone = item.phone || item.mobileNumber || 'N/A';
+                
+                const address = item.addr || item.address || '';
+                const city = item.city || ''; 
+                const state = item.state || '';
+                const pin = item.pin || '';
+                
+                const extraInfo = item.extraInfo || item.existingSkills || '-';
+                const license = item.license || item.aadharNumber || '-';
+                
+                const services = Array.isArray(item.services) ? item.services : (item.caste ? item.caste.split(',') : []);
+                
+                const regBy = item.registeredBy ? item.registeredBy.split('@')[0] : 'Admin';
+                const date = new Date(item.createdAt).toLocaleDateString('en-IN');
+
+                // Get Config
+                const config = categoryConfig[type] || categoryConfig['Default'];
+
+                // Service Tags
+                const serviceHtml = services.length > 0 
+                    ? `<div class="service-tags">${services.map(s => `<span class="tag">${s}</span>`).join('')}</div>`
+                    : '<span style="color:#999; font-size:12px;">No services listed</span>';
+
+                tr.innerHTML = `
+                    <td>
+                        <div class="biz-identity">
+                            <span class="biz-name">${bizName}</span>
+                            <span class="badge-custom ${config.badgeClass}">${type}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="data-val">${owner}</div>
+                        <div style="font-size:12px; color:#555; margin-top:2px;">
+                            <i class="fas fa-phone-alt" style="font-size:10px;"></i> ${phone}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="data-val" style="color: var(--primary);">${state}</div>
+                        <div class="data-val">${city}</div>
+                        <div style="font-size:12px; color:#666;">${address}</div>
+                        <div style="font-size:11px; color:#888;">PIN: ${pin}</div>
+                    </td>
+                    <td>
+                        <div class="data-pair">
+                            <span class="data-label">${config.licenseLabel}</span>
+                            <span class="data-val" style="font-family:monospace;">${license}</span>
+                        </div>
+                        <div class="data-pair">
+                            <span class="data-label">${config.extraInfoLabel}</span>
+                            <span class="data-val">${extraInfo}</span>
+                        </div>
+                    </td>
+                    <td>${serviceHtml}</td>
+                    <td>
+                        <div style="font-size:12px;"><b>Date:</b> ${date}</div>
+                        <div style="font-size:11px; color:#666;"><b>By:</b> ${regBy}</div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPagination(totalPages);
+        }
+
+        // ✅ 3. Pagination Controls
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            // Prev Button
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            // Page Numbers
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if(endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for(let i=startPage; i<=endPage; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            // Next Button
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        window.changePage = function(page) { currentPage = page; renderTable(currentFilteredData); }
+
+        // ✅ 4. Tab Filter Logic (Updates currentFilteredData)
+        window.filterByCategory = function(category) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if(btn.innerText.includes(category) || (category === 'All' && btn.innerText === 'All')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            if (category === 'All') {
+                currentFilteredData = allData;
+            } else {
+                currentFilteredData = allData.filter(item => item.type === category);
+            }
+            
+            currentPage = 1; // Reset to Page 1
+            renderTable(currentFilteredData);
+        }
+
+        // ✅ 5. Search Logic (Updates currentFilteredData)
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const val = this.value.toLowerCase();
+            
+            currentFilteredData = allData.filter(item => {
+                const str = ((item.biz || '') + " " + (item.owner || '') + " " + (item.city || '') + " " + (item.phone || '')).toLowerCase();
+                return str.includes(val);
+            });
+
+            currentPage = 1; // Reset to Page 1
+            renderTable(currentFilteredData);
+        });
+
+        // Initialize
+        window.onload = fetchData;
+
+    </script>
+    <script src="config.js"></script>
+</body>
+</html>

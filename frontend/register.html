@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation - Final Professional Form</title>
+    <style>
+        /* --- Base Reset & Global Styles --- */
+        * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Responsive Container */
+        .container {
+            width: 100%;
+            max-width: 800px; 
+            min-height: 1050px;
+            background-color: white;
+            padding: 30px 50px;
+            border: 1px solid #000;
+            position: relative;
+            color: #1a237e;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- Language Toggle --- */
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .lang-toggle select {
+            padding: 5px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid #1a237e;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* --- Header Section --- */
+        .logo-box { text-align: center; margin-bottom: 5px; }
+        .logo-img { width: 80px; height: auto; }
+
+        .header-main { text-align: center; margin-bottom: 20px; }
+
+        .main-title {
+            color: #d32f2f;
+            font-size: clamp(30px, 8vw, 48px);
+            margin: 0;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .address-header {
+            font-weight: bold;
+            font-size: clamp(14px, 4vw, 18px);
+            margin: 5px 0;
+        }
+
+        .form-title-box {
+            text-align: center;
+            margin: 10px 0 25px 0;
+            position: relative;
+            border-bottom: 2.5px solid #1a237e;
+            padding-bottom: 10px;
+        }
+
+        .form-title-red {
+            color: #d32f2f;
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: bold;
+            background: #fff;
+            padding: 0 15px;
+        }
+
+        .fee-box {
+            border: 1.5px solid #1a237e;
+            padding: 5px 10px;
+            text-align: center;
+            background: white;
+            display: inline-block;
+        }
+
+        @media (min-width: 600px) {
+            .fee-box { position: absolute; right: 0; top: -30px; }
+        }
+
+        /* --- Photo Section --- */
+        .photo-area {
+            width: 135px;
+            height: 165px;
+            border: 2px solid #1a237e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            text-align: center;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+        
+        @media (min-width: 600px) {
+            .photo-area { position: absolute; right: 50px; top: 275px; margin: 0; z-index: 100; }
+        }
+
+        .photo-area img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-text { font-size: 12px; color: #1a237e; font-weight: bold; }
+
+        .camera-icon-btn{
+            position:absolute;
+            top:6px;
+            right:6px;
+            width:32px;
+            height:32px;
+            border:none;
+            border-radius:50%;
+            background:#1a237e;
+            color:#fff;
+            font-size:18px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            z-index:5;
+            line-height:1;
+        }
+
+        /* --- Form Fields --- */
+        .field-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 22px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @media (min-width: 600px) {
+            .row-next-to-photo { width: 75%; }
+        }
+
+        .label { white-space: nowrap; margin-right: 10px; }
+
+        .input-line {
+            border-bottom: 1.5px solid #000;
+            flex: 1;
+            min-width: 150px;
+            padding: 0 10px;
+            min-height: 25px;
+            outline: none;
+            color: #000;
+            font-weight: normal;
+        }
+
+        /* Placeholder for contenteditable date field */
+        .date-placeholder:empty::before {
+            content: attr(data-placeholder);
+            color: #888;
+            font-weight: normal;
+            pointer-events: none;
+        }
+
+        .flex-split {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flex-split > div { flex: 1; min-width: 250px; }
+
+        /* --- Signatures --- */
+        .sig-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .sig-item { 
+            flex: 1;
+            min-width: 150px;
+            border-top: 1.5px solid #000; 
+            padding-top: 8px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .divider-line {
+            border-top: 2px dotted #000;
+            margin: 40px 0;
+            position: relative;
+        }
+        .divider-line::after {
+            content: "✂";
+            position: absolute;
+            left: 0;
+            top: -15px;
+            font-size: 20px;
+        }
+
+        .office-section-title {
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 30px;
+        }
+
+        .print-btn {
+            margin: 20px;
+            padding: 15px 45px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 18px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        /* --- PRINT SETTINGS --- */
+        @media print {
+            @page { size: A4; margin: 5mm; }
+            body { background: none; padding: 0; margin: 0; }
+            .container { 
+                width: 100% !important; 
+                max-width: none !important; 
+                border: none; 
+                box-shadow: none; 
+                padding: 10px 20px !important; 
+            }
+            .print-btn, .lang-toggle, .camera-controls-wrap, #cameraWrap, .camera-icon-btn { display: none !important; }
+            .photo-area { position: absolute !important; top: 230px !important; right: 50px !important; }
+            .field-row { margin-bottom: 8px !important; }
+            .sig-wrapper { margin-top: 20px !important; }
+            .main-title { font-size: 36px !important; }
+        }
+
+        @media (max-width: 500px) {
+            .container { padding: 20px 15px; }
+            .field-row { font-size: 16px; margin-bottom: 15px; }
+            .lang-toggle { position: static; text-align: right; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lang-toggle">
+        <select id="languageSelect" onchange="changeLanguage()">
+            <option value="hi" selected>Hindi</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <div class="container" id="printableForm">
+        
+        <div class="logo-box">
+            <img src="../public/logo.jpg" alt="Logo" class="logo-img" onerror="this.style.visibility='hidden'">
+        </div>
+
+        <div class="header-main">
+            <h1 class="main-title" data-translate="main_title">आगाज फाउंडेशन</h1>
+            <p class="address-header" data-translate="address_header">पता – भूपतिपुर मोड़, सुरभी विहार पटना–20</p>
+        </div>
+
+        <div class="form-title-box">
+            <span class="form-title-red" data-translate="form_title">प्रशिक्षण पंजीकरण फार्म</span>
+            <div class="fee-box">
+                <div style="font-size:10px; font-weight: bold;" data-translate="fee_label">प्रशिक्षण शुल्क</div>
+                <div class="fee-amount">₹ 799</div>
+            </div>
+        </div>
+
+        <div class="photo-area" onclick="document.getElementById('photoInput').click();">
+            <button type="button" class="camera-icon-btn" onclick="openCameraFromIcon(event)" title="Live Camera">📷</button>
+            <div id="photoPlaceholder" class="photo-text" data-translate="photo_text">यहाँ पासपोर्ट <br> फोटो लगाएँ</div>
+            <input type="file" id="photoInput" hidden accept="image/*" capture="environment" onchange="previewImage(event)">
+        </div>
+
+        <div id="cameraWrap" style="display:none; margin: 0 auto 20px auto; max-width: 360px; border:1px solid #ddd; border-radius:10px; padding:10px; background:#fafafa;">
+            <video id="cameraVideo" autoplay playsinline style="width:100%; border-radius:8px; background:#000;"></video>
+            <div style="display:flex; gap:10px; margin-top:10px; justify-content:center; flex-wrap:wrap;">
+                <button type="button" onclick="capturePhoto()" style="padding:8px 12px; border:none; border-radius:8px; background:#2e7d32; color:#fff; font-weight:bold; cursor:pointer;">Capture</button>
+                <button type="button" onclick="closeCamera()" style="padding:8px 12px; border:none; border-radius:8px; background:#d32f2f; color:#fff; font-weight:bold; cursor:pointer;">Close</button>
+            </div>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+        </div>
+
+        <div class="content-area">
+            <div class="field-row row-next-to-photo">
+                <span class="label" data-translate="serial_label">क्रमांक संख्या:</span>
+                <div id="serialInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row row-next-to-photo">
+                <span class="label" data-translate="name_label">नाम:</span>
+                <div id="nameInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row row-next-to-photo">
+                <span class="label" data-translate="guardian_label">पिता / पति का नाम:</span>
+                <div id="guardianInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="address_label">पता:</span>
+                <div class="input-line" contenteditable="true"></div>
+            </div>
+            
+            <div class="field-row">
+                <span class="label" data-translate="mobile_label">मोबाइल नं:</span>
+                <span style="font-weight: normal; margin-right: 5px; border-bottom: 1.5px solid #000; padding-bottom: 2px;">+91</span>
+                <div id="mobileInput" class="input-line" contenteditable="true" style="min-width: 110px;"></div>
+            </div>
+            
+            <div class="field-row">
+                <span class="label" data-translate="gender_label">लिंग:</span>
+                <div class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row">
+                <span class="label">Email ID:</span>
+                <div class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="aadhar_label">आधार कार्ड नं:</span>
+                <div id="aadharInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="flex-split">
+                <div class="field-row">
+                    <span class="label" data-translate="age_label">उम्र:</span>
+                    <div id="ageInput" class="input-line" contenteditable="true"></div>
+                </div>
+                <div class="field-row">
+                    <span class="label" data-translate="caste_label">जाति:</span>
+                    <div class="input-line" contenteditable="true"></div>
+                </div>
+            </div>
+
+            <div class="flex-split">
+                <div class="field-row">
+                    <span class="label" data-translate="training_name_label">प्रशिक्षण का नाम:</span>
+                    <div class="input-line" contenteditable="true"></div>
+                </div>
+                <div class="field-row">
+                    <span class="label" data-translate="skills_label">मौजूदा कौशल:</span>
+                    <div class="input-line" contenteditable="true"></div>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="duration_label">प्रशिक्षण अवधि:</span>
+                <div class="input-line" data-translate="duration_value" style="color: #555; background-color: #f9f9f9; cursor: not-allowed;">45 दिन</div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="date_label">प्रशिक्षण की तारीख:</span>
+                <div id="trainingDateInput" class="input-line date-placeholder" contenteditable="true" data-placeholder="dd/mm/yyyy"></div>
+            </div>
+
+            <div class="sig-wrapper">
+                <div class="sig-item" data-translate="sig_office">ऑफिस का हस्ताक्षर</div>
+                <div class="sig-item" data-translate="sig_coord">पंचायत कोर्डिनेटर हस्ताक्षर</div>
+                <div class="sig-item" data-translate="sig_app">आवेदक का हस्ताक्षर</div>
+            </div>
+        </div>
+
+        <div class="divider-line"></div>
+
+        <div class="office-section-title" data-translate="office_use_title">कार्यालय उपयोग हेतु (प्राप्ति रसीद)</div>
+        
+        <div class="content-area">
+            <div class="field-row">
+                <span class="label" data-translate="serial_label">क्रमांक संख्या:</span>
+                <div id="officeSerialInput" class="input-line" style="flex: 0 0 150px;" contenteditable="true"></div>
+                <div style="flex-grow: 1; text-align: center; font-size: 22px; font-weight: 900; color: #d32f2f;" data-translate="receipt_title">पावती रसीद</div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="name_label">नाम:</span>
+                <div id="officeNameInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="guardian_label">पिता / पति का नाम:</span>
+                <div id="officeGuardianInput" class="input-line" contenteditable="true"></div>
+            </div>
+
+            <div class="field-row">
+                <span class="label" data-translate="address_label">पता:</span>
+                <div class="label" style="font-weight: normal; border-bottom: 1.5px solid #000; flex-grow: 1;">भूपतिपुर मोड़, पटना – 20</div>
+            </div>
+            
+            <div class="field-row">
+                <span class="label" data-translate="contact_label">संपर्क:</span>
+                <div class="label" style="font-weight: normal; border-bottom: 1.5px solid #000; flex-grow: 1;">0612465270, 7361936168</div>
+            </div>
+
+            <div class="sig-wrapper">
+                <div class="sig-item" data-translate="sig_office">ऑफिस का हस्ताक्षर</div>
+                <div class="sig-item" data-translate="sig_coord">पंचायत कोर्डिनेटर हस्ताक्षर</div>
+                <div class="sig-item" data-translate="sig_app">आवेदक का हस्ताक्षर</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="print-btn" onclick="initiatePaymentAndSave()" data-translate="print_btn">Pay & Print Form (₹799)</button>
+    <button id="backHomeBtn" class="print-btn" style="display:none; background-color:#1a237e;" onclick="goToHome()">Back to Home</button>
+
+    <script>
+        // Sare JavaScript functions (Translation, Validation, Razorpay, Save logic) ko waisa hi rakha gaya hai
+        const translations = {
+            "main_title": { hi: "आगाज फाउंडेशन", en: "Aagaj Foundation" },
+            "address_header": { hi: "पता – भूपतिपुर मोड़, सुरभी विहार पटना–20", en: "Address – Bhupatipur More, Surbhi Vihar Patna–20" },
+            "form_title": { hi: "प्रशिक्षण पंजीकरण फार्म", en: "Training Registration Form" },
+            "fee_label": { hi: "प्रशिक्षण शुल्क", en: "Training Fee" },
+            "photo_text": { hi: "यहाँ पासपोर्ट <br> फोटो लगाएँ", en: "Paste Passport <br> Photo Here" },
+            "serial_label": { hi: "क्रमांक संख्या:", en: "Serial No:" },
+            "name_label": { hi: "नाम:", en: "Name:" },
+            "guardian_label": { hi: "पिता / पति का नाम:", en: "Father/Husband Name:" },
+            "address_label": { hi: "पता:", en: "Address:" },
+            "mobile_label": { hi: "मोबाइल नं:", en: "Mobile No:" },
+            "gender_label": { hi: "लिंग:", en: "Gender:" },
+            "aadhar_label": { hi: "आधार कार्ड नं:", en: "Aadhar Card No:" },
+            "age_label": { hi: "उम्र:", en: "Age:" },
+            "caste_label": { hi: "जाति:", en: "Caste:" },
+            "training_name_label": { hi: "प्रशिक्षण का नाम:", en: "Training Name:" },
+            "skills_label": { hi: "मौजूदा कौशल:", en: "Existing Skills:" },
+            "duration_label": { hi: "प्रशिक्षण अवधि:", en: "Training Duration:" },
+            "duration_value": { hi: "45 दिन", en: "45 Days" }, 
+            "date_label": { hi: "प्रशिक्षण की तारीख:", en: "Date of Training:" },
+            "sig_office": { hi: "ऑफिस का हस्ताक्षर", en: "Office Signature" },
+            "sig_coord": { hi: "पंचायत कोर्डिनेटर हस्ताक्षर", en: "Panchayat Coordinator Signature" },
+            "sig_app": { hi: "आवेदक का हस्ताक्षर", en: "Applicant Signature" },
+            "office_use_title": { hi: "कार्यालय उपयोग हेतु (प्राप्ति रसीद)", en: "For Office Use (Acknowledgement Receipt)" },
+            "receipt_title": { hi: "पावती रसीद", en: "Acknowledgement Receipt" },
+            "contact_label": { hi: "संपर्क:", en: "Contact:" },
+            "print_btn": { hi: "फॉर्म प्रिंट करें (₹799)", en: "Pay & Print Form (₹799)" }
+        };
+
+        let cameraStream = null;
+
+        function changeLanguage() {
+            const lang = document.getElementById('languageSelect').value;
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (key === 'photo_text' && el.querySelector('img')) return;
+                if (translations[key] && translations[key][lang]) {
+                    if (translations[key][lang].includes('<')) el.innerHTML = translations[key][lang];
+                    else el.innerText = translations[key][lang];
+                }
+            });
+        }
+
+        function syncOfficeReceiptFields() {
+            const serial = document.getElementById('serialInput');
+            const name = document.getElementById('nameInput');
+            const guardian = document.getElementById('guardianInput');
+
+            const officeSerial = document.getElementById('officeSerialInput');
+            const officeName = document.getElementById('officeNameInput');
+            const officeGuardian = document.getElementById('officeGuardianInput');
+
+            if (serial && officeSerial) officeSerial.innerText = serial.innerText.trim();
+            if (name && officeName) officeName.innerText = name.innerText.trim();
+            if (guardian && officeGuardian) officeGuardian.innerText = guardian.innerText.trim();
+        }
+
+        function goToHome() {
+            window.location.href = 'index.html';
+        }
+
+        window.onload = function() {
+            // ✅ Check for payment callback status
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const orderId = urlParams.get('orderId');
+
+            const yearShort = new Date().getFullYear().toString().slice(-2);
+            let storedYear = localStorage.getItem('serialYear');
+            let count = localStorage.getItem('serialCounter');
+            if (storedYear !== yearShort) {
+                count = 1;
+                localStorage.setItem('serialYear', yearShort);
+                localStorage.setItem('serialCounter', count);
+            } else if (!count) {
+                count = 1;
+                localStorage.setItem('serialCounter', count);
+            }
+
+            // ✅ Increment serial only once after successful payment + DB save
+            if (status === 'success' && orderId) {
+                const lastProcessedOrderId = localStorage.getItem('lastProcessedOrderId');
+                if (lastProcessedOrderId !== orderId) {
+                    const nextCount = parseInt(localStorage.getItem('serialCounter') || '1', 10) + 1;
+                    localStorage.setItem('serialCounter', nextCount.toString());
+                    localStorage.setItem('lastProcessedOrderId', orderId);
+                }
+            }
+            
+            if (status === 'success' && orderId) {
+                // ✅ Fetch beneficiary data and restore form
+                fetchAndRestoreForm(orderId);
+            } else if (status === 'failed') {
+                alert("भुगतान विफल। कृपया दोबारा कोशिश करें।");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            const serialField = document.getElementById('serialInput');
+            
+            // ✅ Only auto-generate serial if not yet paid
+            if (status !== 'success') {
+                const latestCount = localStorage.getItem('serialCounter') || '1';
+                const autoSerial = yearShort + parseInt(latestCount, 10).toString().padStart(5, '0');
+                serialField.innerText = autoSerial;
+            }
+
+            const inputs = document.querySelectorAll('.input-line');
+            [1, 2, 3, 9, 10, 11].forEach(index => setupStringValidation(inputs[index]));
+            setupGenderValidation(inputs[5]);
+
+            // Keep office receipt values always synced with main form values
+            ['serialInput', 'nameInput', 'guardianInput'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', syncOfficeReceiptFields);
+                    el.addEventListener('blur', syncOfficeReceiptFields);
+                }
+            });
+            syncOfficeReceiptFields();
+        };
+
+        // ✅ Fetch beneficiary data and restore form after payment
+        async function fetchAndRestoreForm(orderId) {
+            try {
+                const response = await fetch(CONFIG.API_URL + `/schemes/get-by-order/${orderId}`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const beneficiary = result.data;
+                    const inputs = document.querySelectorAll('.input-line');
+                    
+                    // ✅ Restore all form fields
+                    inputs[0].innerText = beneficiary.serialNumber || '';
+                    inputs[1].innerText = beneficiary.name || '';
+                    inputs[2].innerText = beneficiary.guardianName || '';
+                    inputs[3].innerText = beneficiary.address || '';
+                    inputs[4].innerText = beneficiary.mobileNumber || '';
+                    inputs[5].innerText = beneficiary.gender || '';
+                    inputs[6].innerText = beneficiary.email || '';
+                    inputs[7].innerText = beneficiary.aadharNumber || '';
+                    inputs[8].innerText = beneficiary.age || '';
+                    inputs[9].innerText = beneficiary.caste || '';
+                    inputs[10].innerText = beneficiary.trainingName || '';
+                    inputs[11].innerText = beneficiary.existingSkills || '';
+                    inputs[12].innerText = beneficiary.trainingDuration || '';
+                    inputs[13].innerText = beneficiary.trainingDate || '';
+
+                    // ✅ Keep office receipt section filled before print
+                    syncOfficeReceiptFields();
+                    
+                    // ✅ Restore photo from uploads folder
+                    if (beneficiary.photoUrl) {
+                        const photoPlaceholder = document.getElementById('photoPlaceholder');
+                        photoPlaceholder.innerHTML = `<img src="${beneficiary.photoUrl}" alt="Photo">`;
+                    }
+                    
+                    // ✅ Show success message with registration details
+                    alert(`✅ पंजीकरण सफल!\n\nआपका क्रमांक: ${beneficiary.serialNumber}\nनाम: ${beneficiary.name}\nमोबाइल: ${beneficiary.mobileNumber}\nभुगतान स्थिति: ${beneficiary.paymentStatus}\n\nफॉर्म प्रिंट करने के लिए Ctrl+P दबाएं या नीचे प्रिंट बटन क्लिक करें।`);
+                    
+                    // ✅ Clear URL and auto-print after short delay
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    
+                    // Auto-print after a short delay
+                    setTimeout(() => {
+                        syncOfficeReceiptFields();
+                        window.print();
+                    }, 1000);
+                    
+                    // ✅ Update button text
+                    const btn = document.querySelector('.print-btn');
+                    btn.innerText = "✓ पंजीकरण पूर्ण - फिर से प्रिंट करें";
+                    btn.onclick = () => {
+                        syncOfficeReceiptFields();
+                        window.print();
+                    };
+
+                    const backHomeBtn = document.getElementById('backHomeBtn');
+                    if (backHomeBtn) backHomeBtn.style.display = 'inline-block';
+                    
+                } else {
+                    alert("डेटा प्राप्त करने में त्रुटि। कृपया दोबारा कोशिश करें।");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert("त्रुटि: " + error.message);
+            }
+        }
+
+        function setupStringValidation(el) {
+            el.addEventListener('input', function(e) {
+                let text = el.innerText;
+                let cleanText = text.replace(/[0-9]/g, ''); 
+                let words = cleanText.split(' ');
+                for (let i = 0; i < words.length; i++) {
+                    if (words[i].length > 0) words[i] = words[i][0].toUpperCase() + words[i].substr(1);
+                }
+                cleanText = words.join(' ');
+                if (text !== cleanText) { el.innerText = cleanText; placeCaretAtEnd(el); }
+            });
+        }
+
+        function setupGenderValidation(el) {
+            el.addEventListener('blur', function() {
+                const val = el.innerText.trim();
+                const validOptions = ["Male", "Female", "Other"];
+                if (val !== "" && !validOptions.includes(val)) {
+                    alert("Only this format is available: Male, Female, or Other");
+                    el.innerText = "";
+                }
+            });
+        }
+
+        function setupNumericValidation(elementId, maxLength) {
+            const el = document.getElementById(elementId);
+            
+            // Prevent non-numeric key presses
+            el.addEventListener('keypress', function(e) {
+                if (e.key < '0' || e.key > '9' || el.innerText.replace(/\D/g, '').length >= maxLength) {
+                    e.preventDefault();
+                }
+            });
+
+            // Prevent pasting of strings/characters, force only numbers
+            el.addEventListener('input', function(e) {
+                let text = el.innerText;
+                // Remove anything that is not a number
+                let cleanText = text.replace(/[^0-9]/g, '');
+                
+                // Enforce max length
+                if (cleanText.length > maxLength) {
+                    cleanText = cleanText.slice(0, maxLength);
+                }
+
+                // Update text if it was changed (meaning a letter was typed or pasted)
+                if (text !== cleanText) {
+                    el.innerText = cleanText;
+                    placeCaretAtEnd(el);
+                }
+            });
+            
+            // Prevent rich-text formatting on paste
+            el.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text.replace(/[^0-9]/g, '').slice(0, maxLength));
+            });
+        }
+
+        function placeCaretAtEnd(el) {
+            el.focus();
+            if (typeof window.getSelection != "undefined") {
+                var range = document.createRange();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        setupNumericValidation('mobileInput', 10); 
+        setupNumericValidation('aadharInput', 12); 
+        setupNumericValidation('ageInput', 2);     
+
+        function previewImage(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            const maxSizeBytes = 1 * 1024 * 1024;
+            if (file.size > maxSizeBytes) {
+                const lang = document.getElementById('languageSelect').value;
+                alert(lang === 'en' ? "Photo size must be less than 1MB." : "Photo size 1MB se kam hona chahiye.");
+                event.target.value = "";
+                const fallbackText = translations.photo_text && translations.photo_text[lang]
+                    ? translations.photo_text[lang]
+                    : "यहाँ पासपोर्ट <br> फोटो लगाएँ";
+                document.getElementById('photoPlaceholder').innerHTML = fallbackText;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('photoPlaceholder').innerHTML = `<img src="${reader.result}" alt="Photo">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Camera icon click helper (added)
+        function openCameraFromIcon(e){
+            e.stopPropagation();
+            e.preventDefault();
+            openCamera();
+        }
+
+        // Camera functions (added)
+        async function openCamera() {
+            const wrap = document.getElementById('cameraWrap');
+            const video = document.getElementById('cameraVideo');
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: "environment" } },
+                    audio: false
+                });
+                video.srcObject = cameraStream;
+                wrap.style.display = 'block';
+            } catch (err1) {
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                    video.srcObject = cameraStream;
+                    wrap.style.display = 'block';
+                } catch (err2) {
+                    alert("Camera open nahi ho pa raha. Aap file upload option use karein.");
+                    console.error(err2);
+                }
+            }
+        }
+
+        function closeCamera() {
+            const wrap = document.getElementById('cameraWrap');
+            const video = document.getElementById('cameraVideo');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            cameraStream = null;
+            wrap.style.display = 'none';
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const input = document.getElementById('photoInput');
+
+            if (!video.videoWidth || !video.videoHeight) {
+                alert("Camera ready hone ka wait karein.");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    alert("Photo capture failed. Please retry.");
+                    return;
+                }
+
+                const maxSizeBytes = 1 * 1024 * 1024;
+                if (blob.size > maxSizeBytes) {
+                    const lang = document.getElementById('languageSelect').value;
+                    alert(lang === 'en' ? "Captured photo size must be less than 1MB." : "Captured photo size 1MB se kam hona chahiye.");
+                    return;
+                }
+
+                const file = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+
+                previewImage({ target: input });
+                closeCamera();
+            }, 'image/jpeg', 0.9);
+        }
+
+        window.addEventListener('beforeunload', closeCamera);
+
+        async function initiatePaymentAndSave() {
+            const inputs = document.querySelectorAll('.input-line');
+            const photoInput = document.getElementById('photoInput');
+            const btn = document.querySelector('.print-btn');
+            
+            // Form data for backend
+            const data = {
+                serialNumber: inputs[0].innerText.trim(),
+                name: inputs[1].innerText.trim(),
+                guardianName: inputs[2].innerText.trim(),
+                address: inputs[3].innerText.trim(),
+                mobileNumber: inputs[4].innerText.trim(),
+                gender: inputs[5].innerText.trim(),
+                email: inputs[6].innerText.trim(),
+                aadharNumber: inputs[7].innerText.trim(),
+                age: inputs[8].innerText.trim(),
+                caste: inputs[9].innerText.trim(),
+                trainingName: inputs[10].innerText.trim(),
+                existingSkills: inputs[11].innerText.trim(),
+                trainingDuration: inputs[12].innerText.trim(),
+                trainingDate: inputs[13].innerText.trim(),
+                registeredBy: sessionStorage.getItem('loggedInRole') === 'Admin'
+                    ? 'Admin/Self'
+                    : (sessionStorage.getItem('loggedInUserEmail') || sessionStorage.getItem('loggedInUser') || 'Self')
+            };
+
+            // Validation
+            if (!data.name || !data.mobileNumber || data.mobileNumber.length !== 10) {
+                alert("कृपया नाम और मान्य मोबाइल नंबर भरें।");
+                return;
+            }
+            
+            if (!data.aadharNumber || data.aadharNumber.length < 10) {
+                alert("कृपया आधार नंबर भरें।");
+                return;
+            }
+
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                // ✅ Store form data in localStorage before payment
+                localStorage.setItem('pendingFormData', JSON.stringify(data));
+                
+                // Create FormData for multipart request
+                const formData = new FormData();
+                for (const key in data) {
+                    formData.append(key, data[key]);
+                }
+                if (photoInput.files[0]) {
+                    const maxSizeBytes = 1 * 1024 * 1024;
+                    if (photoInput.files[0].size > maxSizeBytes) {
+                        const lang = document.getElementById('languageSelect').value;
+                        alert(lang === 'en' ? "Photo size must be less than 1MB." : "Photo size 1MB se kam hona chahiye.");
+                        btn.innerText = "Pay & Print Form (₹799)";
+                        btn.disabled = false;
+                        return;
+                    }
+                    formData.append('photo', photoInput.files[0]);
+                }
+                
+                // Send to create-order endpoint
+                const response = await fetch(CONFIG.API_URL + '/schemes/create-order', {
+                    method: 'POST',
+                    body: formData  // Don't set Content-Type, let browser set it with boundary
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    alert("Error: " + (result.message || "Payment gateway error"));
+                    btn.innerText = "Pay & Print Form (₹799)";
+                    btn.disabled = false;
+                    return;
+                }
+
+                const options = {
+                    key: result.key,
+                    amount: result.amount,
+                    currency: result.currency,
+                    order_id: result.orderId,
+                    name: 'Aagaj Foundation',
+                    description: 'Silayi Registration Fee',
+                    prefill: {
+                        name: data.name,
+                        email: data.email,
+                        contact: data.mobileNumber
+                    },
+                    theme: {
+                        color: '#d32f2f'
+                    },
+                    handler: async function (rzpResponse) {
+                        const verifyResponse = await fetch(CONFIG.API_URL + '/schemes/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: rzpResponse.razorpay_order_id,
+                                razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                                razorpay_signature: rzpResponse.razorpay_signature,
+                                pendingOrderId: result.pendingOrderId
+                            })
+                        });
+
+                        const verifyResult = await verifyResponse.json();
+                        if (verifyResult.success) {
+                            window.location.href = `/register.html?status=success&orderId=${encodeURIComponent(verifyResult.orderId)}`;
+                        } else {
+                            window.location.href = '/register.html?status=failed';
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            btn.innerText = 'Pay & Print Form (₹799)';
+                            btn.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                console.error("Payment Error:", error);
+                alert("Error: " + error.message);
+                btn.innerText = "Pay & Print Form (₹799)";
+                btn.disabled = false;
+            }
+        }
+    </script>
+    <script src="config.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>

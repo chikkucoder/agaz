@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAGAJ FOUNDATION | Health Identity</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2e3192; /* Foundation Blue */
+            --accent: #ed1c24;  /* Foundation Red */
+            --gradient-card: linear-gradient(135deg, #2e3192 0%, #1a1c54 100%);
+            --dark: #0f172a;
+            --bg: #f1f5f9;
+            --success: #10b981;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg); padding: 40px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            margin: 0;
+        }
+
+        /* --- Form Styling --- */
+        .form-card {
+            background: white; padding: 35px; border-radius: 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06); 
+            width: 100%; max-width: 750px; box-sizing: border-box;
+            position: relative; /* Essential for absolute positioning of logo */
+        }
+        
+        /* Updated: Logo positioned to the left */
+        .form-logo {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .section-wrapper {
+            background: #f8fafc; padding: 25px; border-radius: 18px;
+            border: 1px solid #edf2f7; margin-bottom: 30px;
+        }
+
+        .section-title {
+            margin: 0 0 25px 0; font-size: 14px; color: var(--primary);
+            font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; width: 100%; } 
+        label { display: block; font-size: 11px; font-weight: 800; margin-bottom: 8px; color: var(--dark); text-transform: uppercase; }
+        
+        input, select { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; 
+            outline: none; font-family: inherit; font-size: 14px; background: white; 
+            transition: 0.3s; box-sizing: border-box;
+        }
+        
+        input:focus { border-color: var(--primary); }
+
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+        .btn-pay-trigger { 
+            width: 100%; padding: 20px; background: var(--primary); color: white; border: none; 
+            border-radius: 16px; font-weight: 800; cursor: pointer; font-size: 16px; 
+            box-shadow: 0 10px 20px rgba(46, 49, 146, 0.2); display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+
+        .btn-home {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            background: #0d6efd;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 15px;
+            display: none;
+        }
+
+        /* --- Professional ID Card Design --- */
+        #id-card-wrap { display: none; padding: 40px; background: #eee; }
+
+       .modern-health-card { 
+            width: 550px; height: 340px; background: white; border-radius: 20px; 
+            position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; font-family: sans-serif;
+            border: 1px solid #ccc; margin-bottom: 30px;
+        }
+
+        .card-header-premium {
+            background: var(--gradient-card); height: 85px; color: white;
+            padding: 15px 25px; display: flex; justify-content: space-between; align-items: center;
+            position: relative;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-logo {
+            width: 45px;
+            height: 45px;
+            background: white;
+            
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .card-header-premium::after {
+            content: ""; position: absolute; bottom: -15px; right: -20px;
+            width: 100px; height: 100px; background: var(--accent);
+            border-radius: 50%; opacity: 0.2;
+        }
+
+        .foundation-logo-text { font-size: 22px; font-weight: 900; letter-spacing: 1px; color: var(--accent); }
+        .foundation-logo-text span { color: var(--accent); }
+
+        .card-body-main { flex: 1; display: flex; padding: 20px; gap: 20px; background: #fff; }
+
+        .photo-box {
+            width: 120px; height: 150px; border: 3px solid var(--primary);
+            border-radius: 12px; overflow: hidden; background: #f1f5f9;
+        }
+        #card-p-img { width: 100%; height: 100%; object-fit: cover; }
+
+        .patient-info-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+        .data-item { display: flex; flex-direction: column; }
+        .data-item.full { grid-column: span 2; }
+        .data-item label { color: #64748b; font-size: 8px; margin: 0; }
+        .data-item span { color: #1e293b; font-size: 14px; font-weight: 700; }
+
+        .card-footer-strip {
+            background: #f8fafc; border-top: 2px solid var(--accent);
+            padding: 10px 25px; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .qr-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+        /* Back Card Design */
+        .back-header { background: var(--accent); color: white; text-align: center; padding: 10px; font-weight: 800; font-size: 14px; }
+
+        /* --- Payment Modal --- */
+        /* .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center; }
+        .payment-box { background: white; width: 350px; padding: 30px; border-radius: 30px; text-align: center; }
+        .btn-confirm { background: var(--success); color: white; width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; } */
+
+        @media print {
+            body * { visibility: hidden; }
+            #id-card-wrap, #id-card-wrap * { visibility: visible; }
+            #id-card-wrap { display: flex !important; position: absolute; left: 0; top: 0; width: 100%; flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-card">
+        <img src="../public/logo.jpg" alt="Logo" class="form-logo">
+        
+        <p style="text-align: center; color: var(--success); font-weight: 800; font-size: 13px; margin-bottom: 5px;">This Card is Being Issued Under Swasthya Suraksha Yojna.</p>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: var(--primary); margin: 0; font-weight: 900;">AAGAJ FOUNDATION</h1>
+            <p style="color: var(--accent); font-weight: 700; margin: 0; letter-spacing: 2px;">HEALTH IDENTITY ENROLLMENT</p>
+        </div>
+        
+        <div class="section-wrapper">
+            <h4 class="section-title"><i class="fas fa-user-medical"></i> Patient Details</h4>
+            <div class="input-group">
+                <label>Upload Passport Size Photo</label>
+                <input type="file" id="u-img" accept="image/*" onchange="previewImg(event)">
+                
+                <!-- Camera Capture Feature -->
+                <button type="button" id="open-camera-btn" onclick="openCamera()" style="margin-top:10px; padding:10px 14px; border:none; border-radius:10px; background:#2e3192; color:#fff; font-weight:700; cursor:pointer;">
+                    <i class="fas fa-camera"></i> Capture from Camera
+                </button>
+
+                <div id="camera-wrap" style="display:none; margin-top:12px; border:1px solid #e2e8f0; border-radius:12px; padding:12px; background:#f8fafc;">
+                    <video id="camera-video" autoplay playsinline style="width:100%; max-width:320px; border-radius:10px; background:#000;"></video>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button type="button" onclick="capturePhoto()" style="padding:10px 14px; border:none; border-radius:10px; background:#10b981; color:#fff; font-weight:700; cursor:pointer;">
+                            <i class="fas fa-circle"></i> Capture
+                        </button>
+                        <button type="button" onclick="closeCamera()" style="padding:10px 14px; border:none; border-radius:10px; background:#ed1c24; color:#fff; font-weight:700; cursor:pointer;">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                    <canvas id="camera-canvas" style="display:none;"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="u-name" placeholder="Name as per Aadhar" oninput="validateText(this)">
+                </div>
+                <div class="input-group">
+                    <label>Contact Number</label>
+                    <input type="text" id="u-mobile" maxlength="10" placeholder="WhatsApp No." oninput="validateNumber(this); clearError('mobile')" onblur="checkLiveExist('mobile')">
+                    <small id="err-mobile" style="color: red; display: none; font-weight: 800; margin-top: 5px;">This contact number is already exist</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Aadhar Number</label>
+                    <input type="text" id="u-aadhar" maxlength="12" placeholder="12 Digit No." oninput="validateNumber(this); clearError('aadhar')" onblur="checkLiveExist('aadhar')">
+                    <small id="err-aadhar" style="color: red; display: none; font-weight: 800; margin-top: 5px;">This aadhar number is already exist</small>
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="text" id="u-age" maxlength="3" placeholder="Age" oninput="validateNumber(this)">
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>Gender</label>
+                    <select id="u-gender"><option>Male</option><option>Female</option><option>Others</option></select>
+                </div>
+                <div class="input-group"><label>Blood Group</label>
+                    <select id="u-blood">
+                        <option>A+</option>
+                        <option>A-</option>
+                        <option>B+</option>
+                        <option>B-</option>
+                        <option>O+</option>
+                        <option>O-</option>
+                        <option>AB+</option>
+                        <option>AB-</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-wrapper">
+            <h4 class="section-title"><i class="fas fa-map-marker-alt"></i> Address Information</h4>
+            <div class="row">
+                <div class="input-group"><label>Village/Area</label><input type="text" id="u-vill" placeholder="Locality"></div>
+                <div class="input-group"><label>Panchayat</label><input type="text" id="u-panchayat" placeholder="Panchayat Name"></div>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>Block</label><input type="text" id="u-block" placeholder="Block Name"></div>
+                <div class="input-group"><label>District</label><input type="text" id="u-dist" placeholder="Patna" oninput="validateText(this)"></div>
+            </div>
+            <div class="row">
+                <div class="input-group"><label>State</label><input type="text" id="u-state" placeholder="Bihar" oninput="validateText(this)"></div>
+                <div class="input-group"><label>Pin Code</label><input type="text" id="u-pin" maxlength="6" placeholder="Pincode" oninput="validateNumber(this)"></div>
+            </div>
+            <input type="hidden" id="u-po" value="N/A"> </div>
+
+        <button class="btn-pay-trigger" id="pay-btn" onclick="openPay()">
+            <i class="fas fa-print"></i> PAY & GENERATE HEALTH CARD
+        </button>
+        <button class="btn-home" id="back-home-btn" onclick="window.location.href='index.html'">
+            <i class="fas fa-house"></i> Back to Home
+        </button>
+    </div>
+
+
+    <div id="id-card-wrap">
+        <div class="modern-health-card">
+            <div style="background: #fff; text-align: center; padding: 2px 0; font-size: 9px; font-weight: 800; color: var(--primary); letter-spacing: 1px; border-bottom: 1px solid #eee;">
+                This Card is Being Issued Under Swasthya Suraksha Yojna
+            </div>
+            <div class="card-header-premium">
+                <div class="card-header-left">
+                    <img src="../public/logo.jpg" alt="Logo" class="card-logo">
+                    <div class="foundation-logo-text">AAGAJ<span>.</span>FOUNDATION</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 8px; font-weight: 700;">HEALTH CARD</div>
+                    <div style="font-size: 12px; font-weight: 900; color: var(--accent);" id="c-id">MC-000000</div>
+                </div>
+            </div>
+            
+            <div class="card-body-main">
+                <div class="photo-box">
+                    <img id="card-p-img" src="" alt="Patient">
+                </div>
+                <div class="patient-info-grid">
+                    <div class="data-item full"><label>PATIENT NAME</label><span id="c-name">---</span></div>
+                    <div class="data-item"><label>AGE / GENDER</label><span id="c-age-gen">--</span></div>
+                    <div class="data-item"><label>BLOOD GROUP</label><span id="c-blood">--</span></div>
+                    <div class="data-item full"><label>AADHAR NUMBER</label><span id="c-aadhar-val">---- ---- ----</span></div>
+                    <div class="data-item full"><label>CONTACT NO.</label><span id="c-front-mobile" style="color:var(--primary)">+91 0000000000</span></div>
+                </div>
+                <!-- <div class="qr-side">
+                    <div id="qr-box-front"></div>
+                    <p style="font-size: 6px; margin-top: 5px; font-weight: bold;">SCAN PROFILE</p>
+                </div> -->
+            </div>
+
+            <div class="card-footer-strip">
+                <div>
+                    <div style="font-size: 9px; font-weight: 800; color: var(--success);">VALID IDENTITY</div>
+                    <div style="font-size: 7px; color: #94a3b8;">Digitally Secured Profile</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 7px; color: #94a3b8;">EXPIRY DATE</div>
+                    <div style="font-size: 10px; font-weight: 800;" id="c-expiry-date">-- --- ----</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modern-health-card">
+            <div class="back-header" style="color:#ed1c24;">RESIDENTIAL & EMERGENCY DETAILS</div>
+            <div class="card-body-main" style="flex-direction: column; padding: 25px;">
+                <div class="data-item full" style="border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                </div>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1;">
+                        <div class="data-item"><label>Village</label><span id="c-back-vill">---</span></div>
+                        <div class="data-item"><label>PANCHAYAT</label><span id="c-back-panchayat">---</span></div>
+                        <div class="data-item"><label>BLOCK</label><span id="c-back-block">---</span></div>
+                        <div class="data-item"><label>DISTRICT</label><span id="c-back-dist">---</span></div>
+                        <div class="data-item"><label>STATE</label><span id="c-back-state">---</span></div>
+                        <div class="data-item"><label>PIN CODE</label><span id="c-back-pin">---</span></div>
+                    </div>
+
+                    <!--QR Code-->
+                    <div class="qr-side" style="margin-left: 15px; margin-right: 35px;">
+                        <div id="qr-box-front"></div>
+                        <p style="font-size: 8px; margin-top: 5px; font-weight: bold;">SCAN PROFILE</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: auto; border: 1px dashed #ccc; padding: 10px; border-radius: 10px; text-align: center;">
+                    <p style="margin:0; font-size: 9px; font-weight: 800;">AAGAJ FOUNDATION - REG: 1882 ACT</p>
+                    <p style="margin:0; font-size: 7px; color: #64748b;">This card is a digital health identity. If found, please return to the foundation.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validateNumber(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
+        function validateText(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
+
+        let paid = false;
+        let isMobileDuplicate = false;
+        let isAadharDuplicate = false;
+        let cameraStream = null;
+
+        function updateButtonState() {
+            const payBtn = document.getElementById('pay-btn');
+            if(isMobileDuplicate || isAadharDuplicate) {
+                payBtn.disabled = true;
+                payBtn.style.opacity = "0.6";
+                payBtn.style.cursor = "not-allowed";
+            } else {
+                payBtn.disabled = false;
+                payBtn.style.opacity = "1";
+                payBtn.style.cursor = "pointer";
+            }
+        }
+
+        // ✅ Function to check duplicates while typing (onblur)
+        async function checkLiveExist(field) {
+            const val = document.getElementById(field === 'mobile' ? 'u-mobile' : 'u-aadhar').value;
+            const errElem = document.getElementById(field === 'mobile' ? 'err-mobile' : 'err-aadhar');
+
+            if(val.length < 5) {
+                // Reset if cleared or too short
+                errElem.style.display = 'none';
+                if(field === 'mobile') isMobileDuplicate = false;
+                if(field === 'aadhar') isAadharDuplicate = false;
+                updateButtonState();
+                return;
+            }
+
+            const payload = {};
+            if(field === 'mobile') payload.mobile = val;
+            if(field === 'aadhar') payload.aadhar = val;
+
+            try {
+                const res = await fetch(CONFIG.API_URL + '/api/healthcard/check-exists', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                
+                if(data.exists) {
+                    errElem.style.display = 'block';
+                    if(field === 'mobile') isMobileDuplicate = true;
+                    if(field === 'aadhar') isAadharDuplicate = true;
+                } else {
+                    errElem.style.display = 'none';
+                    if(field === 'mobile') isMobileDuplicate = false;
+                    if(field === 'aadhar') isAadharDuplicate = false;
+                }
+                updateButtonState();
+            } catch(e) {
+                console.error("Check Error", e);
+            }
+        }
+
+        function clearError(field) {
+            const errElem = document.getElementById(field === 'mobile' ? 'err-mobile' : 'err-aadhar');
+            errElem.style.display = 'none';
+            
+            if(field === 'mobile') isMobileDuplicate = false;
+            if(field === 'aadhar') isAadharDuplicate = false;
+            
+            updateButtonState();
+        }
+
+        function previewImg(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 1024 * 1024) {
+                    alert("File size must be less than 1MB");
+                    e.target.value = "";
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => { document.getElementById('card-p-img').src = reader.result; }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ✅ Camera Open
+        async function openCamera() {
+            const camWrap = document.getElementById('camera-wrap');
+            const video = document.getElementById('camera-video');
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = cameraStream;
+                camWrap.style.display = 'block';
+            } catch (err) {
+                console.error("Camera access error:", err);
+                alert("Camera open nahi ho pa raha. Please camera permission allow karein.");
+            }
+        }
+
+        // ✅ Camera Close
+        function closeCamera() {
+            const camWrap = document.getElementById('camera-wrap');
+            const video = document.getElementById('camera-video');
+
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            cameraStream = null;
+            camWrap.style.display = 'none';
+        }
+
+        // ✅ Capture Photo and put into existing file input
+        function capturePhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            const fileInput = document.getElementById('u-img');
+
+            if (!video.videoWidth || !video.videoHeight) {
+                return alert("Camera ready hone ka wait karein, phir capture karein.");
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob) => {
+                if (!blob) return alert("Photo capture failed. Please retry.");
+
+                if (blob.size > 1024 * 1024) {
+                    alert("Captured image size 1MB se zyada hai. Please dobara capture karein.");
+                    return;
+                }
+
+                const capturedFile = new File([blob], `camera-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+                // Set captured file to existing input so openPay() works unchanged
+                const dt = new DataTransfer();
+                dt.items.add(capturedFile);
+                fileInput.files = dt.files;
+
+                // Trigger preview using existing function
+                previewImg({ target: fileInput });
+
+                // Close camera after successful capture
+                closeCamera();
+            }, 'image/jpeg', 0.9);
+        }
+
+        // ✅ Handle payment success callback on page load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const orderId = urlParams.get('orderId');
+            const paymentId = urlParams.get('paymentId');
+            
+            if (status === 'success' && orderId) {
+                fetchAndRestoreCard(orderId, paymentId);
+            } else if (status === 'failed') {
+                alert("भुगतान विफल। कृपया दोबारा कोशिश करें। (Payment failed. Please try again.)");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+        // ✅ Stop camera on page unload
+        window.addEventListener('beforeunload', closeCamera);
+
+        // ✅ Fetch card data and restore form after payment success
+        async function fetchAndRestoreCard(orderId, paymentId) {
+            try {
+                const query = paymentId ? `?paymentId=${encodeURIComponent(paymentId)}` : '';
+                const response = await fetch(`${CONFIG.API_URL}/api/healthcard/get-by-order/${encodeURIComponent(orderId)}${query}`);
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const cardData = result.data;
+
+                    const backHomeBtn = document.getElementById('back-home-btn');
+                    if (backHomeBtn) {
+                        backHomeBtn.style.display = 'block';
+                    }
+                    
+                    // Build and display card
+                    buildCardAndPrint(cardData);
+                    
+                    // Show success message
+                    alert(`✅ Payment Successful!\n\nHealth ID: ${cardData.healthId}\nName: ${cardData.fullName}\nStatus: ${cardData.paymentStatus}\n\nPress Ctrl+P to print.`);
+                    
+                    // Clear URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    alert("डेटा प्राप्त करने में त्रुटि। कृपया दोबारा कोशिश करें। (Error retrieving data. Please try again.)");
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert("त्रुटि: " + error.message);
+            }
+        }
+
+        // ✅ NEW: Payment + Save Function (RAZORPAY)
+        async function openPay() {
+            const name = document.getElementById('u-name').value;
+            const mobile = document.getElementById('u-mobile').value;
+            const aadhar = document.getElementById('u-aadhar').value;
+            const age = document.getElementById('u-age').value;
+
+            if (!name || mobile.length < 10 || aadhar.length < 12 || !age) {
+                return alert("Please fill Name, Age, 10 digit Mobile, and 12 digit Aadhar No.");
+            }
+
+            // Validate photo
+            const photoFile = document.getElementById('u-img').files[0];
+            if (!photoFile) {
+                return alert("Please upload a photo");
+            }
+
+            try {
+                // Build FormData with all fields and photo
+                const formData = new FormData();
+                formData.append('fullName', name);
+                formData.append('mobile', mobile);
+                formData.append('aadhar', aadhar);
+                formData.append('age', age);
+                formData.append('gender', document.getElementById('u-gender').value);
+                formData.append('bloodGroup', document.getElementById('u-blood').value);
+                formData.append('village', document.getElementById('u-vill').value);
+                formData.append('panchayat', document.getElementById('u-panchayat').value);
+                formData.append('block', document.getElementById('u-block').value);
+                formData.append('district', document.getElementById('u-dist').value);
+                formData.append('state', document.getElementById('u-state').value);
+                formData.append('pincode', document.getElementById('u-pin').value);
+                formData.append('photo', photoFile);
+
+                // Send to Getepay create-order endpoint
+                const payBtn = document.getElementById('pay-btn');
+                payBtn.innerText = "Processing Payment...";
+                payBtn.disabled = true;
+
+                const response = await fetch(CONFIG.API_URL + '/api/healthcard/create-order', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    alert("Error: " + (result.message || "Payment gateway error"));
+                    payBtn.innerText = "PAY & GENERATE HEALTH CARD";
+                    payBtn.disabled = false;
+                    return;
+                }
+
+                const options = {
+                    key: result.key,
+                    amount: result.amount,
+                    currency: result.currency,
+                    order_id: result.orderId,
+                    name: 'Aagaj Foundation',
+                    description: 'Health Card Registration Fee',
+                    prefill: {
+                        name,
+                        contact: mobile
+                    },
+                    theme: {
+                        color: '#2e3192'
+                    },
+                    handler: async function (rzpResponse) {
+                        const verifyResponse = await fetch(CONFIG.API_URL + '/api/healthcard/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: rzpResponse.razorpay_order_id,
+                                razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                                razorpay_signature: rzpResponse.razorpay_signature,
+                                pendingOrderId: result.pendingOrderId
+                            })
+                        });
+
+                        const verifyResult = await verifyResponse.json();
+                        if (verifyResult.success) {
+                            window.location.href = verifyResult.redirectUrl;
+                        } else {
+                            window.location.href = '/healthcard.html?status=failed';
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            payBtn.innerText = 'PAY & GENERATE HEALTH CARD';
+                            payBtn.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                console.error("Payment Error:", error);
+                alert("Error: " + error.message);
+                const payBtn = document.getElementById('pay-btn');
+                payBtn.innerText = "PAY & GENERATE HEALTH CARD";
+                payBtn.disabled = false;
+            }
+        }
+
+        function buildCardAndPrint(serverData) {
+            // UI Fillup using serverData (confirmed from DB)
+            document.getElementById('c-name').innerText = serverData.fullName.toUpperCase();
+            document.getElementById('c-age-gen').innerText = serverData.age + " YRS / " + serverData.gender.toUpperCase();
+            document.getElementById('c-blood').innerText = serverData.bloodGroup;
+            document.getElementById('c-aadhar-val').innerText = serverData.aadhar.replace(/(\d{4})/g, '$1 ').trim();
+            document.getElementById('c-front-mobile').innerText = "+91 " + serverData.mobile;
+            document.getElementById('c-id').innerText = serverData.healthId;
+
+            // Address Section
+            document.getElementById('c-back-vill').innerText = serverData.address.village.toUpperCase();
+            document.getElementById('c-back-block').innerText = serverData.address.block.toUpperCase();
+            document.getElementById('c-back-state').innerText = serverData.address.state.toUpperCase();
+            document.getElementById('c-back-panchayat').innerText = serverData.address.panchayat.toUpperCase();
+            document.getElementById('c-back-dist').innerText = serverData.address.district.toUpperCase();
+            document.getElementById('c-back-pin').innerText = serverData.address.pincode;
+
+            // Expiry date format
+            const exp = new Date(serverData.expiryDate);
+            document.getElementById('c-expiry-date').innerText = exp.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
+
+            // Photo
+            if (serverData.photoPath) {
+                document.getElementById('card-p-img').src = serverData.photoPath;
+            }
+
+            // QR Code generation
+            const qrElem = document.getElementById("qr-box-front");
+            qrElem.innerHTML = "";
+            new QRCode(qrElem, { 
+                text: `HEALTH-ID:${serverData.healthId}\nNAME:${serverData.fullName}`, 
+                width: 80, 
+                height: 80 
+            });
+
+            // Open Print window after delay
+            setTimeout(() => { window.print(); }, 800);
+        }
+    </script>
+    <script src="config.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+</html>

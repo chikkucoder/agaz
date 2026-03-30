@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Careers - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* --- Color Variables --- */
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #fffdf5;
+            
+            /* ADDED: Dark Navy Blue Background for Footer (Matches the Image) */
+            --footer-dark: #001220; 
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            background-color: #ffffff;
+        }
+
+        /* --- Navbar --- */
+        .navbar-nav .nav-item { margin: 0 5px; }
+        .navbar-brand img { height: 65px; width: auto; }
+        .nav-link {
+            font-weight: 600; color: var(--text-dark); padding: 10px 18px !important;
+            border-radius: 8px; transition: all 0.4s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-red) !important;
+            background-color: rgba(253, 216, 49, 0.15);
+        }
+
+        /* --- Header Section --- */
+        .intro-section {
+            padding: 80px 20px 40px;
+            text-align: center;
+            background-color: white;
+        }
+
+        .intro-title {
+            font-weight: 700;
+            font-size: 3rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .yellow-separator {
+            height: 3px;
+            width: 300px;
+            background-color: var(--primary-yellow);
+            margin: 0 auto 30px auto;
+        }
+
+        .intro-text {
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* --- Build Career Header --- */
+        .career-heading-section {
+            background-color: var(--bg-light);
+            padding-top: 50px;
+            text-align: center;
+        }
+        .career-heading-section h2 {
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        /* --- Job List UI --- */
+        .job-list-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px 15px 80px;
+            background-color: var(--bg-light);
+        }
+
+        /* Filter Row */
+        .filter-section {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 15px;
+            text-transform: uppercase;
+            color: var(--text-light);
+        }
+
+        .location-dropdown {
+            background: transparent;
+            border: none;
+            color: var(--primary-red);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* Job Rows */
+        .job-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 0;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.3s;
+        }
+
+        .job-row:hover {
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            padding-left: 10px;
+            padding-right: 10px;
+            border-radius: 8px;
+        }
+
+        .plus-icon {
+            font-size: 2rem;
+            font-weight: 300;
+            margin-right: 25px;
+            color: var(--primary-red);
+            width: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .job-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .job-location {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            font-weight: 400;
+            color: var(--text-light);
+        }
+
+        .fee-badge {
+            font-size: 0.75rem;
+            background-color: #eee;
+            color: #555;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .btn-apply-yellow {
+            background-color: var(--primary-yellow);
+            color: #000;
+            font-weight: 700;
+            padding: 12px 35px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-apply-yellow:hover {
+            transform: translateY(-2px);
+            background-color: var(--primary-red);
+            color: white;
+            box-shadow: 0 6px 12px rgba(237, 28, 36, 0.3);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .job-row { flex-wrap: wrap; }
+            .btn-apply-yellow { margin-top: 15px; width: 100%; text-align: center; }
+            .plus-icon { display: none; }
+            .intro-title { font-size: 2rem; }
+            .yellow-separator { width: 150px; }
+        }
+
+        /* --- Footer (Updated Background) --- */
+        .footer-main { 
+            background-color: var(--footer-dark); 
+            color: white; 
+            padding: 60px 0 40px; 
+        }
+        
+        .newsletter-box { max-width: 600px; margin: 0 auto 50px; text-align: center; }
+        .newsletter-box h2 { font-weight: 700; margin-bottom: 20px; }
+        .input-group-newsletter { display: flex; background: rgba(255,255,255,0.1); border-radius: 50px; padding: 5px; border: 1px solid rgba(255,255,255,0.2); }
+        .input-group-newsletter input { background: transparent; border: none; color: white; padding: 10px 20px; flex-grow: 1; outline: none; }
+        .btn-newsletter { background-color: var(--primary-yellow); border-radius: 50px; padding: 10px 30px; font-weight: 700; border: none; color: black; }
+
+        .footer-column h5 { font-weight: 700; margin-bottom: 20px; position: relative; }
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 12px; }
+        .footer-links li a { color: #d1d1d1; text-decoration: none; transition: 0.3s; }
+        .footer-links li a:hover { color: var(--primary-yellow); padding-left: 5px; }
+        .footer-links li i { color: var(--primary-red); margin-right: 10px; font-size: 0.8rem; }
+
+        .social-icons a { color: white; font-size: 1.5rem; margin-right: 15px; transition: 0.3s; }
+        .social-icons a:hover { color: var(--primary-yellow); }
+
+        .copyright-bar { background-color: var(--primary-yellow); color: #000; padding: 15px 0; font-weight: 600; }
+        .copyright-bar a { color: #000; text-decoration: none; margin-left: 15px; font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            .job-row { flex-direction: column; text-align: center; gap: 15px; }
+            .plus-icon { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="navbar-placeholder"></div>
+
+    <section class="intro-section">
+        <h1 class="intro-title">Join The Aagaj Team</h1>
+        <div class="yellow-separator"></div>
+        <p class="intro-text">
+            Do you believe in every child’s right to a happier childhood? <br>
+            Then come join us to embark on a rewarding journey to create lasting impact for India’s children.
+        </p>
+    </section>
+
+    <div class="career-heading-section">
+        <h2>Build Your Career At Aagaj</h2>
+    </div>
+
+    <section class="job-list-container">
+        
+        <div class="filter-section">
+            <span class="filter-label">Filter By Location</span>
+            <select class="location-dropdown">
+                <option value="all">All Locations</option>
+                <option value="bihar">Bihar</option>
+                <option value="up">Uttar Pradesh</option>
+                <option value="jharkhand">Jharkhand</option>
+            </select>
+            <i class="fa-solid fa-caret-down ms-2 text-danger"></i>
+        </div>
+
+        <div class="job-row">
+            <div class="plus-icon"><i class="fa-solid fa-plus"></i></div>
+            <div class="job-details">
+                <h3 class="job-title">Apply for job <span class="fee-badge">₹499</span></h3>
+            </div>
+            <a href="application.html?role=Normal Job&category=Normal" class="btn-apply-yellow">Apply Now</a>
+        </div>
+
+       
+    </section>
+
+    <footer class="footer-main">
+        <div class="container">
+            <div class="newsletter-box">
+                <h2>Get Our Newsletter</h2>
+                <div class="input-group-newsletter">
+                    <input type="email" placeholder="Enter your email address here">
+                    <button class="btn-newsletter">Submit Now</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <img src="../public/logo.jpeg" alt="Logo" class="mb-3" style="height: 60px; background: white; padding: 5px; border-radius: 5px;">
+                    <h5 class="text-white">Aagaj Foundation</h5>
+                    <p class="small text-light">Aagaj Foundation Empowering communities through sustainable agriculture, health, livelihood, and education initiatives.</p>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 ps-lg-5">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="about.html"><i class="fa-solid fa-arrow-right"></i> About Us</a></li>
+                        <li><a href="gallery.html"><i class="fa-solid fa-arrow-right"></i> Gallery</a></li>
+                        <li><a href="#"><i class="fa-solid fa-arrow-right"></i> Our Programmes</a></li>
+                        <li><a href="contact.html"><i class="fa-solid fa-arrow-right"></i> Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5>Contact Info</h5>
+                    <ul class="footer-links">
+                        <li class="text-light"><i class="fa-solid fa-arrow-right"></i> Email: aagajfoundationpaliganj@gmail.com</li>
+                        <li class="text-light"><i class="fa-solid fa-arrow-right"></i> Phone: 6124065270, 9431430464</li>
+                        <li class="text-light"><i class="fa-solid fa-arrow-right"></i> Map: Surbhi Vihar Bhupatipur Near Krishi Anusandhan Kendra Patna 800020</li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 pe-lg-5">
+                    <h5>Learn More</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Why Aagaj Foundation?</a></li>
+                        <li><a href="#">What We Do</a></li>
+                        <li><a href="#">Where We Work</a></li>
+                    </ul>
+                    <div class="social-icons mt-4">
+                        <a href="https://www.instagram.com/aagajfoundation/"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://www.facebook.com/aagajfoundation.org"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/company/aagaj-foundation/"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="copyright-bar">
+        <div class="container d-md-flex justify-content-between text-center">
+            <p class="mb-0">© 2026 Aagaj Foundation. All Rights Reserved.</p>
+            <div class="mt-2 mt-md-0">
+                <a href="#">Privacy</a> | <a href="#">Cookies Notice</a> | <a href="#">Terms & Conditions</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    // 1. Fetch and Load Navbar
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar-placeholder').innerHTML = data;
+
+            // 2. Set Active Class (kaunsa page open hai)
+            const currentPage = window.location.pathname.split("/").pop();
+            if(currentPage === "about.html") document.getElementById('nav-about').classList.add('active');
+            if(currentPage === "gallery.html") document.getElementById('nav-gallery').classList.add('active');
+
+            // 3. User Login Logic (Dashboard Check)
+            const userName = sessionStorage.getItem('loggedInUser');
+            const adminBtn = document.getElementById('admin-action-btn');
+            const servicesMenu = document.getElementById('services-list');
+
+            if (userName && adminBtn) {
+                adminBtn.href = "admin-dashboard.html"; 
+                adminBtn.innerHTML = `<i class="fa-solid fa-gauge me-2"></i> Dashboard (${userName})`;
+                adminBtn.style.backgroundColor = 'var(--primary-red)';
+                adminBtn.style.color = 'white';
+
+                if (servicesMenu) {
+                    servicesMenu.innerHTML = `
+                        <li><a class="dropdown-item" href="silayi-yojana.html">Mahila Silayi Prasikshan Yojana</a></li>
+                        <li><a class="dropdown-item" href="swarojgaar-yojana.html">Mahila Swarojgaar Yojana</a></li>
+                        <li><a class="dropdown-item" href="swasthya-login.html">Swasthya Suraksha Yojana</a></li>
+                    `;
+                }
+            }
+        });
+});
+ </script>
+</body>
+</html>

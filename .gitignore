@@ -1,0 +1,10 @@
+/.env
+/backend/.env
+/aagaz word file.docx
+/Razorpay payment integration
+node_modules/
+dist/
+build/
+.DS_Store
+*.log
+uploads/

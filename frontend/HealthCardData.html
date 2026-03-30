@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Card Data - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-red: #d32f2f; /* Matching Theme */
+        }
+        body { background: #f4f6f9; padding: 20px; font-family: sans-serif; }
+        
+        .container-custom {
+            background: white; 
+            padding: 25px; 
+            border-radius: 15px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .user-photo { 
+            width: 45px; 
+            height: 45px; 
+            border-radius: 50%; 
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        /* Pagination Styling */
+        .page-item.active .page-link {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+            color: white;
+        }
+        .page-link {
+            color: var(--primary-red);
+            cursor: pointer;
+        }
+
+        /* Search Bar */
+        #searchInput {
+            border-radius: 20px;
+            padding-left: 20px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-flex {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .search-container {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-custom">
+        <div class="d-flex justify-content-between align-items-center mb-4 header-flex">
+            <h3 class="fw-bold m-0"><i class="fa-solid fa-heart-pulse text-danger"></i> Health Card Records</h3>
+            <div class="d-flex gap-2 align-items-center flex-wrap justify-content-center">
+                <span class="badge bg-primary fs-6">Total: <span id="totalCount">0</span></span>
+                <button class="btn btn-dark btn-sm" onclick="window.history.back()">Back to Dashboard</button>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-4 search-container ms-auto">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by Name, Health ID or Mobile...">
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Photo</th>
+                        <th>Health ID</th>
+                        <th>Name</th>
+                        <th>Aadhar</th>
+                        <th>Contact</th>
+                        <th>Address</th>
+                        <th>Expiry</th>
+                    </tr>
+                </thead>
+                <tbody id="healthTableBody">
+                    <tr><td colspan="7" class="text-center p-4">Loading Data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center" id="paginationControls"></ul>
+        </nav>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+        // Global Variables
+        let allData = [];
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        async function loadHealthData() {
+            try {
+                const res = await fetch(CONFIG.API_URL + '/api/healthcard/all');
+                const result = await res.json();
+                
+                if(result.success && result.data.length > 0) {
+                    allData = result.data;
+                    // Sort by newest first (optional, creates better UX)
+                    // allData.reverse(); 
+                    
+                    currentFilteredData = allData;
+                    document.getElementById('totalCount').innerText = allData.length;
+                    renderTable(currentFilteredData);
+                } else {
+                    document.getElementById('healthTableBody').innerHTML = '<tr><td colspan="7" class="text-center">No Health Cards Found</td></tr>';
+                    document.getElementById('totalCount').innerText = '0';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('healthTableBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Server Error</td></tr>';
+            }
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('healthTableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No Records Found</td></tr>';
+                document.getElementById('paginationControls').innerHTML = '';
+                return;
+            }
+
+            // Pagination Logic
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(card => {
+                const photo = card.photoPath ? `${CONFIG.API_URL}${card.photoPath}` : '/logo.jpg'; // Fallback logic kept safe
+                
+                // Safe formatting for date
+                let dateStr = 'N/A';
+                if(card.expiryDate) {
+                    dateStr = new Date(card.expiryDate).toLocaleDateString();
+                }
+
+                // Safe formatting for address
+                let addressStr = 'N/A';
+                if(card.address) {
+                    addressStr = `${card.address.village || ''}, ${card.address.district || ''}`;
+                }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td><img src="${photo}" class="user-photo" onerror="this.src='https://via.placeholder.com/45'"></td>
+                        <td class="fw-bold text-primary">${card.healthId || 'N/A'}</td>
+                        <td class="fw-bold">${(card.fullName || 'Unknown').toUpperCase()}</td>
+                        <td>${card.aadhar || '-'}</td>
+                        <td>${card.mobile || '-'}</td>
+                        <td class="small text-muted">${addressStr}</td>
+                        <td><span class="badge bg-warning text-dark">${dateStr}</span></td>
+                    </tr>
+                `;
+            });
+
+            renderPagination(totalPages);
+        }
+
+        // Pagination Controls Function
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            // Prev Button
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            // Page Numbers (Smart Window)
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if(endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for(let i=startPage; i<=endPage; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            // Next Button
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        // Change Page Function
+        window.changePage = function(page) {
+            currentPage = page;
+            renderTable(currentFilteredData);
+        }
+
+        // Search Filter
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            currentFilteredData = allData.filter(card => {
+                return (card.fullName && card.fullName.toLowerCase().includes(term)) ||
+                       (card.healthId && card.healthId.toLowerCase().includes(term)) ||
+                       (card.mobile && card.mobile.toString().includes(term));
+            });
+            currentPage = 1;
+            renderTable(currentFilteredData);
+        });
+
+        // Initialize
+        loadHealthData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Normal Jobs Data - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --sidebar-bg: #051630;
+            --text-light: #f8f9fa;
+        }
+
+        body { font-family: sans-serif; background-color: #f4f6f9; overflow-x: hidden; }
+
+        /* --- Sidebar & Layout --- */
+        .sidebar { 
+            height: 100vh; 
+            background-color: var(--sidebar-bg); 
+            color: white; 
+            position: fixed; 
+            width: 250px; 
+            overflow-y: auto; 
+            z-index: 1100; 
+            transition: 0.3s;
+            left: 0;
+        }
+
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: relative; }
+        .sidebar-header img { height: 60px; background: white; padding: 5px; border-radius: 5px; }
+        
+        .close-sidebar {
+            display: none;
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .sidebar ul { padding: 0; list-style: none; margin-top: 20px; }
+        .sidebar ul li a { display: block; padding: 15px 25px; color: #b8c7ce; text-decoration: none; transition: 0.3s; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { background-color: rgba(255,255,255,0.1); color: var(--primary-yellow); border-left: 4px solid var(--primary-red); }
+        
+        /* ✅ Sidebar Dropdown Arrow Styling */
+        .sidebar ul li a[data-bs-toggle="collapse"] { position: relative; }
+        .sidebar ul li a[data-bs-toggle="collapse"]::after {
+            content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: 20px; font-size: 0.8rem; transition: 0.3s;
+        }
+        .sidebar ul li a[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+        .main-content { margin-left: 250px; padding: 20px; transition: 0.3s; min-height: 100vh; }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -250px; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; }
+            .close-sidebar { display: block; }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1050;
+            }
+            .sidebar-overlay.active { display: block; }
+        }
+
+        .mobile-header {
+            display: none;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 10px 20px;
+            justify-content: space-between;
+            align-items: center;
+        }
+        @media (max-width: 992px) { .mobile-header { display: flex; } }
+
+        /* --- Stats & Table --- */
+        .stat-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid transparent; height: 100%; }
+        .stat-card.red { border-bottom-color: var(--primary-red); }
+        .stat-card.blue { border-bottom-color: #0d6efd; }
+        .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .table img.user-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+
+        /* --- ID CARD PREVIEW MODAL STYLES --- */
+        .id-card-wrapper { display: flex; justify-content: center; align-items: center; padding: 10px; background: #f0f2f5; overflow-x: auto; }
+        .id-card-container { width: 320px; min-width: 320px; height: 500px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); overflow: hidden; position: relative; border: 1px solid #ddd; font-family: Arial, sans-serif; }
+        .card-header-custom { background: #000080; color: white; text-align: center; padding: 15px; border-bottom: 5px solid #ED1C24; }
+        .card-header-custom h3 { margin: 0; font-size: 18px; font-weight: bold; }
+        .card-header-custom p { margin: 2px 0 0; font-size: 10px; opacity: 0.8; }
+        .unique-id { position: absolute; top: 15px; right: 15px; background: white; color: #ED1C24; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; }
+        .photo-section { text-align: center; margin-top: 15px; }
+        .photo-frame { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #ED1C24; object-fit: cover; padding: 3px; background: white; }
+        .card-body-custom { padding: 10px 20px; text-align: center; }
+        .card-name { color: #000080; font-size: 18px; font-weight: bold; text-transform: uppercase; margin: 5px 0; }
+        .card-designation { color: #ED1C24; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .details-box { background: #f8f9fa; padding: 8px; border-radius: 8px; text-align: left; font-size: 12px; line-height: 1.8; color: #333; }
+        .details-box strong { color: #000080; display: inline-block; width: 60px; }
+        .card-footer-custom { background: #000080; color: white; position: absolute; bottom: 0; width: 100%; padding: 8px; text-align: center; font-size: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <div class="mobile-header">
+        <h5 class="mb-0 fw-bold text-white">Aagaj Admin</h5>
+        <button class="btn btn-outline-light btn-sm" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="close-sidebar" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></span>
+            <img src="../public/logo.jpg" alt="Logo"> 
+            <h5 class="mb-0 mt-2 fw-bold">Aagaj Admin</h5>
+        </div>
+        <ul>
+            <li><a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
+            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Jobs Data</a></li>
+            <li><a href="Normal_Jobs_Data.html"><i class="fa-solid fa-briefcase me-2"></i> Normal Jobs Data</a></li>
+            
+            <li>
+                <a href="#paymentSubmenu" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fa-solid fa-money-bill me-2"></i> Payments
+                </a>
+                <ul class="collapse list-unstyled" id="paymentSubmenu" style="background: rgba(0,0,0,0.2);">
+                    <li>
+                        <a href="all_transactions.html" style="padding-left: 50px; font-size: 0.9rem;">
+                            <i class="fa-solid fa-receipt me-2"></i> All Transactions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="donation_history.html" style="padding-left: 50px; font-size: 0.9rem;">
+                            <i class="fa-solid fa-hand-holding-heart me-2"></i> Donation History
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="index.html" class="mt-5 border-top pt-3"><i class="fa-solid fa-house me-2"></i> Back to Website</a></li>
+            <li><a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="d-md-flex justify-content-between align-items-center mb-4 text-center text-md-start">
+            <h3 class="fw-bold text-dark">Normal Jobs Management</h3>
+            <div class="mt-2 mt-md-0">
+                <button class="btn btn-dark" onclick="fetchData()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-6">
+                <div class="stat-card red d-flex flex-column flex-sm-row justify-content-between align-items-center text-center text-sm-start">
+                    <div>
+                        <h6 class="text-muted small">Total Applicants</h6>
+                        <h2 class="fw-bold mb-0" id="totalCount">0</h2>
+                    </div>
+                    <i class="fa-solid fa-users fa-2x text-danger mt-2 mt-sm-0"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-6">
+                <div class="stat-card blue d-flex flex-column flex-sm-row justify-content-between align-items-center text-center text-sm-start">
+                    <div>
+                        <h6 class="text-muted small">Generated IDs</h6>
+                        <h2 class="fw-bold mb-0" id="idCount">0</h2>
+                    </div>
+                    <i class="fa-solid fa-id-card fa-2x text-primary mt-2 mt-sm-0"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="row g-3 mb-3 align-items-center">
+                <div class="col-12 col-md-4">
+                    <h5 class="fw-bold mb-0 text-center text-md-start">Normal Job Applicants</h5>
+                </div>
+                <div class="col-12 col-md-8">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search Name or ID...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="min-width: 800px;">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Photo</th>
+                            <th>Pravesh ID</th>
+                            <th>Name / Email</th>
+                            <th>Role Applied</th>
+                            <th>Credentials</th>
+                            <th class="text-center">Form PDF</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr><td colspan="7" class="text-center p-3">Loading Data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="paginationControls"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="modal fade" id="cardModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ID Card Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-light text-center p-0">
+                    <div class="id-card-wrapper">
+                        <div class="id-card-container" id="adminIdCard">
+                            <div class="unique-id" id="card_uid">ID: 0000</div>
+                            <div class="card-header-custom">
+                                <h3>Aagaj Foundation</h3>
+                                <p>Registered Under Indian Trust Act 1882</p>
+                            </div>
+                            <div class="photo-section">
+                                <img src="" id="card_photo" class="photo-frame" alt="User Photo">
+                            </div>
+                            <div class="card-body-custom">
+                                <div class="card-name" id="card_name">Loading...</div>
+                                <div class="card-designation" id="card_role">General Staff</div>
+                                <div class="details-box">
+                                    <div><strong>Post:</strong> <span id="card_role_detail">---</span></div>
+                                    <div><strong>DOB:</strong> <span id="card_dob">--/--/----</span></div>
+                                    <div><strong>Mobile:</strong> <span id="card_mobile">---</span></div>
+                                    <div><strong>Email:</strong> <span id="card_email">---</span></div>
+                                    <div><strong>Dist:</strong> <span id="card_dist">---</span></div>
+                                    <div><strong>State:</strong> <span id="card_state">---</span></div>
+                                </div>
+                            </div>
+                            <div class="card-footer-custom">
+                                www.aagajfoundation.com | Helpline: 9431430464
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="downloadAdminCard()">Download Card</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="viewCredModal" tabindex="-1">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Login Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="mb-1">User ID (Email):</p>
+                    <h6 class="fw-bold text-success" id="view_user">---</h6>
+                    <hr>
+                    <p class="mb-1">Password:</p>
+                    <h5 class="fw-bold text-success" id="view_pass">---</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // SIDEBAR TOGGLE LOGIC
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        let allData = [];
+        // ✅ Pagination Variables
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        document.addEventListener("DOMContentLoaded", fetchData);
+
+        async function fetchData() {
+            try {
+                const res = await fetch(CONFIG.API_URL + '/admin/get-all-applicants', {
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem("authToken") }
+                });
+                const data = await res.json();
+                allData = data.filter(u => u.job_category === 'Normal');
+                renderTable(allData);
+                updateStats();
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Server Not Connected!</td></tr>`;
+            }
+        }
+
+        function renderTable(data) {
+            // ✅ Update global data reference for pagination
+            currentFilteredData = data;
+
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No Normal Job Data Found</td></tr>';
+                document.getElementById('paginationControls').innerHTML = ''; // Clear pagination
+                return;
+            }
+
+            // ✅ Pagination Logic: Slice Data
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach(user => {
+                const photo = user.photoPath ? user.photoPath : 'https://via.placeholder.com/40';
+                let credBtn = user.emp_password ? `<button class="btn btn-sm btn-success" onclick="viewCredentials('${user.emp_username}', '${user.emp_password_plain || 'Protected'}')">Pass</button>` : `<span class="badge bg-warning text-dark">No Pass</span>`;
+                let pdfBtn = user.applicationPdf ? `<a href="${user.applicationPdf}" target="_blank" class="btn btn-sm btn-danger"><i class="fa-solid fa-file-pdf"></i> PDF</a>` : `<span class="badge bg-secondary">No PDF</span>`;
+                let cardBtn = `<button class="btn btn-sm btn-primary" onclick="openCardModal('${user._id}')"><i class="fa-solid fa-id-card"></i></button>`;
+                let deleteBtn = `<button class="btn btn-sm btn-dark" onclick="deleteEmployee('${user._id}')"><i class="fa-solid fa-trash"></i></button>`;
+
+                const row = `
+                    <tr>
+                        <td><img src="${photo}" class="user-thumb"></td>
+                        <td class="fw-bold text-primary">AF-${user.uniqueId}</td>
+                        <td><div class="fw-bold small">${user.fullName}</div><small class="text-muted" style="font-size:11px;">${user.email}</small></td>
+                        <td><span class="badge bg-info text-dark" style="font-size:11px;">${user.roleApplied || 'N/A'}</span></td>
+                        <td>${credBtn}</td>
+                        <td class="text-center">${pdfBtn}</td> 
+                        <td><div class="d-flex gap-1">${cardBtn} ${deleteBtn}</div></td>
+                    </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            // ✅ Render Pagination Buttons
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            // Prev Button
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            // Page Numbers (Smart Window)
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if(endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for(let i=startPage; i<=endPage; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            // Next Button
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        // ✅ Change Page Function
+        window.changePage = function(page) { 
+            currentPage = page; 
+            renderTable(currentFilteredData); 
+        }
+
+        async function deleteEmployee(id) {
+            if(!confirm("Are you sure you want to delete this record?")) return;
+            try {
+                const res = await fetch(`${CONFIG.API_URL}/admin/delete-employee/${id}`, { 
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem("authToken") }
+                });
+                const d = await res.json();
+                if(d.success) { alert("Deleted!"); fetchData(); }
+            } catch(e) { console.error(e); }
+        }
+
+        function openCardModal(id) {
+            const user = allData.find(u => u._id === id);
+            if (!user) return;
+            document.getElementById('card_uid').innerText = "ID: AF-" + user.uniqueId;
+            document.getElementById('card_name').innerText = user.fullName;
+            document.getElementById('card_role').innerText = user.roleApplied || "General Staff";
+            document.getElementById('card_role_detail').innerText = user.roleApplied || "N/A";
+            document.getElementById('card_dob').innerText = user.dob || "N/A";
+            document.getElementById('card_mobile').innerText = user.mobile;
+            document.getElementById('card_email').innerText = user.email.length > 18 ? user.email.substring(0,16)+"..." : user.email;
+            document.getElementById('card_dist').innerText = user.district || "N/A";
+            document.getElementById('card_state').innerText = user.state || "N/A";
+            document.getElementById('card_photo').src = user.photoPath ? user.photoPath : 'https://via.placeholder.com/100';
+            new bootstrap.Modal(document.getElementById('cardModal')).show();
+        }
+
+        function viewCredentials(u, p) {
+            document.getElementById('view_user').innerText = u;
+            document.getElementById('view_pass').innerText = p;
+            new bootstrap.Modal(document.getElementById('viewCredModal')).show();
+        }
+
+        function downloadAdminCard() {
+            const card = document.getElementById('adminIdCard');
+            html2canvas(card, { scale: 3, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Employee_Card.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('totalCount').innerText = allData.length;
+            document.getElementById('idCount').innerText = allData.length;
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            const filtered = allData.filter(u => u.fullName.toLowerCase().includes(term) || u.uniqueId.includes(term));
+            currentPage = 1; // Reset to page 1 on search
+            renderTable(filtered);
+        });
+
+        function logout() { sessionStorage.removeItem('loggedInUser'); window.location.href = 'index.html'; }
+
+        // Sidebar Active State
+        const currentPagePath = window.location.pathname.split("/").pop();
+        document.querySelectorAll('.sidebar ul li a').forEach(link => {
+            if (link.getAttribute('href') === currentPagePath) link.classList.add('active');
+        });
+    </script>
+    <script src="config.js"></script>
+</body>
+</html>

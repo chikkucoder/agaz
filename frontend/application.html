@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation - Application Form</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; } */
+       
+        /* === Global Fixes === */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+
+
+        .container { background-color: #fff; border: 2px solid #000080; padding: 30px; max-width: 850px; margin: auto; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        #receipt-container {
+        border: none !important;
+        }
+        .left-logo-container { position: absolute; left: 20px; top: 5px; width: 110px; text-align: center; }
+        .small-logo { width: 70px; height: auto; margin-bottom: 2px; }
+        .small-logo-text { color: #e31e24; font-size: 10px; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .header { text-align: center; margin-bottom: 20px; position: relative; padding-top: 10px; }
+        .logo-text { color: #e31e24; font-size: 50px; font-weight: bold; margin: 0; }
+        .sub-header { font-weight: bold; font-size: 18px; color: #000080; margin: 5px 0; }
+        .contact-info { font-weight: bold; font-size: 15px; color: #000080; margin-bottom: 10px; }
+        
+        .lang-switch { position: absolute; top: 10px; right: 20px; background: #eee; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold; z-index: 2000; }
+        .lang-switch label { cursor: pointer; margin: 0 5px; color: #000080; }
+        
+        .photo-box { border: 2px solid #000080; width: 110px; height: 130px; display: flex; align-items: center; justify-content: center; position: absolute; top: 100px; border-radius: 8px; color: #000080; font-weight: bold; cursor: pointer; background-color: #f9f9f9; overflow: hidden; z-index: 1000; }
+        .photo-right { right: 20px; }
+
+        /* === Added for camera icon feature === */
+        .camera-icon-btn{
+            position:absolute;
+            top:4px;
+            right:4px;
+            width:34px;
+            height:34px;
+            border:none;
+            border-radius:50%;
+            background: #0d6efd !important; /* blue */
+            color: #fff;
+            cursor:pointer;
+            z-index:1200;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+            line-height:1;
+        }
+        .camera-modal{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.75);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:9999;
+            padding:15px;
+        }
+        .camera-modal-box{
+            background:#fff;
+            width:100%;
+            max-width:360px;
+            border-radius:10px;
+            padding:10px;
+        }
+        .camera-modal-box video{
+            width:100%;
+            border-radius:8px;
+            background:#000;
+        }
+        .camera-actions{
+            display:flex;
+            gap:10px;
+            justify-content:center;
+            margin-top:10px;
+            flex-wrap:wrap;
+        }
+        .camera-actions button{
+            border:none;
+            border-radius:6px;
+            padding:8px 12px;
+            color:#fff;
+            font-weight:bold;
+            cursor:pointer;
+        }
+        .cam-capture{ background:#2e7d32; }
+        .cam-close{ background:#d32f2f; }
+        /* === Added for camera icon feature end === */
+
+        .instruction { text-align: center; font-weight: bold; font-size: 13px; color: #000080; border-top: 1px dotted #000080; margin-top: 55px; padding-top: 10px; }
+        input[type="text"], input[type="email"], input[type="date"] { border: none; border-bottom: 1px dotted #000; outline: none; padding: 2px 5px; background: transparent; font-family: inherit; color: #000; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; margin-top: 10px; }
+        td, th { border: 1px solid #000080; padding: 6px; color: #000080; font-weight: bold; }
+        .label-col { width: 35%; }
+        .address-section { color: #e31e24; font-weight: bold; line-height: 2.2; }
+        .address-section input { width: auto; min-width: 100px; color: #000; border-bottom: 1px dotted #000080; }
+        
+        .qual-table th { font-size: 11px; text-align: center; background: #f9f9f9; }
+        .qual-table input { border: none; text-align: center; width: 100%; }
+        
+        .red-text { color: #e31e24; font-size: 13px; font-weight: bold; line-height: 1.4; }
+        .footer-sig { display: flex; justify-content: space-between; margin-top: 40px; font-weight: bold; color: #000080; }
+        .post-choice { color: #e31e24; font-weight: bold; margin: 15px 0; }
+        .action-buttons { text-align: center; margin-top: 30px; padding-bottom: 20px; }
+        .btn { padding: 10px 25px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; border: none; margin: 0 10px; color: white; }
+        .btn-print { background-color: #000080; }
+        .btn-submit { background-color: #e31e24; }
+        
+        @media print {
+        @page { size: A4; margin: 5mm; }
+
+        body {
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        }
+
+        .container {
+        width: 100% !important;
+        max-width: none !important;
+        min-height: auto !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 10px 20px !important;
+        margin: 0 !important;
+        transform: none !important;          /* scale hata diya */
+        transform-origin: initial !important;
+        page-break-inside: avoid !important;
+        }
+
+    /* Receipt border clean */
+    #receipt-container {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Photo box exact visible */
+    .photo-box {
+        display: flex !important;
+        position: absolute !important;
+        top: 95px !important;
+        right: 20px !important;
+        border: 2px solid #000080 !important;
+        background-color: #f9f9f9 !important;
+    }
+
+    .left-logo-container { display: block !important; }
+
+    /* Colors preserve */
+    .logo-text, .address-section, .post-choice, .red-text, select { color: #e31e24 !important; }
+    .sub-header, .contact-info, .instruction, td, th, .footer-sig, p[data-key="declaration"] { color: #000080 !important; }
+    td, th { border: 1px solid #000080 !important; }
+
+    input {
+        border: none !important;
+        border-bottom: 1px dotted #000 !important;
+        background: transparent !important;
+        color: #000 !important;
+        font-weight: bold !important;
+    }
+
+    select {
+        border: none !important;
+        border-bottom: 1px solid #000 !important;
+        background: transparent !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        font-weight: bold !important;
+    }
+
+    .action-buttons,
+    .lang-switch,
+    input[type="file"],
+    .camera-icon-btn,
+    .camera-modal {
+        display: none !important;
+    }
+}
+        /* --- Responsive Design --- */
+        /* @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; width: 100%; border: none; box-shadow: none; }
+            
+            .left-logo-container {
+                position: relative;
+                left: auto;
+                top: auto;
+                width: 100%;
+                margin-bottom: 15px;
+            }
+            
+            .lang-switch {
+                position: relative;
+                top: auto;
+                right: auto;
+                text-align: center;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            
+            .photo-box {
+                position: relative;
+                top: auto;
+                right: auto;
+                margin: 10px auto;
+            }
+            
+            .header { padding-top: 0; }
+            .logo-text { font-size: 28px; }
+            .sub-header { font-size: 14px; }
+            .contact-info { font-size: 12px; }
+            
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+            
+            .address-section { line-height: normal; }
+            .address-section input { width: 100% !important; display: block; margin-bottom: 10px; }
+            .address-section span { display: block; font-weight: bold; margin-top: 10px; }
+            .address-section br { display: none; }
+            
+            .footer-sig {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            
+            .action-buttons .btn { width: 100%; margin: 5px 0; }
+            #role-select { width: 100% !important; }
+        } */
+
+
+        /* --- Responsive Design for Mobile Devices --- */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; width: 100%; border: 1px solid #000080; box-shadow: none; border-radius: 8px;}
+            
+            /* Header & Logos */
+            .lang-switch { position: relative; top: auto; right: auto; text-align: center; margin-bottom: 15px; width: 100%; display: flex; justify-content: center; padding: 10px; }
+            .left-logo-container { position: relative; left: auto; top: auto; width: 100%; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; }
+            
+            .header { padding-top: 0; margin-bottom: 10px; }
+            .logo-text { font-size: 32px; line-height: 1.1; }
+            .sub-header { font-size: 15px; }
+            .contact-info { font-size: 13px; }
+            .instruction { margin-top: 10px; border-top: none; }
+            
+            /* Photo Box Centered */
+            .photo-box { position: relative; top: auto; right: auto; margin: 15px auto; }
+            
+            /* Primary Info Table to Stacked Layout */
+            table:not(.qual-table), 
+            table:not(.qual-table) tbody, 
+            table:not(.qual-table) tr, 
+            table:not(.qual-table) td { display: block; width: 100%; }
+            table:not(.qual-table) tr { margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; padding: 10px; background: #fafafa;}
+            table:not(.qual-table) td { border: none; padding: 5px 0; text-align: left; }
+            table:not(.qual-table) td.label-col { border-bottom: 1px dashed #ccc; padding-bottom: 8px; margin-bottom: 8px; font-size: 14px; }
+            
+            /* Qualification Table (Horizontal Scroll allowed) */
+            .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #000080; border-radius: 6px; margin-bottom: 15px; }
+            .qual-table { margin: 0; min-width: 700px; /* Forces wide width inside scroll container */ border: none; }
+            .qual-table th, .qual-table td { border: 1px solid #ddd; padding: 8px; }
+            
+            /* Address Section Stacking */
+            .address-section { line-height: normal; display: flex; flex-direction: column; gap: 10px; background: #fafafa; padding: 10px; border: 1px solid #ddd; border-radius: 6px;}
+            .address-section input { width: 100% !important; margin-bottom: 5px; padding: 8px 5px; background: #fff;}
+            .address-section span { display: block; font-weight: bold; margin-top: 5px; }
+            .address-section br { display: none; }
+            
+            /* Dropdown Choice */
+            .post-choice { text-align: center; background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #ddd;}
+            #role-select { width: 100% !important; margin-top: 10px; padding: 8px; }
+            
+            /* Footer Signatures */
+            .footer-sig { flex-direction: column; align-items: stretch; gap: 20px; background: #fafafa; padding: 15px; border-radius: 6px; border: 1px solid #ddd; margin-top: 20px;}
+            .footer-sig > span { display: flex; flex-direction: column; width: 100%; }
+            .footer-sig input { width: 100% !important; margin-top: 5px; }
+            
+            /* Helpline Section Bottom */
+            .helpline-section { flex-direction: column; align-items: center; text-align: center; gap: 15px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;}
+            
+            /* Buttons */
+            .action-buttons { display: flex; flex-direction: column; gap: 10px; }
+            .action-buttons .btn { width: 100%; margin: 0; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="form-container">
+        <div class="lang-switch">
+            <label><input type="radio" name="lang" value="en" checked onclick="setLanguage('en')"> English</label>
+            <label><input type="radio" name="lang" value="hi" onclick="setLanguage('hi')"> हिंदी</label>
+        </div>
+
+        <div class="left-logo-container">
+            <img src="../public/logo.jpg" class="small-logo" alt="Logo">
+            <span class="small-logo-text">AAGAJ FOUNDATION</span>
+        </div>
+
+        <label class="photo-box photo-right" for="finalPhotoInput">
+            <span id="txtR" data-key="photo_label">PHOTO</span>
+            <img id="imgR" style="display:none; width:100%; height:100%; object-fit:cover;">
+            <button type="button" class="camera-icon-btn" onclick="openLiveCamera(event)" title="Live Camera">📷</button>
+            <input type="file" id="finalPhotoInput" accept="image/*" style="display:none;" onchange="previewImage(this)">
+        </label>
+
+        <div class="header">
+            <h1 class="logo-text" data-key="foundation_name">AAGAJ FOUNDATION</h1>
+            <p class="sub-header" data-key="reg_text">Registered Under Indian Trust Act 1882</p>
+            <p class="contact-info">
+                GST No.10AAHTA9693GIZM <br>
+                PAN No.AAHTA9693G <br>
+                Email: aagajfoundationpaliganj@gmail.com
+            </p>
+        </div>
+
+        <div class="instruction">
+            <span data-key="app_form">APPLICATION FORM</span> <br>
+            <span data-key="block_letters">ALL ENTERS TO BE MADE IN CAPITAL BLOCK LETTERS</span>
+        </div>
+
+        <table>
+            <tr><td class="label-col" data-key="name_full">Name in full (in block letters)</td><td><input type="text" id="form-name" class="uppercase-input"></td></tr>
+            <tr><td data-key="father_name">Father/ Husband Name (in block letters)</td><td><input type="text" id="form-father" class="uppercase-input"></td></tr>
+            <tr><td data-key="mother_name">Mother's Name (in block letters)</td><td><input type="text" id="form-mother" class="uppercase-input"></td></tr>
+            <tr><td data-key="dob">Date of Birth (DD/MM/YY)</td><td><input type="text" id="form-dob" placeholder="DD/MM/YYYY" maxlength="10"></td></tr>
+            <tr><td data-key="mobile">Mobile No.</td><td><input type="text" id="form-mobile" maxlength="10"></td></tr>
+            <tr><td data-key="email">Email ID</td><td><input type="email" id="form-email"></td></tr>
+            <tr><td data-key="aadhar">Aadhar NO</td><td><input type="text" id="form-aadhar" maxlength="12"></td></tr>
+        </table>
+
+        <div class="address-section">
+            <span data-key="perm_address">Permanent home address:</span><br>
+            <span data-key="village">Village:</span> <input type="text" id="form-vill" class="uppercase-input" style="width:180px"> 
+            <span data-key="panchayat">Panchayat:</span> <input type="text" id="form-panchayat" class="uppercase-input" style="width:180px"> 
+            <span data-key="post">Post Office:</span> <input type="text" id="form-post" class="uppercase-input" style="width:180px"><br>
+            <span data-key="block">Block:</span> <input type="text" id="form-block" class="uppercase-input" style="width:150px"> 
+            <span data-key="police">Police Station:</span> <input type="text" id="form-police" class="uppercase-input" style="width:180px"> 
+            <span data-key="dist">District:</span> <input type="text" id="form-dist" class="uppercase-input" style="width:180px"><br>
+            <span data-key="state">State:</span> <input type="text" id="form-state" class="uppercase-input" style="width:150px"> 
+            <span data-key="pin">Pin Code:</span> <input type="text" id="form-pin" style="width:100px" maxlength="6"> 
+            <span data-key="ward">Ward No:</span> <input type="text" id="form-ward" style="width:80px"> 
+            
+            <span data-key="total_ward">Total Ward:</span> <input type="text" id="form-total-ward" style="width:80px"><br>
+            
+            <span data-key="nation">Nationality:</span> <input type="text" id="form-nation" style="width:150px" class="uppercase-input"> 
+            <span data-key="lang">Language Known:</span> <input type="text" id="form-lang" style="width:350px" class="uppercase-input"><br>
+            
+            <span data-key="acc_no">Account No:</span> <input type="text" id="form-acc-no" style="width:380px"> 
+            <span data-key="ifsc">IFSC Code:</span> <input type="text" id="form-ifsc" style="width:150px" class="uppercase-input"><br>
+            <span data-key="acc_holder">Account Holder Name:</span> <input type="text" id="form-acc-holder" style="width:250px" class="uppercase-input"> 
+
+            <span data-key="bank">Bank Name:</span> <input type="text" id="form-bank" style="width:250px" class="uppercase-input">
+        </div>
+
+        <p style="color: #e31e24; font-weight: bold; margin-bottom: 5px;" data-key="qualification">Qualification:</p>
+        
+        <table class="qual-table">
+    <thead>
+        <tr>
+            <th style="width: 10%;" data-key="exam_col">Exam</th> 
+            <th width="25%" data-key="school_addr">Name of School/College</th>
+            <th data-key="pass_year">Year</th>
+            <th data-key="board">Board/Univ</th>
+            <th data-key="subjects">Subjects</th>
+            <th data-key="division">Div</th>
+            <th data-key="percent">%</th>
+            <th data-key="remarks">Remarks</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td data-key="matric">Matric</td>
+            <td><input type="text" id="m_school" class="title-case-text"></td>
+            <td><input type="text" id="m_year" class="year-input" maxlength="4" placeholder="YYYY"></td>
+            <td><input type="text" id="m_board" class="title-case-text"></td>
+            <td><input type="text" id="m_sub" class="subjects-input"></td>
+            <td><input type="text" id="m_div" class="div-input"></td>
+            <td><input type="text" id="m_marks" class="percent-input"></td>
+            <td><input type="text" id="m_rem" class="percent-input"></td>
+        </tr>
+        <tr>
+            <td data-key="inter">Intermediate</td>
+            <td><input type="text" id="i_school" class="title-case-text"></td>
+            <td><input type="text" id="i_year" class="year-input" maxlength="4" placeholder="YYYY"></td>
+            <td><input type="text" id="i_board" class="title-case-text"></td>
+            <td><input type="text" id="i_sub" class="subjects-input"></td>
+            <td><input type="text" id="i_div" class="div-input"></td>
+            <td><input type="text" id="i_marks" class="percent-input"></td>
+            <td><input type="text" id="i_rem" class="percent-input"></td>
+        </tr>
+        <tr>
+            <td data-key="grad">Graduation</td>
+            <td><input type="text" id="g_school" class="title-case-text"></td>
+            <td><input type="text" id="g_year" class="year-input" maxlength="4" placeholder="YYYY"></td>
+            <td><input type="text" id="g_board" class="title-case-text"></td>
+            <td><input type="text" id="g_sub" class="subjects-input"></td>
+            <td><input type="text" id="g_div" class="div-input"></td>
+            <td><input type="text" id="g_marks" class="percent-input"></td>
+            <td><input type="text" id="g_rem" class="percent-input"></td>
+        </tr>
+    </tbody>
+</table>
+
+    <!-- <div class="post-choice">
+        <span data-key="choose_post">Choose option of the post:</span> <br>
+        <select id="role-select" style="border:none; border-bottom:1px solid #000; font-weight:bold; color:#e31e24; width: 200px;">
+            <option value="Panchayat Coordinator" data-key="role_panchayat">Panchayat Coordinator</option>
+            <option value="Block Coordinator" data-key="role_block">Block Coordinator</option>
+            <option value="District Coordinator" data-key="role_district">District Coordinator</option>
+            <option value="Health Supervisor" data-key="role_health">Health Supervisor</option>
+            <option value="Mahila Mitra" data-key="role_mitra">Mahila Mitra</option>
+            <option value="Skill Trainer" data-key="role_skill">Skill Trainer</option> 
+            <option value="Trainer" data-key="role_trainer">Trainer</option>
+            <option value="Other NGO Job" data-key="role_ngo">Other NGO Job</option>
+        </select>
+    </div> -->
+    <div class="post-choice">
+            <span data-key="choose_post">Choose option of the post:</span> <br>
+            <select id="role-select" style="border:none; border-bottom:1px solid #000; font-weight:bold; color:#e31e24; width: 200px;">
+                <option value="" disabled selected data-key="select_role_prompt">-- Select Job Role --</option>
+                <option value="Panchayat Coordinator" data-key="role_panchayat">Panchayat Coordinator</option>
+                <option value="Block Coordinator" data-key="role_block">Block Coordinator</option>
+                <option value="District Coordinator" data-key="role_district">District Coordinator</option>
+                <option value="Health Supervisor" data-key="role_health">Health Supervisor</option>
+                <option value="Mahila Mitra" data-key="role_mitra">Mahila Mitra</option>
+                <option value="Skill Trainer" data-key="role_skill">Skill Trainer</option> 
+                <option value="Trainer" data-key="role_trainer">Trainer</option>
+                <option value="Other NGO Job" data-key="role_ngo">Other NGO Job</option>
+            </select>
+        </div>
+
+    <p style="font-size: 14px; font-weight: bold; color: #000080; text-align: center;" data-key="declaration">
+        I hereby give my consent and sign as per the above.
+    </p>
+
+    <div class="footer-sig">
+        <span data-key="sig_guardian">Guardian Signature</span>
+        <span><span data-key="place">Place:</span> <input type="text" id="form-place" class="uppercase-input" style="width:100px; border-bottom: 1px dotted #000080;"></span>
+        <span><span data-key="date">Date:</span> <input type="date" id="form-date" style="width:100px; border-bottom: 1px dotted #000080;"></span>
+        <span data-key="sig_coord">Coordinator Signature</span>
+    </div>
+
+    <div class="red-text" style="margin-top: 10px; font-size: 11px; text-align: justify;" data-key="note_text">
+        Note: Fee once paid is not refundable.
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+        <span style="font-weight: bold; color: #000080;"><span data-key="helpline">📞 Helpline:</span> 06124065270, 8507355085</span>
+        <span class="red-text" style="font-size: 20px;" data-key="sig_officer">Officer Signature</span>
+    </div>
+
+    <div class="action-buttons">
+        <!-- <button type="button" class="btn btn-print" onclick="window.print()" data-key="btn_print">Print Form</button> -->
+        <button type="button" class="btn btn-submit" id="payBtn" onclick="initiatePayment()" data-key="btn_pay">Submit & Pay Now</button>
+    </div>
+    </div>
+
+    <!-- ✅ NEW: Receipt Container (Hidden by default) -->
+    <div class="container" id="receipt-container" style="display: none; text-align: center;">
+        <div class="header">
+            <h1 class="logo-text">AAGAJ FOUNDATION</h1>
+            <p class="sub-header">Payment Receipt</p>
+            <p style="font-weight:bold;">Date: <span id="rec-date"></span></p>
+        </div>
+
+        <div style="border: 1px solid #000; padding: 20px; margin: 20px auto; max-width: 600px; text-align: left; font-size: 16px; line-height: 1.8;">
+            <p><strong>Transaction ID:</strong> <span id="rec-txn"></span></p>
+            <p><strong>Name:</strong> <span id="rec-name"></span></p>
+            <p><strong>Mobile No:</strong> <span id="rec-mobile"></span></p>
+            <p><strong>Applied For:</strong> <span id="rec-role"></span></p>
+            <p><strong>Amount Paid:</strong> ₹<span id="rec-amount"></span></p>
+            <p><strong>Payment Status:</strong> <span style="color:green; font-weight:bold;">SUCCESSFUL</span></p>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-print" onclick="window.print()">Print Receipt</button>
+            <button id="btn-download-pdf" class="btn btn-submit" style="background-color: #000080; color: white; display: none;" onclick="printApplicationForm()">Print Application Form</button>
+            <button id="btn-proceed-card" class="btn btn-submit" style="display: none;" onclick="proceedToCard()">Proceed to ID Card</button>
+            <button class="btn btn-submit" style="background-color: #28a745; color: white; margin-top: 10px;" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i> Back to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- Added camera modal -->
+    <div id="cameraModal" class="camera-modal">
+        <div class="camera-modal-box">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <div class="camera-actions">
+                <button type="button" class="cam-capture" onclick="captureFromCamera()">Capture</button>
+                <button type="button" class="cam-close" onclick="closeLiveCamera()">Close</button>
+            </div>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+        </div>
+    </div>
+
+
+    <script src="config.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // --- 1. CONFIGURATION ---
+        const jobFees = {
+            'Panchayat Coordinator': 999, 'Block Coordinator': 1499, 'District Coordinator': 2100,
+            'Health Supervisor': 1499, 'Mahila Mitra': 999, 'Trainer': 499, 'Other NGO Job': 499,
+            'Normal Job': 499 // ✅ Added Normal Job Fee
+        };
+        let currentFee = 499;
+        let cameraStream = null; // added
+
+        // --- 2. LIVE INPUT FORMATTING ---
+        function setupLiveFormatting() {
+            
+            // A. AUTO CAPITALIZE: Names and Addresses
+            document.querySelectorAll('.uppercase-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            });
+
+            // B. NUMBERS ONLY LOCK (Mobile, Aadhar, Pin, Ward, Total Ward)
+            const numberFields = [
+                { id: 'form-mobile', len: 10 },
+                { id: 'form-aadhar', len: 12 },
+                { id: 'form-pin', len: 6 },
+                { id: 'form-ward', len: 3 },
+                { id: 'form-total-ward', len: 4 } // Added Total Ward here
+            ];
+
+            numberFields.forEach(field => {
+                const el = document.getElementById(field.id);
+                if(el) {
+                    el.addEventListener('input', function() {
+                        this.value = this.value.replace(/\D/g, '').slice(0, field.len);
+                    });
+                }
+            });
+
+            // C. TEXT (ALPHABETS) ONLY LOCK
+            // In fields me koi number type nahi kar payega
+            const textOnlyIds = [
+                'form-name', 'form-father', 'form-mother', 
+                'form-vill', 'form-panchayat', 'form-post', 'form-block', 
+                'form-police', 'form-dist', 'form-state', 
+                'form-nation', 'form-lang', 'form-bank','form-place',
+            ];
+
+            textOnlyIds.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.addEventListener('input', function() {
+                        // Replace any character that is NOT a-z, A-Z or Space
+                        this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+                        // Capitalize bhi kar do saath me
+                        this.value = this.value.toUpperCase();
+                    });
+                }
+            });
+
+            // D. DATE FORMATTER (DD/MM/YYYY)
+            const dobInput = document.getElementById('form-dob');
+            if(dobInput) {
+                dobInput.addEventListener('input', function(e) {
+                    let val = this.value.replace(/\D/g, ''); 
+                    if (val.length > 4) {
+                        this.value = val.slice(0,2) + '/' + val.slice(2,4) + '/' + val.slice(4,8);
+                    } else if (val.length > 2) {
+                        this.value = val.slice(0,2) + '/' + val.slice(2);
+                    } else {
+                        this.value = val;
+                    }
+                });
+            }
+
+            // E. TABLE INPUTS VALIDATION
+            
+            // 1. Title Case + Text Only (School, Board)
+            document.querySelectorAll('.title-case-text').forEach(input => {
+                input.addEventListener('input', function() {
+                    // Allow alphabets, spaces, and dots
+                    let val = this.value.replace(/[^a-zA-Z\s.]/g, '');
+                    
+                    // Title Case Logic
+                    let words = val.split(' ');
+                    for (let i = 0; i < words.length; i++) {
+                        if (words[i].length > 0) {
+                            words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+                        }
+                    }
+                    this.value = words.join(' ');
+                });
+            });
+
+            // NEW: Subjects Input (Allowing special chars)
+            document.querySelectorAll('.subjects-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    // Allow alphabets, spaces, comma, dot, hyphen
+                    let val = this.value.replace(/[^a-zA-Z\s,.-]/g, '');
+                    
+                    // Title Case Logic
+                    let words = val.split(' ');
+                    for (let i = 0; i < words.length; i++) {
+                        if (words[i].length > 0) {
+                            words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+                        }
+                    }
+                    this.value = words.join(' ');
+                });
+            });
+
+            // 2. Year Input (Numbers Only)
+            document.querySelectorAll('.year-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+                });
+            });
+
+            // 3. Percent/Marks Input (Numbers and Dot)
+            document.querySelectorAll('.percent-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                });
+            });
+
+            // 4. Division Input (Alphanumeric Uppercase)
+            document.querySelectorAll('.div-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            });
+        }
+
+        
+
+        // // --- 3. VALIDATION MESSAGES & LOGIC ---
+        // const errorTexts = {
+        //     en: {
+        //         empty_name: "Please enter Full Name.", empty_father: "Please enter Father/Husband Name.",
+        //         empty_dob: "Please enter Date of Birth.", invalid_dob: "Date must be in DD/MM/YYYY format.",
+        //         invalid_mobile: "Please enter a valid 10-digit Mobile Number.",
+        //         invalid_email: "Please enter a valid Email ID.", invalid_aadhar: "Please enter a valid 12-digit Aadhar Number.",
+        //         empty_photo: "Please upload your Photo.", empty_address: "Please fill Village, District, State and Pin Code.",
+        //         invalid_pin: "Pin Code must be 6 digits."
+        //     },
+        //     hi: {
+        //         empty_name: "कृपया पूरा नाम भरें।", empty_father: "कृपया पिता/पति का नाम भरें।",
+        //         empty_dob: "कृपया जन्म तिथि भरें।", invalid_dob: "तारीख DD/MM/YYYY फॉर्मेट में होनी चाहिए।",
+        //         invalid_mobile: "कृपया मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।",
+        //         invalid_email: "कृपया मान्य ईमेल आईडी दर्ज करें।", invalid_aadhar: "कृपया मान्य 12-अंकीय आधार नंबर दर्ज करें।",
+        //         empty_photo: "कृपया अपनी फोटो अपलोड करें।", empty_address: "कृपया गाँव, जिला, राज्य और पिन कोड भरें।",
+        //         invalid_pin: "पिन क��ड 6 अंकों का होना चाहिए।"
+        //     }
+        // };
+
+        // function validateForm() {
+        //     const lang = document.querySelector('input[name="lang"]:checked').value;
+        //     const msg = errorTexts[lang]; 
+
+        //     const name = document.getElementById('form-name').value.trim();
+        //     const father = document.getElementById('form-father').value.trim();
+        //     const dob = document.getElementById('form-dob').value.trim();
+        //     const mobile = document.getElementById('form-mobile').value.trim();
+        //     const email = document.getElementById('form-email').value.trim();
+        //     const aadhar = document.getElementById('form-aadhar').value.trim();
+        //     const photoInput = document.getElementById('finalPhotoInput');
+            
+        //     const vill = document.getElementById('form-vill').value.trim();
+        //     const dist = document.getElementById('form-dist').value.trim();
+        //     const state = document.getElementById('form-state').value.trim();
+        //     const pin = document.getElementById('form-pin').value.trim();
+
+        //     const mobilePattern = /^[6-9]\d{9}$/; 
+        //     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        //     const aadharPattern = /^\d{12}$/;
+        //     const pinPattern = /^\d{6}$/;
+        //     const dobPattern = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
+
+        //     if (!name) { alert(msg.empty_name); return false; }
+        //     if (!father) { alert(msg.empty_father); return false; }
+        //     if (!dob) { alert(msg.empty_dob); return false; }
+        //     if (!dobPattern.test(dob)) { alert(msg.invalid_dob); return false; }
+            
+        //     if (!mobilePattern.test(mobile)) { alert(msg.invalid_mobile); return false; }
+        //     if (!emailPattern.test(email)) { alert(msg.invalid_email); return false; }
+        //     if (!aadharPattern.test(aadhar)) { alert(msg.invalid_aadhar); return false; }
+            
+        //     if (!vill || !dist || !state || !pin) { alert(msg.empty_address); return false; }
+        //     if (!pinPattern.test(pin)) { alert(msg.invalid_pin); return false; }
+        //     if (!photoInput.files || photoInput.files.length === 0) { alert(msg.empty_photo); return false; }
+
+        //     return true;
+        // }
+
+
+
+
+
+        // --- 3. VALIDATION MESSAGES & LOGIC ---
+        const errorTexts = {
+            en: {
+                empty_name: "Please enter Full Name.", empty_father: "Please enter Father/Husband Name.",
+                empty_dob: "Please enter Date of Birth.", invalid_dob: "Date must be in DD/MM/YYYY format.",
+                invalid_mobile: "Please enter a valid 10-digit Mobile Number.",
+                invalid_email: "Please enter a valid Email ID.", invalid_aadhar: "Please enter a valid 12-digit Aadhar Number.",
+                empty_photo: "Please upload your Photo.", empty_address: "Please fill Village, District, State and Pin Code.",
+                invalid_pin: "Pin Code must be 6 digits.",
+                empty_role: "Please select a Job Role before proceeding." // <-- नया जोड़ा गया
+            },
+            hi: {
+                empty_name: "कृपया पूरा नाम भरें।", empty_father: "कृपया पिता/पति का नाम भरें।",
+                empty_dob: "कृपया जन्म तिथि भरें।", invalid_dob: "तारीख DD/MM/YYYY फॉर्मेट में होनी चाहिए।",
+                invalid_mobile: "कृपया मान्य 10-अंकीय मोबाइल नंबर दर्ज करें।",
+                invalid_email: "कृपया मान्य ईमेल आईडी दर्ज करें।", invalid_aadhar: "कृपया मान्य 12-अंकीय आधार नंबर दर्ज करें।",
+                empty_photo: "कृपया अपनी फोटो अपलोड करें।", empty_address: "कृपया गाँव, जिला, राज्य और पिन कोड भरें।",
+                invalid_pin: "पिन कोड 6 अंकों का होना चाहिए।",
+                empty_role: "कृपया आगे बढ़ने से पहले पद (Job Role) चुनें।" // <-- नया जोड़ा गया
+            }
+        };
+
+        function validateForm() {
+            const lang = document.querySelector('input[name="lang"]:checked').value;
+            const msg = errorTexts[lang]; 
+
+            const name = document.getElementById('form-name').value.trim();
+            const father = document.getElementById('form-father').value.trim();
+            const dob = document.getElementById('form-dob').value.trim();
+            const mobile = document.getElementById('form-mobile').value.trim();
+            const email = document.getElementById('form-email').value.trim();
+            const aadhar = document.getElementById('form-aadhar').value.trim();
+            const photoInput = document.getElementById('finalPhotoInput');
+            const role = document.getElementById('role-select').value; // <-- नया जोड़ा गया: Role की वैल्यू लेने के लिए
+            
+            const vill = document.getElementById('form-vill').value.trim();
+            const dist = document.getElementById('form-dist').value.trim();
+            const state = document.getElementById('form-state').value.trim();
+            const pin = document.getElementById('form-pin').value.trim();
+
+            const mobilePattern = /^[6-9]\d{9}$/; 
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const aadharPattern = /^\d{12}$/;
+            const pinPattern = /^\d{6}$/;
+            const dobPattern = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
+
+            if (!name) { alert(msg.empty_name); return false; }
+            if (!father) { alert(msg.empty_father); return false; }
+            if (!dob) { alert(msg.empty_dob); return false; }
+            if (!dobPattern.test(dob)) { alert(msg.invalid_dob); return false; }
+            
+            if (!mobilePattern.test(mobile)) { alert(msg.invalid_mobile); return false; }
+            if (!emailPattern.test(email)) { alert(msg.invalid_email); return false; }
+            if (!aadharPattern.test(aadhar)) { alert(msg.invalid_aadhar); return false; }
+            
+            if (!vill || !dist || !state || !pin) { alert(msg.empty_address); return false; }
+            if (!pinPattern.test(pin)) { alert(msg.invalid_pin); return false; }
+            if (!role || role === "") { alert(msg.empty_role); return false; } // <-- नया जोड़ा गया: Role चेक करने के लिए
+            if (!photoInput.files || photoInput.files.length === 0) { alert(msg.empty_photo); return false; }
+
+            return true;
+        }
+
+        // --- 4. TRANSLATION DATA ---
+        const translations = {
+            en: {
+                photo_label: "PHOTO", foundation_name: "AAGAJ FOUNDATION", reg_text: "Registered Under Indian Trust Act 1882", app_form: "APPLICATION FORM", block_letters: "ALL ENTERS TO BE MADE IN CAPITAL BLOCK LETTERS",
+                name_full: "Name in full (in block letters)", father_name: "Father/ Husband Name (in block letters)", mother_name: "Mother's Name (in block letters)", dob: "Date of Birth (DD/MM/YYYY)", mobile: "Mobile No.", email: "Email ID", aadhar: "Aadhar NO",
+                perm_address: "Permanent home address:", village: "Village:", panchayat: "Panchayat:", post: "Post Office:", block: "Block:", police: "Police Station:", dist: "District:", state: "State:",
+                pin: "Pin Code:", ward: "Ward No:", total_ward: "Total Ward:", nation: "Nationality:", lang: "Language Known:", acc_no: "Account No:", ifsc: "IFSC Code:", acc_holder: "Account Holder Name:", bank: "Bank Name:",
+                qualification: "Qualification:", exam_col: "Exam", school_addr: "Name of School/College", pass_year: "Year", board: "Board/Univ", subjects: "Subjects", division: "Div", percent: "%", remarks: "Remarks",
+                matric: "Matric", inter: "Intermediate", grad: "Graduation",
+                choose_post: "Choose option of the post:",
+                declaration: "I hereby give my consent and sign as per the above.",
+                sig_guardian: "Guardian Signature", place: "Place:", date: "Date:", sig_coord: "Coordinator Signature",
+                fee_text: "Form Registration Fee applicable. No Refund.",
+                note_text: "Note: Fee once paid is not refundable.",
+                helpline: "📞 Helpline:", sig_officer: "Officer Signature", btn_print: "Print Form", btn_pay: "Submit & Pay Now",
+                role_panchayat: "Panchayat Coordinator", role_block: "Block Coordinator", role_district: "District Coordinator", role_health: "Health Supervisor", role_mitra: "Mahila Mitra", role_skill: "Skill Trainer", role_trainer: "Trainer", role_ngo: "Other NGO Job",
+                empty_role: "Please select a Job Role before proceeding."
+            },
+            hi: {
+                photo_label: "फोटो", foundation_name: "आगाज फाउंडेशन", reg_text: "भारतीय ट्रस्ट अधिनियम 1882 के तहत पंजीकृत", app_form: "आवेदन पत्र", block_letters: "सभी प्रविष्टियां बड़े अक्षरों में की जाएं",
+                name_full: "पूरा नाम (बड़े अक्षरों में)", father_name: "पिता / पति का नाम (बड़े अक्षरों में)", mother_name: "माता का नाम (बड़े अक्षरों में)", dob: "जन्म तिथि (DD/MM/YY)", mobile: "मोबाइल नं.", email: "ईमेल आईडी", aadhar: "आधार नं.",
+                perm_address: "स्थायी घर का पता:", village: "गाँव:", panchayat: "पंचायत:", post: "डाकघर:", block: "प्रखंड:", police: "थाना:", dist: "जिला:", state: "राज्य:",
+                pin: "पिन कोड:", ward: "वार्ड नं:", total_ward: "कुल वार्ड:", nation: "राष्ट्रीयता:", lang: "भाषा ज्ञान:", acc_no: "खाता सं:", ifsc: "IFSC कोड:", acc_holder: "खाता धारक का नाम:", bank: "बैंक का नाम:",
+                qualification: "योग्यता:", exam_col: "परीक्षा", school_addr: "स्कूल/कॉलेज का नाम", pass_year: "वर्ष", board: "बोर्ड/विवि", subjects: "विषय", division: "श्रेणी", percent: "%", remarks: "टिप्पणी",
+                matric: "मैट्रिक", inter: "इंटरमीडिएट", grad: "स्नातक",
+                choose_post: "पद का विकल्प चुनें:",
+                declaration: "अतः उपरोक्त के अनुसार मैं अपना / अपनी सहमति देकर अपना हस्ताक्षर करता / करती हूँ।",
+                sig_guardian: "अभिभावक का हस्ताक्षर", place: "स्थान:", date: "दिनांक:", sig_coord: "समन्वयक का हस्ताक्षर",
+                fee_text: "फॉर्म पंजीकरण शुल्क लागू। वापसी नहीं होगी।",
+                note_text: "नोट: फॉर्म शुल्क वापसी का कोई प्रावधान नहीं है।",
+                helpline: "📞 हेल्पलाइन:", sig_officer: "ऑफिसर का हस्ताक्षर", btn_print: "प्रिंट करें", btn_pay: "जमा करें और भुगतान करें",
+                role_panchayat: "पंचायत समन्वयक", role_block: "प्रखंड समन्वयक", role_district: "जिला समन्वयक", role_health: "स्वास्थ्य पर्यवेक्षक", role_mitra: "महिला मित्र", role_skill: "कौशल प्रशिक्षक", role_trainer: "प्रशिक्षक", role_ngo: "अन्य एनजीओ नौकरी"
+                , empty_role: "कृपया आगे बढ़ने से पहले पद (Job Role) चुनें।"
+            }
+        };
+
+        // --- 4. PAYMENT API CONFIG (same style as donate.html) ---
+        const APPLICATION_PAYMENT_API_URL = CONFIG.API_URL + '/application/create-order';
+            
+
+        // --- 5. ON LOAD LOGIC ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const params = new URLSearchParams(window.location.search);
+            const roleKey = params.get('role');
+            const roleSelect = document.getElementById('role-select');
+
+            const roleMap = { 'panchayat': 'Panchayat Coordinator', 'block': 'Block Coordinator', 'district': 'District Coordinator', 'health': 'Health Supervisor', 'mitra': 'Mahila Mitra', 'trainer': 'Trainer' };
+            
+            // ✅ Handle Normal Job Category
+            const category = params.get('category');
+            if (category === 'Normal') {
+                // ✅ Fix: Show specific Normal Jobs instead of generic 'Normal Job'
+                roleSelect.innerHTML = '<option value="" disabled selected>Select Job Role</option>';
+                const normalRoles = ["Computer Operator", "Driver", "Guard", "Peon", "Cook", "Gardener", "Helper", "Housekeeping", "Receptionist", "Other"];
+                
+                normalRoles.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r;
+                    opt.innerText = r;
+                    roleSelect.appendChild(opt);
+                });
+
+                // If URL has a specific role (not generic), select it
+                if (roleKey && roleKey !== 'Normal Job') {
+                    if (!normalRoles.includes(roleKey)) {
+                        const opt = document.createElement('option');
+                        opt.value = roleKey;
+                        opt.innerText = roleKey;
+                        roleSelect.appendChild(opt);
+                    }
+                    roleSelect.value = roleKey;
+                }
+            } else {
+                // NGO Logic
+                if(roleKey && roleMap[roleKey]) { roleSelect.value = roleMap[roleKey]; }
+            }
+
+            updateFeeDisplay();
+            roleSelect.addEventListener('change', updateFeeDisplay);
+
+            setupLiveFormatting();
+
+            // ✅ Payment wapas aane par Receipt dikhane ka logic
+            const paymentStatus = (params.get('status') || '').toLowerCase();
+            if (paymentStatus === 'success') {
+                document.getElementById('form-container').style.display = 'none';
+                document.getElementById('receipt-container').style.display = 'block';
+                
+                document.getElementById('rec-date').innerText = new Date().toLocaleDateString('en-GB');
+                document.getElementById('rec-txn').innerText = params.get('txn') || 'N/A';
+                document.getElementById('rec-name').innerText = decodeURIComponent(params.get('name') || 'N/A');
+                document.getElementById('rec-mobile').innerText = params.get('mobile') || 'N/A';
+                document.getElementById('rec-role').innerText = decodeURIComponent(params.get('role') || 'N/A');
+                document.getElementById('rec-amount').innerText = params.get('amount') || '0';
+
+                // ✅ Show the download and proceed buttons
+                const downloadBtn = document.getElementById('btn-download-pdf');
+                const proceedBtn = document.getElementById('btn-proceed-card');
+                
+                if (downloadBtn) {
+                    downloadBtn.style.display = 'inline-block';
+                }
+                if (proceedBtn) {
+                    proceedBtn.style.display = 'inline-block';
+                }
+            } else if (paymentStatus === 'failed') {
+                alert("Payment Failed or Cancelled. Please try again.");
+            }
+
+        });
+
+        // --- 6. HELPER FUNCTIONS ---
+        function updateFeeDisplay() {
+            const role = document.getElementById('role-select').value;
+            currentFee = jobFees[role] || 499;
+            const btn = document.getElementById('payBtn');
+            const isHindi = document.querySelector('input[name="lang"]:checked').value === 'hi';
+            btn.innerText = (isHindi ? "जमा करें और भुगतान करें" : "Submit & Pay Now") + ` ₹${currentFee}`;
+        }
+
+        function setLanguage(lang) {
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) el.innerText = translations[lang][key];
+            });
+            updateFeeDisplay();
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = document.getElementById('imgR');
+                    img.src = e.target.result;
+                    img.style.display = 'block'; 
+                    document.getElementById('txtR').style.display = 'none';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // added: live camera functions
+        async function openLiveCamera(e){
+            e.preventDefault();
+            e.stopPropagation();
+
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('cameraVideo');
+            try{
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video:{ facingMode:{ ideal:'environment' } },
+                    audio:false
+                });
+                video.srcObject = cameraStream;
+                modal.style.display = 'flex';
+            }catch(err1){
+                try{
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+                    video.srcObject = cameraStream;
+                    modal.style.display = 'flex';
+                }catch(err2){
+                    alert("Camera access nahi mila. Please normal photo upload karein.");
+                }
+            }
+        }
+
+        function closeLiveCamera(){
+            const modal = document.getElementById('cameraModal');
+            const video = document.getElementById('cameraVideo');
+            if(video.srcObject){
+                video.srcObject.getTracks().forEach(t=>t.stop());
+                video.srcObject = null;
+            }
+            cameraStream = null;
+            modal.style.display = 'none';
+        }
+
+        function captureFromCamera(){
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            const input = document.getElementById('finalPhotoInput');
+
+            if(!video.videoWidth || !video.videoHeight){
+                alert("Camera ready hone dein, phir capture karein.");
+                return;
+            }
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob((blob)=>{
+                if(!blob){ alert("Capture failed."); return; }
+
+                const file = new File([blob], `camera-${Date.now()}.jpg`, { type:'image/jpeg' });
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+
+                previewImage(input);
+                closeLiveCamera();
+            }, 'image/jpeg', 0.9);
+        }
+
+        document.getElementById('cameraModal').addEventListener('click', function(e){
+            if(e.target.id === 'cameraModal') closeLiveCamera();
+        });
+        window.addEventListener('beforeunload', closeLiveCamera);
+
+        
+      // --- 7. PAYMENT LOGIC (EXACTLY LIKE donate.html) ---
+        // --- 7. PAYMENT LOGIC (EXACTLY LIKE donate.html) ---
+        async function initiatePayment() {
+            if (!validateForm()) return;
+
+            const name = document.getElementById('form-name').value;
+            const mobile = document.getElementById('form-mobile').value;
+            const email = document.getElementById('form-email').value;
+            const photoInput = document.getElementById('finalPhotoInput'); 
+            const photoFile = photoInput.files[0];
+            const role = document.getElementById('role-select').value;
+            const category = new URLSearchParams(window.location.search).get('category') || 'NGO'; 
+            const amount = currentFee;
+
+            const payBtn = document.getElementById('payBtn');
+            const isHindi = document.querySelector('input[name="lang"]:checked').value === 'hi';
+            const originalBtnText = payBtn.innerHTML;
+            
+            payBtn.innerHTML = isHindi ? 
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> सुरक्षित रूप से रीडायरेक्ट कर रहा है...' : 
+                '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Securely Redirecting...';
+            payBtn.disabled = true;
+
+            const qualData = {
+                matric: { school: document.getElementById('m_school').value, year: document.getElementById('m_year').value, board: document.getElementById('m_board').value, subject: document.getElementById('m_sub').value, division: document.getElementById('m_div').value, marks: document.getElementById('m_marks').value, remarks: document.getElementById('m_rem').value },
+                inter: { school: document.getElementById('i_school').value, year: document.getElementById('i_year').value, board: document.getElementById('i_board').value, subject: document.getElementById('i_sub').value, division: document.getElementById('i_div').value, marks: document.getElementById('i_marks').value, remarks: document.getElementById('i_rem').value },
+                grad: { school: document.getElementById('g_school').value, year: document.getElementById('g_year').value, board: document.getElementById('g_board').value, subject: document.getElementById('g_sub').value, division: document.getElementById('g_div').value, marks: document.getElementById('g_marks').value, remarks: document.getElementById('g_rem').value }
+            };
+
+            const applicationData = {
+                full_name: name,
+                mobile: mobile,
+                email: email,
+                dob: document.getElementById('form-dob').value || "",
+                district: document.getElementById('form-dist').value || "",
+                state: document.getElementById('form-state').value || "",
+                role_applied: role, 
+                aadhar: document.getElementById('form-aadhar').value,
+                job_category: category, 
+                amount: amount,
+                qualifications: JSON.stringify(qualData) 
+            };
+
+            const allInputs = {};
+            document.querySelectorAll('#form-container input, #form-container select').forEach(el => {
+                if (el.id) allInputs[el.id] = el.value;
+            });
+            localStorage.setItem('savedAppForm', JSON.stringify(allInputs));
+
+            const formData = new FormData();
+            
+            Object.keys(applicationData).forEach(key => {
+                formData.append(key, applicationData[key]);
+            });
+
+            if (photoFile) {
+                formData.append('photo', photoFile);
+            }
+
+            try {
+                const response = await fetch(APPLICATION_PAYMENT_API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || 'Failed to create payment order');
+                }
+
+                const options = {
+                    key: result.key,
+                    amount: result.amount,
+                    currency: result.currency,
+                    order_id: result.orderId,
+                    name: 'Aagaj Foundation',
+                    description: 'Application Fee',
+                    prefill: {
+                        name,
+                        email,
+                        contact: mobile
+                    },
+                    theme: {
+                        color: '#ED1C24'
+                    },
+                    handler: async function (rzpResponse) {
+                        const verifyResponse = await fetch(CONFIG.API_URL + '/application/verify-payment', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: rzpResponse.razorpay_order_id,
+                                razorpay_payment_id: rzpResponse.razorpay_payment_id,
+                                razorpay_signature: rzpResponse.razorpay_signature,
+                                pendingOrderId: result.pendingOrderId
+                            })
+                        });
+
+                        const verifyResult = await verifyResponse.json();
+                        if (verifyResult.success && verifyResult.redirectUrl) {
+                            window.location.href = verifyResult.redirectUrl;
+                        } else {
+                            window.location.href = '/application.html?status=failed';
+                        }
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            payBtn.innerHTML = originalBtnText;
+                            payBtn.disabled = false;
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (error) {
+                console.error('Connection Error:', error);
+                const errorMsg = isHindi 
+                    ? 'सर्वर कनेक्शन विफल। कृपया सुनिश्चित करें कि सर्वर पोर्ट 5000 पर चल रहा है।'
+                    : 'Server Connection Failed. Please ensure the backend is running on port 5000.';
+
+                alert(errorMsg + "\n\nError: " + error.message);
+                payBtn.innerHTML = originalBtnText;
+                payBtn.disabled = false;
+            }
+        }
+        
+
+        // ✅ PRINT APPLICATION FORM (SIMPLE - NO STYLING CHANGES)
+        function printApplicationForm() {
+            const btn = document.getElementById('btn-download-pdf');
+            const formContainer = document.getElementById('form-container');
+            const receiptContainer = document.getElementById('receipt-container');
+            
+            if (!formContainer) return;
+
+            try {
+                // 1. DATA RECOVER KARNA 
+                const savedForm = JSON.parse(localStorage.getItem('savedAppForm') || '{}');
+                Object.keys(savedForm).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.type !== 'file') {
+                        el.value = savedForm[id];
+                        el.setAttribute('value', savedForm[id]); 
+                        if(el.tagName === 'SELECT') {
+                            Array.from(el.options).forEach(opt => {
+                                if(opt.value === savedForm[id]) opt.setAttribute('selected', 'selected');
+                                else opt.removeAttribute('selected');
+                            });
+                        }
+                    }
+                });
+
+                // 2. Photo Set Karna
+                const params = new URLSearchParams(window.location.search);
+                const photoUrl = decodeURIComponent(params.get('photo') || '');
+                if (photoUrl && photoUrl !== 'undefined' && photoUrl !== 'null') {
+                    const img = document.getElementById('imgR');
+                    const txt = document.getElementById('txtR');
+                    if (img) { img.src = photoUrl; img.style.display = 'block'; }
+                    if (txt) { txt.style.display = 'none'; }
+                }
+                
+                // 3. Receipt aur buttons hide karna
+                const originalFormDisplay = formContainer.style.display;
+                const originalReceiptDisplay = receiptContainer.style.display;
+                formContainer.style.display = 'block';
+                receiptContainer.style.display = 'none';
+                document.querySelectorAll('.action-buttons, .lang-switch').forEach(el => el.style.display = 'none');
+                
+                // 4. Print kar do
+                setTimeout(() => {
+                    window.print();
+                    
+                    // 5. Print complete hone ke baad wapas restore kar do
+                    setTimeout(() => {
+                        formContainer.style.display = originalFormDisplay;
+                        receiptContainer.style.display = originalReceiptDisplay;
+                        document.querySelectorAll('.action-buttons, .lang-switch').forEach(el => el.style.display = 'block');
+
+                        if(btn) {
+                            btn.innerText = "Print Application Form";
+                            btn.style.opacity = "1";
+                            btn.disabled = false;
+                        }
+                    }, 500);
+
+                }, 300);
+
+            } catch(error) {
+                console.error("Script Error:", error);
+                alert("Something went wrong! Error: " + error.message);
+                if(btn) { btn.innerText = "Print Application Form"; btn.disabled = false; }
+            }
+        }
+
+        // ✅ PROCEED TO CARD PAGE WITH DATA
+        function proceedToCard() {
+            const params = new URLSearchParams(window.location.search);
+            const cardParams = new URLSearchParams();
+            
+            // Pass all relevant data to card.html including photo
+            cardParams.append('unique_id', params.get('unique_id') || '');
+            cardParams.append('name', params.get('name') || '');
+            cardParams.append('mobile', params.get('mobile') || '');
+            cardParams.append('email', params.get('email') || '');
+            cardParams.append('aadhar', params.get('aadhar') || '');
+            cardParams.append('dob', params.get('dob') || '');
+            cardParams.append('district', params.get('district') || '');
+            cardParams.append('state', params.get('state') || '');
+            cardParams.append('role', params.get('role') || '');
+            cardParams.append('txn', params.get('txn') || '');
+            cardParams.append('photo', params.get('photo') || '');
+            
+            console.log("Redirecting to card.html with data...", cardParams.toString());
+            window.location.href = 'card.html?' + cardParams.toString();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation - Home</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* New Color Palette defined here */
+            --primary-red: #ED1C24;   /* Main Action Color */
+            --primary-yellow: #fdd831; /* Highlight/Background Color */
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #fffdf5; /* Slight warm tint for background */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Navbar Styling --- */
+        .navbar-nav .nav-item { margin: 0 5px; }
+        
+        .navbar-brand img {
+            height: 85px; 
+            width: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-dark);
+            padding: 10px 18px !important;
+            border-radius: 8px;
+            position: relative;
+            transition: all 0.4s ease;
+            overflow: hidden;
+        }
+        
+        /* Hover Effect: Text Red, Background Light Yellow */
+        .nav-link:hover {
+            color: var(--primary-red) !important;
+            background-color: rgba(253, 216, 49, 0.15); /* Light Yellow bg */
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        .nav-link.active {
+            color: var(--primary-red) !important;
+            background-color: rgba(237, 28, 36, 0.05);
+        }
+        /* Underline is now Yellow */
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background-color: var(--primary-yellow);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+        /* --- admin Button Styling --- */
+        .admin-btn {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 8px 20px;
+            border: 2px solid var(--text-dark); /* Border around button */
+            border-radius: 30px; /* Rounded pill shape */
+            transition: all 0.3s ease;
+            margin-left: 15px; /* Spacing from menu */
+        }
+
+        .admin-btn i {
+            font-size: 1.2rem;
+        }
+
+        .admin-btn:hover {
+            background-color: var(--primary-red);
+            color: white !important;
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(237, 28, 36, 0.3);
+        }
+
+        /* Small arrow adjustment */
+        .admin-arrow {
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        /* Mobile responsive adjustment */
+        @media (max-width: 991px) {
+            .admin-btn {
+                margin-left: 0;
+                margin-top: 15px;
+                display: inline-flex;
+                width: fit-content;
+            }
+        }
+        
+        /* --- Hero Section --- */
+        .hero-section {
+            position: relative;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .hero-carousel-item {
+            height: auto; 
+            position: relative;
+            width: 100%;
+        }
+        .hero-carousel-item img {
+            object-fit: contain; 
+            height: auto; 
+            width: 100%;
+            display: block;
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(237, 28, 36, 0.6) 100%); /* Red gradient at bottom */
+        }
+        .hero-text-overlay {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%;
+            z-index: 10; 
+            color: white;
+            padding: 20px 0;
+        }
+        .hero-text-overlay h2 {
+            font-size: 1.6rem; 
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            border-left: 5px solid var(--primary-yellow); /* Yellow accent line */
+            padding-left: 15px;
+        }
+        .hero-text-overlay p {
+            font-size: 1rem; 
+            margin-bottom: 0;
+            font-weight: 400;
+            opacity: 0.95;
+            padding-left: 20px;
+        }
+
+        /* --- Global Section Styles --- */
+        .section-padding { padding: 80px 0; }
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 {
+            font-weight: 700;
+            color: var(--text-dark);
+            position: relative;
+            display: inline-block;
+            margin-bottom: 15px;
+            z-index: 2;
+        }
+        
+        .title-drop-bg {
+            background-image: url('../public/drop.jpeg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: 120px; 
+        }
+
+        /* Underline changed to Yellow */
+        .section-title h2.blue-underline::after {
+            background-color: var(--primary-yellow);
+            content: '';
+            width: 60px;
+            height: 4px;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        /* Override specifically for the "Our Programmes" title color */
+        .section-title h2.blue-underline {
+            color: var(--primary-red) !important;
+        }
+
+        /* --- Card Styles --- */
+        .program-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+            height: 100%;
+            border-bottom: 4px solid var(--primary-yellow); /* Yellow bottom border */
+        }
+        .program-card:hover { transform: translateY(-5px); border-bottom-color: var(--primary-red); }
+        .program-img { height: 220px; object-fit: cover; }
+        .card-body { padding: 25px; }
+        .card-title { font-weight: 700; color: var(--text-dark); }
+        
+        .btn-link-custom {
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+        .btn-link-custom:hover { color: #b0151b; }
+
+        /* --- Priorities Section --- */
+        .priority-card img { transition: transform 0.3s ease; border: 2px solid transparent;}
+        .priority-card:hover img { 
+            transform: scale(1.03); 
+            border-color: var(--primary-yellow);
+        }
+
+        /* --- Custom Play Button --- */
+        .custom-play-btn {
+            width: 80px; height: 80px; 
+            background-color: var(--primary-red);
+            border-radius: 25px;
+            display: flex; align-items: center; justify-content: center; 
+            box-shadow: 0 8px 20px rgba(237, 28, 36, 0.4);
+            transition: transform 0.3s;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .custom-play-btn:hover { transform: scale(1.1); }
+        
+        /* --- Split Layout Updates --- */
+        .split-container {
+            display: flex;
+            width: 95%;   
+            max-width: 1800px; 
+            background-color: transparent; 
+            position: relative;
+            align-items: center;
+            flex-wrap: wrap; 
+            margin: 0 auto;
+        }
+        .left-panel {
+            flex: 1; 
+            background-color: var(--primary-yellow); /* CHANGED TO YELLOW */
+            padding: 60px; 
+            color: #333;
+            min-width: 400px;
+            border-radius: 40px; 
+            z-index: 5; 
+            margin-right: -150px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        .top-tagline {
+            color: var(--primary-red); /* CHANGED TO RED */
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .split-header {
+            font-size: 2.8rem;
+            line-height: 1.2;
+            color: #222;
+            margin-bottom: 30px;
+            max-width: 90%; 
+        }
+        .highlight-red { color: var(--primary-red); }
+        p.description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 50px;
+            max-width: 650px; 
+        }
+        .stats-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px; 
+            border-top: 2px solid rgba(0,0,0,0.1);
+            padding-top: 30px;
+        }
+        .stat-box {
+            border-right: 2px solid rgba(237, 28, 36, 0.3);
+            padding-right: 40px;
+        }
+        .stat-box:last-child { border-right: none; padding-right: 0; }
+        .stat-number {
+            display: block; font-size: 2rem; font-weight: 800;
+            color: var(--primary-red); margin-bottom: 5px;
+        }
+        .stat-label { font-size: 0.9rem; color: #222; font-weight: 600; }
+        
+        .right-panel {
+            flex: 1.4; 
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0) 50%, rgba(0,0,0,0.8) 100%), url('../public/transform.jpeg'); 
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 750px; 
+            border-radius: 40px; 
+            padding: 60px 60px 60px 180px; 
+            position: relative;
+            z-index: 1; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .image-tagline { font-size: 1.1rem; margin-bottom: 15px; opacity: 0.9; color: white; font-weight: 500; }
+        .image-headline { font-size: 2.2rem; font-weight: 700; line-height: 1.3; color: white; max-width: 800px; }
+
+        /* Floating Play Button */
+        .play-button {
+            position: absolute;
+            left: 45%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px; height: 100px;
+            background-color: var(--primary-red);
+            border-radius: 25px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 30px rgba(237, 28, 36, 0.5);
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+        .play-button:hover { transform: translate(-50%, -50%) scale(1.1); }
+        .play-icon {
+            width: 0; height: 0; 
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 26px solid white;
+            margin-left: 6px;
+        }
+        .play-circle {
+            border: 3px solid white;
+            border-radius: 50%;
+            width: 60px; height: 60px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- How We Work --- */
+        .work-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            display: flex; align-items: flex-start;
+            height: 100%;
+            transition: transform 0.3s;
+            border-left: 5px solid transparent;
+        }
+        .work-card:hover { 
+            transform: translateY(-5px); 
+            border-left: 5px solid var(--primary-yellow);
+        }
+        .work-card h4 { font-weight: 700; margin-bottom: 10px; font-size: 1.2rem; color: #333; }
+        .work-card p { color: #666; margin-bottom: 0; line-height: 1.6; font-size: 0.95rem; }
+        
+        .work-icon-box {
+            width: 65px; height: 65px;
+            border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: white;
+            margin-right: 25px; flex-shrink: 0;
+        }
+        /* Updated colors for icons */
+        .bg-red-coral { background-color: var(--primary-red); }
+        .bg-blue-custom { background-color: var(--primary-yellow); color: #333 !important; } /* Yellow bg, dark icon */
+        .bg-cyan-custom { background-color: #333; } /* Neutral dark */
+
+        /* --- Partners --- */
+        .partner-logo {
+            max-height: 50px;
+            width: auto; max-width: 100%;
+            opacity: 0.5; filter: grayscale(100%);
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .partner-logo:hover { opacity: 1; filter: grayscale(0%); transform: scale(1.1); }
+
+        /* --- Footer --- */
+        .footer { background-color: #051630; color: #d1d1d1; padding: 60px 0 30px; font-size: 0.95rem; }
+        .footer h4 { color: white; margin-bottom: 25px; font-weight: 700; font-size: 1.2rem; }
+        .footer-newsletter { text-align: center; margin-bottom: 50px; }
+        .footer-newsletter h3 { color: white; font-weight: 700; margin-bottom: 20px; }
+        .newsletter-form { max-width: 600px; margin: 0 auto; position: relative; }
+        
+        .newsletter-input {
+            background-color: #0b2246; border: 1px solid #1a3a6c;
+            color: white; border-radius: 30px; padding: 12px 20px 12px 45px;
+            width: 100%;
+        }
+        .newsletter-input:focus { outline: none; border-color: var(--primary-yellow); }
+        .newsletter-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--primary-yellow); }
+        
+        .newsletter-btn {
+            background-color: var(--primary-yellow); 
+            color: #333; font-weight: 700;
+            border: none; border-radius: 30px; padding: 12px 30px;
+            position: absolute; right: 0; top: 0; height: 100%;
+            transition: 0.3s;
+        }
+        .newsletter-btn:hover { background-color: var(--primary-red); color: white; }
+
+        .footer ul { list-style: none; padding: 0; }
+        .footer ul li { margin-bottom: 12px; display: flex; align-items: flex-start; }
+        .footer ul li a { color: #d1d1d1; text-decoration: none; transition: 0.3s; }
+        .footer ul li a:hover { color: var(--primary-yellow); padding-left: 5px; }
+        .footer-arrow { margin-right: 10px; color: var(--primary-red); font-size: 0.8rem; margin-top: 5px; }
+        .footer-logo {
+            width: 150px; 
+            height: auto;
+            margin-bottom: 20px;
+            display: inline-block; 
+        }
+        .footer-brand-text { line-height: 1.6; margin-top: 15px; }
+        
+        .copyright-bar {
+            background-color: var(--primary-yellow); /* Bright Yellow Footer Bar */
+            color: #333; text-align: center;
+            padding: 15px 0; font-weight: 600; font-size: 0.95rem;
+        }
+        .copyright-bar span { color: var(--primary-red); font-weight: 800; }
+        
+        .apply-link { color: var(--primary-red); font-weight: 700; font-size: 0.9rem; text-decoration: underline; transition: color 0.3s; }
+        .apply-link:hover { color: #b0151b; }
+
+        /* --- Social Sidebar --- */
+        .social-sidebar {
+            position: fixed; top: 50%; left: 0;
+            transform: translateY(-50%); z-index: 1030;
+            display: flex; flex-direction: column;
+        }
+        .social-sidebar a {
+            display: flex; justify-content: center; align-items: center;
+            width: 50px; height: 50px; color: white; font-size: 22px;
+            text-decoration: none; transition: all 0.3s ease;
+            border-top-right-radius: 5px; border-bottom-right-radius: 5px;
+            margin-bottom: 2px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+        .social-sidebar a:hover { width: 65px; padding-left: 10px; }
+        
+        /* You can update specific brand colors here or keep original */
+        .social-sidebar .facebook { background: #3b5998; }
+        .social-sidebar .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-sidebar .twitter { background: #1DA1F2; }
+        .social-sidebar .youtube { background: var(--primary-red); }
+        .social-sidebar .linkedin { background: #0077b5; }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .hero-text-overlay h2, .hero-text-overlay p { white-space: normal; font-size: 1.2rem; }
+            .hero-text-overlay p { font-size: 0.9rem; }
+            .left-panel { margin-right: 0; min-width: auto; } 
+        }
+        @media (max-width: 768px) {
+            .social-sidebar { display: none; }
+            .newsletter-btn { position: static; width: 100%; margin-top: 10px; }
+            .hero-carousel-item { height: auto; }
+            .navbar { margin: 0; border-radius: 0; }
+            .hero-text-overlay { padding: 15px 0; }
+            .hero-text-overlay h2 { font-size: 1.1rem; }
+            .hero-text-overlay p { font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp:2; -webkit-box-orient: vertical; overflow: hidden; }
+            .split-container { flex-direction: column; width: 100%; }
+            .left-panel { margin-right: 0; width: 100%; padding: 40px; border-radius: 0; }
+            .right-panel { width: 100%; min-height: 400px; padding: 40px; border-radius: 0; justify-content: center; text-align: center; }
+            .play-button { left: 50%; top: 0; }
+        }
+        
+        /* Helper Utility for inline styles overrides */
+        .text-danger { color: var(--primary-red) !important; }
+        .btn-warning { background-color: var(--primary-yellow) !important; color: #333 !important; border:none; }
+        
+        /* --- Carousel (Hero Section) से बॉर्डर हटाने के लिए UPDATED --- */
+        /* Group Selector for sections */
+        section, header.hero-section, .split-container {
+            position: relative; 
+            padding-bottom: 60px !important;
+            margin-bottom: -1px; 
+        }
+
+        section::after, header.hero-section::after, .split-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; 
+            background-image: url('../public/border.png'); 
+            background-size: 100% 100%; 
+            background-repeat: no-repeat;
+            z-index: 9; 
+            pointer-events: none; 
+        }
+
+        /* --- SPECIFIC FIXES --- */
+
+        /* 1. Hero Section: No border, No extra bottom padding (removes black bar) */
+        header.hero-section::after {
+            display: none !important;
+            content: none !important;
+        }
+        header.hero-section {
+            padding-bottom: 0 !important; /* This removes the black space */
+        }
+
+        /* 2. Class to remove border image from specific sections (e.g. How We Work) */
+        .no-border::after {
+            display: none !important;
+            background-image: none !important;
+        }
+        /* Restore normal padding since border overlap is gone */
+        .no-border {
+            padding-bottom: 80px !important; 
+        }
+        /* --- Dropdown Custom Styling --- */
+        .dropdown-menu {
+            border-top: 3px solid var(--primary-red) !important; /* Top red border */
+            border-radius: 0 0 10px 10px;
+            padding: 0;
+            margin-top: 0;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--bg-light);
+            color: var(--primary-red);
+            padding-left: 25px; /* Slight slide effect on hover */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="social-sidebar">
+        <a href="https://www.facebook.com/aagajfoundation.org" class="facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/aagajfoundation/" class="instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="twitter" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/aagaj-foundation/" class="linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" class="youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+
+    <div id="navbar-placeholder"></div>
+
+    <header class="hero-section">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+            <div class="carousel-inner">
+                <div class="carousel-item active hero-carousel-item">
+                    <img src="../public/pic1.jpeg" alt="Aagaj Foundation Rally">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="carousel-item hero-carousel-item">
+                    <img src="../public/pic4.jpg" alt="Women Health Distribution">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="carousel-item hero-carousel-item">
+                    <img src="../public/pic2.jpg" alt="Sewing Training Center">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="carousel-item hero-carousel-item">
+                    <img src="../public/pic5.jpg" alt="Awareness Campaign">
+                    <div class="hero-overlay"></div>
+                </div>
+                <div class="carousel-item hero-carousel-item">
+                    <img src="../public/pic3.jpg" alt="Community Meeting">
+                    <div class="hero-overlay"></div>
+                </div>
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" style="z-index: 12;">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" style="z-index: 12;">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+
+            <div class="hero-text-overlay">
+                <div class="container">
+                    <h2>Empowering Women, Uplifting Communities – Aagaj Foundation</h2>
+                    <p>Aagaj Foundation works to empower women, improve health awareness, and strengthen community development through sustainable programmes.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="section-padding pb-0">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-3" style="font-size: 2.5rem; color: #333;">
+                        About <span style="color: var(--brand-red);">Aagaj Foundation</span>
+                    </h2>
+                    <p class="text-secondary" style="font-size: 1.1rem; line-height: 1.8;">
+                        Aagaj Foundation is a community-driven organization dedicated to empowering women, improving health awareness, and strengthening rural development. Through our skill-training programmes, self-employment initiatives, and healthcare support services, we aim to create opportunities that uplift families and transform communities.
+                    </p>
+                    <ul class="list-unstyled mt-4">
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="fa-solid fa-check me-3 fs-5" style="color: var(--brand-red);"></i> 
+                            <span class="fs-5 text-secondary">Empowering Rural Bihar</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-center">
+                            <i class="fa-solid fa-check me-3 fs-5" style="color: var(--brand-red);"></i> 
+                            <span class="fs-5 text-secondary">Driving Inclusive Growth</span>
+                        </li>
+                    </ul>
+                    <a href="#" class="btn mt-4 px-4 py-2 fw-bold" style="background-color: var(--brand-yellow); color: #333; border-radius: 5px;">
+                        Know More
+                    </a>
+                </div>
+                <div class="col-lg-6">
+                    <img src="../public/pic3.jpg" alt="Aagaj Foundation Team" class="img-fluid rounded shadow w-100" style="object-fit: cover; height: 400px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-light">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="blue-underline title-drop-bg" style="color: var(--primary-blue);">Our Programmes</h2>
+                <p class="text-muted mt-2">Empowering Rural Bihar Driving Inclusive Growth</p>
+            </div>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="program-card bg-white">
+                        <img src="../public/silai.jpeg" class="card-img-top program-img" alt="Silayi Training">
+                        <div class="card-body">
+                            <h5 class="card-title">Silayi Training</h5>
+                            <p class="card-text text-muted">Providing vocational sewing training (Mahila Silayi Prasikshan Yojana) to help women achieve financial independence.</p>
+                            <a href="#" class="btn-link-custom">View More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="program-card bg-white">
+                        <img src="../public/women.jpg" class="card-img-top program-img" alt="Women Health">
+                        <div class="card-body">
+                            <h5 class="card-title">Women Health</h5>
+                            <p class="card-text text-muted">Improving hygiene and healthcare access through the Mahila Swasthya Suraksha Yojana.</p>
+                            <a href="#" class="btn-link-custom">View More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="program-card bg-white">
+                        <img src="../public/community.jpg" class="card-img-top program-img" alt="Community Welfare">
+                        <div class="card-body">
+                            <h5 class="card-title">Community Welfare</h5>
+                            <p class="card-text text-muted">Har Graam Ward Pathshala Yojana focuses on education and food distribution for the underprivileged.</p>
+                            <a href="#" class="btn-link-custom">View More <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background-color: #f4f1ea;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-5 mb-lg-0 text-center">
+                     <img src="../public/meter.png" alt="Impact Meter" class="img-fluid" style="max-height: 450px;">
+                </div>
+                <div class="col-lg-7">
+                    <p class="fw-bold mb-2" style="color: var(--brand-red);">People Impacted by Aagaj Foundation</p>
+                    <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #333;">
+                        We support <span style="color: var(--brand-red);">women and rural communities</span> with training, healthcare for a better future.
+                    </h2>
+                    <p class="text-secondary mb-4" style="line-height: 1.7; font-size: 1.05rem;">
+                        Aagaj Foundation works across villages and districts to uplift underprivileged women through various welfare schemes such as Mahila Silayi Prasikshan Yojana, Mahila Swarojgaar Yojana, Mahila Swasthya Suraksha Yojana, and Har Graam Ward Pathshala Yojana. Our efforts focus on providing skill training, self-employment support, healthcare benefits, and educational assistance to improve the quality of life in rural areas.
+                    </p>
+                    <div class="d-flex align-items-center gap-5 mt-5">
+                        <div class="text-start">
+                            <div class="fw-bold" style="font-size: 3rem; line-height: 1; color: var(--brand-red);">200K</div>
+                            <div class="text-muted fst-italic">People Benefited</div>
+                        </div>
+                        <a href="#" class="btn px-4 py-3 fw-bold shadow-sm" style="background-color: var(--brand-red); color: white; border-radius: 5px;">
+                            <i class="fa-solid fa-heart me-2"></i> Donate Now
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title">
+                <h2 class="fw-bold title-drop-bg" style="color: #333;">Our Priorities</h2>
+                <p class="text-muted">Our key focus areas for community development and support.</p>
+            </div>
+            <div class="row text-center justify-content-center">
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="priority-card">
+                        <img src="../public/s.jpg" alt="Women Skill Development" class="img-fluid rounded mb-3 shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
+                        <h5 class="fw-bold text-dark">Women Skill Development</h5>
+                        <p class="small fw-semibold" style="color: var(--brand-red);">Silayi Prasikshan Yojana</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="priority-card">
+                        <img src="../public/h.jpg" alt="Healthcare Support" class="img-fluid rounded mb-3 shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
+                        <h5 class="fw-bold text-dark">Healthcare Support</h5>
+                        <p class="small fw-semibold" style="color: var(--brand-red);">Healthy People. Better World.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="priority-card">
+                        <img src="../public/community.jpg" alt="Community Support" class="img-fluid rounded mb-3 shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
+                        <h5 class="fw-bold text-dark">Community Support & Welfare</h5>
+                        <p class="small fw-semibold" style="color: var(--brand-red);">Welfare</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="priority-card">
+                        <img src="../public/l.jpg" alt="Sustainable Livelihood" class="img-fluid rounded mb-3 shadow-sm" style="height: 200px; object-fit: cover; width: 100%;">
+                        <h5 class="fw-bold text-dark">Sustainable Livelihood</h5>
+                        <p class="small fw-semibold" style="color: var(--brand-red);">Helpful information</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="split-container">
+        <div class="play-button">
+            <div class="play-circle">
+                <div class="play-icon"></div>
+            </div>
+        </div>
+
+        <div class="left-panel">
+            <div class="top-tagline">Empowering Women. Uplifting Communities</div>
+            <h1 class="split-header">
+                <span class="highlight-red">Aagaj Foundation</span> has transformed thousands of lives across rural Bihar
+            </h1>
+            <p class="description">
+                For years, Aagaj Foundation has been working at the grassroots level to support women, families, and underprivileged communities through skill development, healthcare initiatives, education support, and sustainable livelihood programmes.
+            </p>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <span class="stat-number">18000+</span>
+                    <span class="stat-label">Trained through Silayi</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">25000+</span>
+                    <span class="stat-label">Swasthya Suraksha</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number">12000+</span>
+                    <span class="stat-label">Community Welfare</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="image-tagline">When women rise, families rise</div>
+            <div class="image-headline">
+                Aagaj Foundation is bringing hope and opportunity to rural communities—one family at a time
+            </div>
+        </div>
+    </div>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="section-title mb-5">
+                <h2 class="fw-bold" style="font-size: 2.5rem; color: #333;">Careers</h2>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/panch.jpeg" alt="Panchayat Co-ordinator" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">Panchayat Co-ordinator</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/mitra.jpeg" alt="Block Co-ordinator" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">Block Co-ordinator</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/district.jpg" alt="District Co-ordinator" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">District Co-ordinator</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/trainer.jpeg" alt="Trainer" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">Trainer</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/mitra.jpeg" alt="Mahila Mitra" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">Mahila Mitra</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4 text-center">
+                    <div class="career-card">
+                        <img src="../public/health.jpg" alt="Health Co-ordinator" class="img-fluid mb-3 shadow-sm" style="width: 100%; height: 250px; object-fit: cover;">
+                        <h5 class="fw-bold text-dark mt-3">Health Co-ordinator</h5>
+                        <a href="NGO-jobs.html" class="apply-link">APPLY NOW >></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding bg-light no-border">
+        <div class="container">
+            <div class="section-title mb-5">
+                <h2 class="blue-underline title-drop-bg" style="color: var(--primary-blue);">How We Work?</h2>
+                <p class="text-muted mt-2">Our process is simple, transparent, and designed to empower every woman and community we serve.</p>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-6">
+                    <div class="work-card">
+                        <div class="work-icon-box bg-red-coral">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h4>Identify Community Needs</h4>
+                            <p>We engage with women at the village level to understand their requirements.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="work-card">
+                        <div class="work-icon-box bg-blue-custom">
+                            <i class="fa-solid fa-thumbs-up"></i>
+                        </div>
+                        <div>
+                            <h4>Select Your Programme</h4>
+                            <p>We help beneficiaries choose the right training or health support programme affected by poverty.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="work-card">
+                        <div class="work-icon-box bg-cyan-custom">
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <div>
+                            <h4>Training & Field Support</h4>
+                            <p>Skill training, awareness sessions, and guidance are provided by our team.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="work-card">
+                        <div class="work-icon-box bg-red-coral">
+                            <i class="fa-solid fa-hand-holding-heart"></i>
+                        </div>
+                        <div>
+                            <h4>Certification & Empowerment</h4>
+                            <p>Successful trainees receive certificates and support for self-employment.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h3 class="fw-bold" style="color: #333;">Grateful to collaborate with our partners</h3>
+            </div>
+            <div class="row align-items-center justify-content-center text-center g-4">
+                <div class="col-6 col-md-3">
+                    <img src="../public/logo1.jpeg" alt="Proled" class="partner-logo">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="../public/logo2.jpeg" alt="Evoseo" class="partner-logo">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="../public/logo3.jpeg" alt="Nextgen Partners" class="partner-logo">
+                </div>
+                <div class="col-6 col-md-3">
+                    <img src="../public/logo4.jpeg" alt="Bluefin" class="partner-logo">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-newsletter">
+                <h3>Get Our Newsletter</h3>
+                <div class="newsletter-form">
+                    <i class="fa-regular fa-envelope newsletter-icon"></i>
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address here">
+                    <button class="newsletter-btn">Submit Now</button>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-3 mb-4 text-center text-lg-start">
+                    <img src="../public/logo.jpg" alt="Aagaj Foundation Logo" class="footer-logo">
+                    <h5 class="text-white fw-bold mb-3">Aagaj Foundation</h5>
+                    <p class="footer-brand-text">Aagaj Foundation Empowering communities through sustainable agriculture, health, livelihood, and education initiatives.</p>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3">Quick Links</h4>
+                    <ul class="ms-lg-3">
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="about.html">About Us</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="gallery.html">Gallery</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="#">Our Programmes</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Email: <br> Aagajfoundationpaliganj@gmail.com</span></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Phone: 6124065270, <br> 9431430464</span></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Map: Surbhi Vihar Bhupatipur Near Krishi Anusandhan Kendra Patna 800020</span></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3 text-white fw-bold border-bottom d-inline-block pb-1" style="border-color: #666 !important;">Learn More</h4>
+                    <ul class="ms-lg-3 mt-3 list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Why Aagaj Foundation?</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">What We Do</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Where We Work</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Frequently Asked Questions</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Charity Ratings</a></li>
+                    </ul>
+                    <div class="d-flex gap-3 align-items-center">
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-x-twitter"></i></a> 
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>    
+                </div>
+                
+            </div>
+        </div>
+    </footer>
+    
+    <div class="copyright-bar">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-2 mb-md-0">
+                &copy; 2026 <span>Aagaj Foundation</span>. All Rights Reserved <Br>&copy; 2026 <span>Designed & Developed By Bireenainfo Technologies Pvt. Ltd.</span>. All Rights Reserved.</Reserved>
+                
+            </div>
+             
+            
+            <div class="legal-links">
+                <a href="#" class="text-dark text-decoration-none small">Privacy</a>
+                <span class="mx-1">|</span>
+                <a href="#" class="text-dark text-decoration-none small">Cookies Notice</a>
+                <span class="mx-1">|</span>
+                <a href="#" class="text-dark text-decoration-none small">Terms & Conditions</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+   
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Fetch and Load Navbar
+            fetch('navbar.html')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('navbar-placeholder').innerHTML = data;
+
+                    // 2. Set Active Class (kaunsa page open hai)
+                    const currentPage = window.location.pathname.split("/").pop();
+                    if(currentPage === "about.html") document.getElementById('nav-about').classList.add('active');
+                    if(currentPage === "gallery.html") document.getElementById('nav-gallery').classList.add('active');
+
+                    // 3. User Login Logic (Dashboard Check)
+                    const userName = sessionStorage.getItem('loggedInUser');
+                    const adminBtn = document.getElementById('admin-action-btn');
+                    const servicesMenu = document.getElementById('services-list');
+
+                    if (userName && adminBtn) {
+                        if (userName === 'Admin') {
+                            // Admin Login Logic
+                            adminBtn.href = "admin-dashboard.html"; 
+                            adminBtn.innerHTML = `<i class="fa-solid fa-gauge me-2"></i> Dashboard`;
+                            adminBtn.style.backgroundColor = '#28a745';
+                            adminBtn.style.borderColor = '#28a745';
+                            adminBtn.style.color = 'white';
+                        } else {
+                            // Employee Login Logic
+                            adminBtn.href = "#"; 
+                            adminBtn.innerHTML = `<i class="fa-solid fa-user me-2"></i> ${userName}`;
+                            adminBtn.style.backgroundColor = 'var(--primary-red)';
+                            adminBtn.style.borderColor = 'var(--primary-red)';
+                            adminBtn.style.color = 'white';
+                            
+                            // Logout functionality for Employee
+                            adminBtn.onclick = function() {
+                                if(confirm("Logout?")) {
+                                    sessionStorage.removeItem("loggedInUser");
+                                    sessionStorage.removeItem("loggedInUserEmail");
+                                    sessionStorage.removeItem("loggedInRole");
+                                    sessionStorage.removeItem("adminEmail");
+                                    localStorage.removeItem("authToken");
+                                    window.location.reload();
+                                }
+                            };
+                        }
+
+                        // Show 3 Dropdowns in Services for Both Admin & Employee
+                        if (servicesMenu) {
+                            servicesMenu.innerHTML = `
+                                <li><a class="dropdown-item" href="silayiyojna_description.html">Mahila Silayi Prasikshan Yojana</a></li>
+                                <li><a class="dropdown-item" href="swarojgaar_description.html">Mahila Swarojgaar Yojana</a></li>
+                                <li><a class="dropdown-item" href="swasthyasuraksha_register.html">Swasthya Suraksha Yojana</a></li>
+                            `;
+                        }
+                    }
+                });
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आगाज फाउंडेशन - महिला स्वरोजगार योजना</title>
+    <style>
+        /* वही CSS जो आपने silayi-yojana.html में दी थी */
+        :root {
+            --primary-color: #d35400;
+            --secondary-color: #2c3e50;
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* Header Section */
+        header {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-bottom: 5px solid var(--primary-color);
+            position: relative;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.5rem;
+            margin-top: 10px;
+        }
+
+        header h2 {
+            color: var(--secondary-color);
+            margin: 10px 0 0 0;
+            font-weight: 400;
+        }
+
+        /* Auth Buttons */
+        .auth-buttons {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-family: sans-serif;
+        }
+
+        .btn-login {
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-login:hover {
+            background-color: #fff3e0;
+        }
+
+        .btn-register {
+            background-color: var(--primary-color);
+            color: white;
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-register:hover {
+            background-color: #e67e22;
+            border-color: #e67e22;
+        }
+
+        /* Hero Image Styles */
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Grid Layout */
+        .grid-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .card ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .card ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .card ul li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        /* Highlight Section */
+        .highlight-section {
+            background-color: var(--secondary-color);
+            color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .highlight-box {
+            margin: 10px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            min-width: 200px;
+        }
+
+        .highlight-box h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: #f39c12;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #333;
+            color: #fff;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 600px) {
+            .auth-buttons {
+                position: static;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            .hero-image {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="auth-buttons">
+            <!-- <a href="#" class="btn btn-login">Log In</a> -->
+            <a href="swarojgaar_register.html" class="btn btn-register">Register</a>
+        </div>
+
+        <h1>आगाज फाउंडेशन</h1>
+        <h2>महिला स्वरोजगार योजना</h2>
+    </header>
+
+    <div class="hero-image">
+        <img src="../public/swarojgaar.png" alt="महिला स्वरोजगार योजना केंद्र" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+
+    <div class="container">
+        
+        <div class="grid-section">
+            <div class="card">
+                <h3>परिचय</h3>
+                <ul>
+                    <li>यह योजना उन महिलाओं के लिए है जो पहले से सिलाई जानती हैं।</li>
+                    <li>महिलाओं का समूह बनाकर उन्हें रोजगार दिया जाएगा।</li>
+                    <li>नियमित काम और आय का अवसर।</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>समूह निर्माण (Group Formation)</h3>
+                <ul>
+                    <li>10 महिलाओं का एक समूह बनाया जाएगा।</li>
+                    <li>समूह बनने के बाद रोजगार को लेकर बैठक आयोजित होगी।</li>
+                    <li>सभी सदस्यों को सिलाई का काम आना आवश्यक है।</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="grid-section">
+            <div class="card">
+                <h3>योगदान एवं सामग्री</h3>
+                <ul>
+                    <li>प्रत्येक महिला को समूह में ₹5000 जमा करने होंगे।</li>
+                    <li>कच्चा माल (कपड़ा, धागा आदि) संस्था द्वारा दिया जाएगा।</li>
+                    <li>अन्य आवश्यक सिलाई सामग्री भी संस्था देगी।</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>मजदूरी एवं आय</h3>
+                <ul>
+                    <li>सभी महिलाओं को 'प्रति पीस' (per piece) के हिसाब से मजदूरी मिलेगी।</li>
+                    <li>काम के अनुसार तुरंत भुगतान किया जाएगा।</li>
+                    <li>नियमित आय का सुनहरा अवसर।</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="grid-section">
+            <div class="card">
+                <h3>बैंक लोन सुविधा</h3>
+                <ul>
+                    <li>समूह निर्माण के बाद पूंजी बढ़ाने के लिए लोन की सुविधा।</li>
+                    <li>बैंक से आसानी से लोन दिलाया जाएगा।</li>
+                    <li>आत्मनिर्भर बनने में पूर्ण सहयोग।</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>आवश्यक दस्तावेज</h3>
+                <ul>
+                    <li>आवेदक: आधार कार्ड, पैन कार्ड, बैंक पासबुक।</li>
+                    <li>अन्य: जाति प्रमाण पत्र, आवासीय प्रमाण पत्र, फोटो।</li>
+                    <li>गारंटर: गारंटर का आधार कार्ड और पैन कार्ड।</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="highlight-section">
+            <div class="highlight-box">
+                <h3>आयु सीमा</h3>
+                <p>न्यूनतम आयु: <strong>18 वर्ष</strong></p>
+                <p>अधिकतम आयु: <strong>40 वर्ष</strong></p>
+            </div>
+            <div class="highlight-box">
+                <h3>संपर्क करें</h3>
+                <p>ऋण विभाग (Loan Department)</p>
+                <p>आगाज फाउंडेशन</p>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 आगाज फाउंडेशन - सभी अधिकार सुरक्षित</p>
+    </footer>
+
+</body>
+</html>

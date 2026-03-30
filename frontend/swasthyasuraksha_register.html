@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation | Partner Tie-up Portal</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <style>
+        /* --- KEEPING ORIGINAL HEADER STYLES --- */
+        :root {
+            --primary: #2e3192;
+            --accent: #ed1c24;
+            --dark: #0f172a;
+            --bg: #f4f4f4; /* Changed to match Swarojgaar background */
+        }
+
+        .header-container {
+            background-color: white;
+            border-bottom: 4px solid var(--primary);
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            font-family: 'Plus Jakarta Sans', sans-serif; /* Keeping header font distinct as requested */
+        }
+
+        .title {
+            color: var(--accent);
+            font-size: clamp(30px, 5vw, 48px);
+            font-weight: 800;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .details { color: var(--primary); margin-top: 10px; }
+        .reg-text { font-size: clamp(14px, 2vw, 20px); font-weight: bold; margin-bottom: 5px; }
+        .info-text { font-size: clamp(12px, 1.8vw, 16px); font-weight: 600; opacity: 0.9; }
+
+        /* --- SWAROJGAAR STYLES APPLIED BELOW --- */
+        
+        body {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding-bottom: 50px;
+            color: #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page {
+            background: #fff;
+            padding: 40px 60px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            min-height: 800px; /* Adjusted height */
+        }
+
+        .header-text {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-top: 10px; 
+            margin-bottom: 30px;
+            line-height: 1.5;
+            text-decoration: underline;
+        }
+
+        /* Swarojgaar Input Styles (Invisible/Underline) */
+        .editable-input {
+            border: none;
+            border-bottom: 1px dotted #000;
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 5px;
+            outline: none;
+            background: transparent;
+            color: #000;
+            width: 100%;
+        }
+
+        .editable-input:focus {
+            border-bottom: 1px solid var(--primary);
+        }
+
+        /* Form Labels styled like document text */
+        .form-row {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+
+        .label-text {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 150px;
+        }
+
+        /* Table Styles from Swarojgaar */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f9f9f9;
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        /* Select Styling to blend in */
+        select.editable-input {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0px center;
+            background-size: 12px;
+            padding-right: 20px;
+            cursor: pointer;
+        }
+
+        /* Checkbox Area */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .check-item {
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Button Style from Swarojgaar */
+       /* --- NEW BUTTON STYLE --- */
+.btn-register {
+    background: #2e3192; /* var(--primary) */
+    color: white;
+    border: none;
+    padding: 18px;
+    width: 100%;
+    max-width: 400px; /* बटन को बीच में और सीमित चौड़ाई में रखने के लिए */
+    margin: 30px auto; /* ऊपर-नीचे मार्जिन और क्षैतिज रूप से सेंटर */
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: 0.3s;
+    font-family: inherit;
+}
+
+.btn-register:hover { 
+    background: #ed1c24; /* var(--accent) hover पर लाल रंग */ 
+}
+
+/* प्रिंट करते समय बटन छिपाने के लिए */
+@media print {
+    .btn-register { display: none; }
+}
+        #success-msg { 
+            display: none; 
+            background: #fff; 
+            border: 1px solid #000;
+            color: #000; 
+            padding: 30px; 
+            text-align: center; 
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* Print Media Query */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { width: 100%; max-width: 100%; margin: 0; }
+            .page { box-shadow: none; margin: 0; padding: 20px; border: none; }
+            .btn-submit { display: none; }
+            .header-container { border-bottom: 2px solid #000; }
+        }
+
+        @media (max-width: 600px) {
+            .page { padding: 20px; }
+            .service-grid { grid-template-columns: 1fr; }
+            .form-row { flex-direction: column; }
+            .editable-input { margin-top: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-container">
+    <h1 class="title">AAGAJ FOUNDATION</h1>
+    <div class="details">
+        <div class="reg-text">Registered Under Indian Trust Act 1882</div>
+        <div class="info-text">GST: 10AAHTA9693GIZM | PAN: AAHTA9693G</div>
+        <div class="info-text">Email: aagajfoundationpaliganj@gmail.com</div>
+    </div>
+</div>
+
+<div class="container">
+    <div id="success-msg">
+        <h2 style="margin-top:0;">Registration Successful</h2>
+        <p>Your business application is being reviewed by Aagaj Foundation.</p>
+    </div>
+
+    <section class="page" id="form-card">
+        
+        <div class="header-text">
+            PARTNER TIE-UP PORTAL AGREEMENT
+        </div>
+
+        <p style="text-align: justify; margin-bottom: 30px;">
+            This document serves as an application for business partnership with Aagaj Foundation. Please fill in the details accurately.
+        </p>
+
+        <form id="tieupForm">
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; font-size: 1.1rem;">
+                    1. Business Identity (व्यवसाय का विवरण)
+                </h3>
+                
+                <table style="margin-top: 0;">
+                    <tr>
+                        <td style="width: 30%; font-weight: bold; background: #fcfcfc;">Business Category</td>
+                        <td>
+                            <select id="entity-type" class="editable-input" onchange="handleTypeChange()">
+                                <option value="Hospital">Hospital / Clinic</option>
+                                <option value="Lab">Diagnostics Lab</option>
+                                <option value="Pharmacy">Pharmacy / Medical Store</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; background: #fcfcfc;">Business Name</td>
+                        <td>
+                            <input type="text" id="biz-name" class="editable-input" placeholder="Enter Full Registered Name" oninput="vPureText(this)" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; background: #fcfcfc;">Experience / Details</td>
+                        <td>
+                            <input type="text" id="biz-details" class="editable-input" placeholder="Years of experience, etc." oninput="vAlphanumeric(this)">
+                        </td>
+                    </tr>
+                </table>
+
+                <div id="dynamic-fields" style="margin-top: 15px;"></div>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; font-size: 1.1rem;">
+                    2. Location Details (स्थान विवरण)
+                </h3>
+                
+                <div class="form-row">
+                    <span class="label-text">Full Address:</span>
+                    <input type="text" id="addr-main" class="editable-input" style="flex: 1;" placeholder="Building, Street, Area" oninput="vAlphanumeric(this)" required>
+                </div>
+                
+                <div class="form-row">
+                    <span class="label-text">Landmark:</span>
+                    <input type="text" id="addr-extra" class="editable-input" style="flex: 1;" placeholder="Near Temple, etc." oninput="vAlphanumeric(this)">
+                </div>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; display: flex; align-items: baseline;">
+                        <span class="label-text" style="min-width: auto;">City/Town:</span>
+                        <input type="text" id="addr-city" class="editable-input" style="flex: 1;" placeholder="e.g. Patna" oninput="vPureText(this)" required>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: baseline;">
+                        <span class="label-text" style="min-width: auto; margin-left: 10px;">State:</span>
+                        <input type="text" id="addr-state" class="editable-input" style="flex: 1;" placeholder="e.g. Bihar" oninput="vPureText(this)" required>
+                    </div>
+                    <div style="flex: 1; display: flex; align-items: baseline;">
+                        <span class="label-text" style="min-width: auto; margin-left: 10px;">Pincode:</span>
+                        <input type="text" id="addr-pin" maxlength="6" class="editable-input" style="flex: 1;" placeholder="800001" oninput="vNum(this)" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 20px; font-size: 1.1rem;">
+                    3. Contact Information (संपर्क विवरण)
+                </h3>
+                <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                    <div style="flex: 1;">
+                        <span class="label-text" style="display:block; margin-bottom:5px;">Authorized Person Name:</span>
+                        <input type="text" id="owner-name" class="editable-input" placeholder="Full Name" oninput="vPureText(this)" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <span class="label-text" style="display:block; margin-bottom:5px;">WhatsApp Number:</span>
+                        <input type="text" id="biz-phone" maxlength="10" class="editable-input" placeholder="10 Digit Number" oninput="vNum(this)" required>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 10px; font-size: 1.1rem;">
+                    4. Services Offered (सेवाएं)
+                </h3>
+                <p style="font-size:0.9rem; color:#666; margin-bottom:15px; margin-top:0;">
+                    ℹ️ ये services appointment booking के समय patients को दिखेंगी।
+                </p>
+                <div class="form-row" style="margin-bottom: 12px;">
+                    <span class="label-text" style="min-width: 170px;">Add Custom Service:</span>
+                    <input type="text" id="custom-service-input" class="editable-input" style="flex:1;" placeholder="e.g. Dialysis, PET Scan">
+                    <button type="button" id="add-custom-service-btn" style="margin-left:10px; padding:8px 12px; cursor:pointer;">
+                        + Add
+                    </button>
+                </div>
+                <div class="service-grid" id="service-options">
+                    </div>
+            </div>
+
+            <!-- <button type="button" class="btn-submit" onclick="submitTieup()">
+                Submit Application (आवेदन जमा करें)
+            </button> -->
+            <button type="button" class="btn-register" onclick="saveAndPrint()">
+            <i class="fas fa-paper-plane"></i> Submit Partner Application
+            </button>
+        </form>
+    </section>
+</div>
+
+<script>
+    // Validation Logic
+    function vNum(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
+    function vPureText(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
+    function vAlphanumeric(el) { el.value = el.value.replace(/[^a-zA-Z0-9\s]/g, ''); }
+    function vTextComma(el) { el.value = el.value.replace(/[^a-zA-Z0-9\s,]/g, ''); }
+    function vDateChar(el) { el.value = el.value.replace(/[^0-9\/]/g, ''); }
+
+    const config = {
+        Hospital: {
+            label: "Total Beds / Specialist Doctors",
+            placeholder: "e.g. 50 Beds, 10 Doctors",
+            license: "Medical Registration No.",
+            services: ["ICU", "Emergency", "OPD", "Ambulance", "Surgery", "General Ward", "Private Ward", "NICU"]
+        },
+        Lab: {
+            label: "NABL Accreditation Status",
+            placeholder: "Yes / No / Applied",
+            license: "Lab License Number",
+            services: ["Blood Test", "Home Collection", "X-Ray", "CT Scan", "Pathology", "MRI", "Ultrasound", "ECG"]
+        },
+        Pharmacy: {
+            label: "Drug License Expiry",
+            placeholder: "DD/MM/YYYY",
+            license: "Pharmacy License No.",
+            services: ["Home Delivery", "Generic Meds", "Surgicals", "Refrigerated Items", "Baby Care", "Ayurvedic", "Allopathic"]
+        }
+    };
+
+    const customServicesByType = {
+        Hospital: [],
+        Lab: [],
+        Pharmacy: []
+    };
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderServiceOptions(type) {
+        const serviceContainer = document.getElementById('service-options');
+        const mergedServices = [...config[type].services, ...customServicesByType[type]];
+
+        serviceContainer.innerHTML = mergedServices.map((s) => {
+            const safeService = escapeHtml(s);
+            return `
+                <div class="check-item">
+                    <input type="checkbox" name="service" value="${safeService}">
+                    <label>${safeService}</label>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function addCustomService() {
+        const type = document.getElementById('entity-type').value;
+        const input = document.getElementById('custom-service-input');
+        const serviceName = input.value.trim();
+
+        if (!serviceName) return;
+
+        const isDuplicateDefault = config[type].services.some(s => s.toLowerCase() === serviceName.toLowerCase());
+        const isDuplicateCustom = customServicesByType[type].some(s => s.toLowerCase() === serviceName.toLowerCase());
+
+        if (isDuplicateDefault || isDuplicateCustom) {
+            alert('This service is already added.');
+            return;
+        }
+
+        customServicesByType[type].push(serviceName);
+        renderServiceOptions(type);
+        input.value = '';
+        input.focus();
+    }
+
+    function handleTypeChange() {
+        const type = document.getElementById('entity-type').value;
+        const dynamicContainer = document.getElementById('dynamic-fields');
+
+        let valFunc = "vAlphanumeric(this)";
+        if(type === 'Hospital') valFunc = "vTextComma(this)";
+        if(type === 'Pharmacy') valFunc = "vDateChar(this)";
+
+        // Generating Dynamic Fields with Table Layout for consistency
+        dynamicContainer.innerHTML = `
+            <table>
+                <tr>
+                    <td style="width: 30%; font-weight: bold; background: #fcfcfc;">${config[type].label}</td>
+                    <td>
+                        <input type="text" id="extra-info" class="editable-input" placeholder="${config[type].placeholder}" oninput="${valFunc}" required>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: bold; background: #fcfcfc;">${config[type].license}</td>
+                    <td>
+                        <input type="text" id="license" class="editable-input" placeholder="Reg/License Number" oninput="vAlphanumeric(this)" required>
+                    </td>
+                </tr>
+            </table>
+        `;
+
+        renderServiceOptions(type);
+    }
+
+    async function saveAndPrint() {
+        const services = Array.from(document.querySelectorAll('input[name="service"]:checked')).map(cb => cb.value);
+
+        // ✅ Create Combined Address for Generic Schema
+        const fullAddress = `${document.getElementById('addr-main').value.trim()}, ${document.getElementById('addr-city').value.trim()}, ${document.getElementById('addr-state').value.trim()} - ${document.getElementById('addr-pin').value.trim()}`;
+
+        const d = {
+            // ✅ 1. Standard Fields (To ensure saving in generic schema)
+            name: document.getElementById('biz-name').value.trim(),
+            guardianName: document.getElementById('owner-name').value.trim(),
+            mobileNumber: document.getElementById('biz-phone').value.trim(),
+            address: fullAddress,
+            trainingName: document.getElementById('entity-type').value, // Maps Type -> TrainingName
+            aadharNumber: document.getElementById('license').value.trim(), // Maps License -> Aadhar
+            existingSkills: document.getElementById('extra-info').value.trim(), // Maps Extra -> Skills
+            caste: services.join(', '), // Maps Services -> Caste (String)
+
+            // ✅ 2. Specific Fields (For flexible schemas)
+            biz: document.getElementById('biz-name').value.trim(),
+            details: document.getElementById('biz-details').value.trim(),
+            type: document.getElementById('entity-type').value,
+            addr: document.getElementById('addr-main').value.trim(),
+            addrExtra: document.getElementById('addr-extra').value.trim(),
+            phone: document.getElementById('biz-phone').value.trim(),
+            city: document.getElementById('addr-city').value.trim(),
+            state: document.getElementById('addr-state').value.trim(),
+            pin: document.getElementById('addr-pin').value.trim(),
+            owner: document.getElementById('owner-name').value.trim(),
+            extraInfo: document.getElementById('extra-info').value.trim(),
+            license: document.getElementById('license').value.trim(),
+            services: services,
+            yojanaName: 'Swasthya Suraksha Yojana', // ✅ Added for easier filtering
+            // ✅ Send Employee Email
+            registeredBy: sessionStorage.getItem('loggedInRole') === 'Admin'
+                ? 'Admin/Self'
+                : (sessionStorage.getItem('loggedInUserEmail') || sessionStorage.getItem('loggedInUser') || 'Self')
+        };
+
+        // Strict Validation Check
+        if(!d.biz || d.phone.length < 10 || !d.city || !d.state || d.pin.length < 6 || !d.owner || !d.extraInfo || !d.license || !d.addr) {
+            return alert("Please fill all details correctly! (कृपया सभी विवरण सही ढंग से भरें!)");
+        }
+
+        const btn = document.querySelector('.btn-register');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(CONFIG.API_URL + '/swasthya/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(d)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('form-card').style.display = 'none';
+                const successMsg = document.getElementById('success-msg');
+                successMsg.style.display = 'block';
+                successMsg.innerHTML = `
+                    <h2 style="margin-top:0;">Registration Successful</h2>
+                    <p>Your business application has been saved.</p>
+                    <p><strong>Partner ID: ${result.data.uniqueId}</strong></p>
+                `;
+                window.scrollTo(0,0);
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Server Error. Please check if backend is running.");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Initialize fields
+    document.getElementById('add-custom-service-btn').addEventListener('click', addCustomService);
+    document.getElementById('custom-service-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addCustomService();
+        }
+    });
+
+    handleTypeChange();
+</script>
+<script src="config.js"></script>
+
+</body>
+</html>

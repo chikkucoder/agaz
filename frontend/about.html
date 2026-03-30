@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Aagaz Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- COPYING STYLES FROM index.html TO MAINTAIN CONSISTENCY --- */
+        :root {
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #fffdf5;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Navbar Styling */
+        .navbar-nav .nav-item { margin: 0 5px; }
+        .navbar-brand img { height: 85px; width: auto; transition: transform 0.3s ease; }
+        .nav-link { font-weight: 600; color: var(--text-dark); padding: 10px 18px !important; border-radius: 8px; position: relative; transition: all 0.4s ease; }
+        .nav-link:hover { color: var(--primary-red) !important; background-color: rgba(253, 216, 49, 0.15); transform: translateY(-3px); }
+        .nav-link.active { color: var(--primary-red) !important; background-color: rgba(237, 28, 36, 0.05); }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 3px; background-color: var(--primary-yellow); transition: width 0.3s ease; }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        /* Social Sidebar */
+        .social-sidebar { position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 1030; display: flex; flex-direction: column; }
+        .social-sidebar a { display: flex; justify-content: center; align-items: center; width: 50px; height: 50px; color: white; font-size: 22px; text-decoration: none; transition: all 0.3s ease; border-top-right-radius: 5px; border-bottom-right-radius: 5px; margin-bottom: 2px; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+        .social-sidebar a:hover { width: 65px; padding-left: 10px; }
+        .social-sidebar .facebook { background: #3b5998; }
+        .social-sidebar .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+        .social-sidebar .twitter { background: #1DA1F2; }
+        .social-sidebar .youtube { background: var(--primary-red); }
+        .social-sidebar .linkedin { background: #0077b5; }
+
+        /* Global Layout */
+        .section-padding { padding: 80px 0; }
+        
+        /* Footer Styling (Updated to match index.html) */
+        .footer { background-color: #051630; color: #d1d1d1; padding: 60px 0 30px; font-size: 0.95rem; }
+        .footer h4 { color: white; margin-bottom: 25px; font-weight: 700; font-size: 1.2rem; }
+        /* .newsletter-input { background-color: #0b2246; border: 1px solid #1a3a6c; color: white; border-radius: 30px; padding: 12px 20px 12px 45px; width: 100%; } */
+        /* --- NEWSLETTER SECTION STYLES --- */
+.newsletter-container {
+    max-width: 750px;
+    margin: 0 auto 50px; /* Centered with bottom spacing */
+}
+
+.newsletter-title {
+    color: white;
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-size: 2.2rem;
+    text-align: center;
+}
+
+.newsletter-bar {
+    border: 1px solid rgba(255, 255, 255, 0.4); /* Light border */
+    border-radius: 50px; /* Pill shape */
+    display: flex;
+    align-items: center;
+    overflow: hidden; /* Ensures content stays inside rounded corners */
+    background-color: rgba(255, 255, 255, 0.05); /* Slight transparent bg */
+    transition: all 0.3s ease;
+}
+
+.newsletter-bar:hover {
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(253, 216, 49, 0.1);
+}
+
+.newsletter-icon-box {
+    padding-left: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.newsletter-separator {
+    width: 1px;
+    height: 25px;
+    background-color: rgba(255, 255, 255, 0.4);
+    margin: 0 15px;
+}
+
+.newsletter-input-custom {
+    background: transparent;
+    border: none;
+    color: white;
+    flex-grow: 1; /* Takes up remaining space */
+    font-style: italic;
+    outline: none;
+    padding: 18px 0;
+    font-size: 1rem;
+}
+
+.newsletter-input-custom::placeholder {
+    color: #cccccc;
+    font-weight: 300;
+}
+
+.newsletter-submit-btn {
+    background-color: var(--primary-yellow);
+    color: #333; /* Dark text for contrast */
+    border: none;
+    padding: 18px 45px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    height: 100%; /* Full height match */
+}
+
+.newsletter-submit-btn:hover {
+    background-color: #e5c32d; /* Slightly darker yellow on hover */
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .newsletter-bar {
+        flex-direction: column;
+        border-radius: 15px;
+        padding: 10px;
+    }
+    .newsletter-separator { display: none; }
+    .newsletter-icon-box { margin-bottom: 10px; }
+    .newsletter-input-custom { width: 100%; text-align: center; margin-bottom: 10px; }
+    .newsletter-submit-btn { width: 100%; border-radius: 10px; }
+}
+        /* Logo and List Styles Added */
+        .footer-logo {
+            width: 150px; 
+            height: auto;
+            margin-bottom: 20px;
+            display: inline-block; 
+        }
+        .footer-brand-text { line-height: 1.6; margin-top: 15px; }
+        
+        .footer ul { list-style: none; padding: 0; }
+        .footer ul li { margin-bottom: 12px; display: flex; align-items: flex-start; }
+        .footer ul li a { color: #d1d1d1; text-decoration: none; transition: 0.3s; }
+        .footer ul li a:hover { color: var(--primary-yellow); padding-left: 5px; }
+        .footer-arrow { margin-right: 10px; color: var(--primary-red); font-size: 0.8rem; margin-top: 5px; }
+
+        .copyright-bar { background-color: var(--primary-yellow); color: #333; text-align: center; padding: 15px 0; font-weight: 600; font-size: 0.95rem; }
+        .copyright-bar span { color: var(--primary-red); font-weight: 800; }
+
+        /* Dropdown */
+        .dropdown-menu { border-top: 3px solid var(--primary-red) !important; border-radius: 0 0 10px 10px; padding: 0; margin-top: 0; }
+        .dropdown-item { padding: 12px 20px; font-weight: 500; color: var(--text-dark); transition: all 0.3s ease; }
+        .dropdown-item:hover { background-color: var(--bg-light); color: var(--primary-red); padding-left: 25px; }
+
+        /* --- SPECIFIC STYLES FOR ABOUT PAGE --- */
+        .page-header {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('../public/pic3.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 0;
+        }
+
+        .about-content-text {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-light);
+        }
+
+        /* Chairman Section Styles */
+        .chairman-section {
+            background-image: url('../public/leaf-bg.png');
+            background-color: var(--bg-light);
+            position: relative;
+        }
+        
+        .chairman-img-wrapper {
+            position: relative;
+            padding: 10px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        
+        .chairman-img-wrapper img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        /* Buttons from Uploaded Images */
+        .btn-yellow-custom {
+            background-color: var(--primary-yellow);
+            color: #333;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .btn-yellow-custom:hover {
+            background-color: #e5c32d;
+            transform: translateY(-2px);
+        }
+
+        .btn-red-custom {
+            background-color: var(--primary-red);
+            color: white;
+            font-weight: 700;
+            padding: 12px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(237, 28, 36, 0.3);
+        }
+        .btn-red-custom:hover {
+            background-color: #b0151b;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .check-list li {
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        /* Priorities Section Styles */
+        .priority-item {
+            transition: transform 0.3s ease;
+        }
+        .priority-item:hover {
+            transform: translateY(-5px);
+        }
+        .priority-img {
+            width: 100%;
+            height: 250px; /* Fixed height for consistency */
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        @media (min-width: 992px) {
+            .overlap-left-panel {
+                /* Width increased visually via grid, Height increased by 25px+ */
+                min-height: 575px !important; /* 450px + 25px = 475px */
+                width: calc(50% + 100px) !important;
+                flex: 0 0 auto !important;
+                z-index: 1;
+            }
+            .overlap-right-panel {
+                width: calc(50% - 100px) !important;
+            flex: 0 0 auto !important;
+            
+            /* Overlap logic same rahega */
+            margin-left: -80px; 
+            z-index: 10;
+            position: relative;
+            box-shadow: -10px 0 20px rgba(0,0,0,0.2);
+            }
+        }
+        
+        /* Mobile view fix */
+        @media (max-width: 991px) {
+            .overlap-left-panel { min-height: 450px; width: 100% !important;}
+            .overlap-right-panel { margin-left: 0; width: 100% !important;}
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .social-sidebar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="social-sidebar">
+        <a href="#" class="facebook" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" class="instagram" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="twitter" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        <a href="#" class="linkedin" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" class="youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+
+    <div id="navbar-placeholder"></div>
+
+    <header class="page-header">
+        <div class="container">
+            <h1 class="fw-bold display-4">Who We Are</h1>
+            <p class="lead">Dedicated to the holistic development of rural Bihar</p>
+        </div>
+    </header>
+
+    <section class="section-padding">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #333;">
+                        About <span style="color: var(--primary-red);">Aagaz Foundation</span>
+                    </h2>
+                    
+                    <p class="about-content-text">
+                        Founded in 2020, Aagaz Foundation is a registered, non-profit organisation committed to empowering communities across Bihar through sustainable development initiatives.
+                    </p>
+                    <p class="about-content-text">
+                        Headquartered in Surbhi Vihar, Bhupatipur, Patna (800020), with a district office in Akhtiyarpur, Muzaffarpur, the foundation works towards holistic social upliftment by focusing on women empowerment, education, health, and livelihood generation.
+                    </p>
+
+                    <ul class="list-unstyled mt-4 check-list">
+                        <li class="d-flex align-items-center">
+                            <i class="fa-solid fa-check me-3" style="color: var(--primary-red);"></i> 
+                            <span>Empowering Rural Bihar</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fa-solid fa-check me-3" style="color: var(--primary-red);"></i> 
+                            <span>Driving Inclusive Growth</span>
+                        </li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <a href="#" class="btn-yellow-custom">Give Them A Chance</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="position-relative">
+                        <img src="../public/pic4.jpg" alt="Aagaz Foundation Team" class="img-fluid rounded shadow-lg w-100" style="object-fit: cover;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding chairman-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-5 mb-lg-0">
+                    <div class="chairman-img-wrapper">
+                        <img src="../public/chairman.jpg" alt="Chairman of Aagaz Foundation">
+                    </div>
+                </div>
+                
+                <div class="col-lg-7 ps-lg-5">
+                    <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #333;">
+                        From the <span style="color: var(--primary-red);">Chairman's Desk</span>
+                    </h2>
+                    
+                    <p class="about-content-text">
+                        At Aagaz Foundation, we believe that true development begins when opportunities reach every corner of society—especially the rural and marginalised sections.
+                    </p>
+                    
+                    <p class="about-content-text">
+                        Our journey started with a simple yet powerful vision: to empower individuals through education, skill development, health awareness, and livelihood support. Over the years, we have seen how small efforts can create lasting transformations. Every woman who learns a new skill, every youth who gains employment, and every child who steps into a classroom represents a step forward towards a stronger Bihar.
+                    </p>
+
+                    <p class="about-content-text fst-italic text-dark border-start border-4 border-warning ps-3">
+                        "Our dedicated team and partners, including <strong>ABS Manufacturing Vastra Nirman Udyog</strong> and <strong>Budhinath Traders Private Limited</strong>, have been instrumental in turning our vision into reality. Together, we continue to work tirelessly to build communities that are self-reliant, confident, and capable of shaping their own future."
+                    </p>
+
+                    <div class="mt-4">
+                        <a href="#" class="btn-red-custom">Who We Are?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background-color: #fff;">
+        <div class="container text-center">
+            <div class="mb-5">
+                <h2 class="fw-bold display-5 mb-3" style="color: #333; position: relative; display: inline-block;">
+                    Our <span style="position: relative; z-index: 1;">Priorities</span>
+                    <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background-color: var(--primary-yellow); opacity: 0.3; border-radius: 50%; z-index: 0;"></span>
+                </h2>
+                <p class="text-muted mt-2">adipisicing elit Rem autem voluptatem obcaecati</p>
+                <div style="width: 60px; height: 3px; background-color: var(--primary-red); margin: 15px auto 0;"></div>
+            </div>
+            
+            <div class="row g-4 justify-content-center">
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="priority-item h-100">
+                        <div class="overflow-hidden rounded mb-3 shadow-sm">
+                            <img src="../public/s.jpg" alt="Women Skill Development" class="priority-img img-fluid" style="transition: 0.5s;">
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Women Skill Development</h5>
+                        <p class="small fw-bold" style="color: var(--primary-red);">Silayi Prasikshan Yojana</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="priority-item h-100">
+                        <div class="overflow-hidden rounded mb-3 shadow-sm">
+                            <img src="../public/h.jpg" alt="Healthcare Support" class="priority-img img-fluid" style="transition: 0.5s;">
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Healthcare Support</h5>
+                        <p class="small fw-bold" style="color: var(--primary-red);">Healthy People. Better World.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="priority-item h-100">
+                        <div class="overflow-hidden rounded mb-3 shadow-sm">
+                            <img src="../public/community.jpg" alt="Community Support" class="priority-img img-fluid" style="transition: 0.5s;">
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Community Support & Welfare</h5>
+                        <p class="small fw-bold" style="color: var(--primary-red);">Welfare</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="priority-item h-100">
+                        <div class="overflow-hidden rounded mb-3 shadow-sm">
+                            <img src="../public/l.jpg" alt="Sustainable Livelihood" class="priority-img img-fluid" style="transition: 0.5s;">
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Sustainable Livelihood</h5>
+                        <p class="small fw-bold" style="color: var(--primary-red);">Helpful information</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background-color: var(--bg-light);">
+        <div class="container">
+            <div class="row align-items-center">
+                
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #333;">
+                        Our <span style="color: var(--primary-red);">Mission</span>
+                    </h2>
+                    
+                    <p class="about-content-text">
+                        Our mission is to empower and uplift the underprivileged communities of Bihar by promoting education, health, and self-employment. We aim to create sustainable opportunities for women and youth through skill development, awareness programmes, and community participation.
+                    </p>
+                    <p class="about-content-text">
+                        Aagaz Foundation is committed to fostering equality, self-reliance, and social responsibility—ensuring that every individual has the tools and confidence to lead a dignified and independent life.
+                    </p>
+
+                    <ul class="list-unstyled mt-4 check-list">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="fa-solid fa-check me-3" style="color: var(--primary-red);"></i> 
+                            <span>Empowering Rural Bihar</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fa-solid fa-check me-3" style="color: var(--primary-red);"></i> 
+                            <span>Driving Inclusive Growth</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="position-relative">
+                        <img src="../public/pic4.jpg" alt="Aagaz Foundation Mission Group" class="img-fluid rounded shadow w-100" style="object-fit: cover;">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="section-padding" style="background-color: #fff;">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                     <div class="position-relative">
+                        <img src="../public/serve.jpg" alt="Who We Serve Illustration" class="img-fluid rounded shadow-sm w-100">
+                    </div>
+                </div>
+
+                <div class="col-lg-6 ps-lg-5">
+                    <h2 class="fw-bold mb-4" style="font-size: 2.5rem; color: #333;">
+                        Who We <span style="color: var(--primary-red);">Serve</span>
+                    </h2>
+                    
+                    <p class="about-content-text">
+                        Aagaz Foundation works at the grassroots level to serve women, youth, and underprivileged communities across Bihar. Our initiatives focus on empowering those who are often left behind in the journey of development.
+                    </p>
+                    
+                    <h5 class="fw-bold mt-4 mb-3">We serve:</h5>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2 about-content-text"><i class="fa-solid fa-circle-notch me-2" style="color: var(--primary-yellow); font-size: 0.8rem;"></i> Women seeking skill development, self-employment, and financial independence.</li>
+                        <li class="mb-2 about-content-text"><i class="fa-solid fa-circle-notch me-2" style="color: var(--primary-yellow); font-size: 0.8rem;"></i> Youth in need of education, career guidance, and vocational training for sustainable livelihoods.</li>
+                        <li class="mb-2 about-content-text"><i class="fa-solid fa-circle-notch me-2" style="color: var(--primary-yellow); font-size: 0.8rem;"></i> Children from rural and low-income families, ensuring access to quality education and health awareness.</li>
+                        <li class="mb-2 about-content-text"><i class="fa-solid fa-circle-notch me-2" style="color: var(--primary-yellow); font-size: 0.8rem;"></i> Rural communities aiming to improve their overall quality of life through collective growth and social participation.</li>
+                    </ul>
+
+                    <div class="mt-4 d-flex align-items-center gap-4">
+                        <a href="#" class="btn-red-custom">Who We Are?</a>
+                        <a href="#" class="text-decoration-none fw-bold" style="color: var(--primary-red); font-size: 1.1rem;">
+                            <i class="fa-solid fa-heart me-2"></i> Donate For Nature
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-0">
+        <div class="container-fluid p-0">
+            <div class="row g-0 align-items-center">
+                
+                <div class="col-lg-6 overlap-left-panel position-relative d-flex align-items-center justify-content-center text-center p-5" 
+                     style="background: linear-gradient(rgba(109, 128, 159, 0.8), rgba(109, 128, 159, 0.8)), url('../public/rural.jpeg') no-repeat center center/cover;">
+                    
+                    <div class="z-1 px-lg-5">
+                        <i class="fa-solid fa-quote-left mb-4" style="color: var(--primary-yellow); font-size: 3.5rem;"></i>
+                        <h3 class="text-white fst-italic fw-normal" style="line-height: 1.6;">
+                            "Aagaj Foundation works to empower women, support rural families, and provide essential services in health, education, and livelihood."
+                        </h3>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 overlap-right-panel d-flex align-items-center p-5" style="background-color: var(--primary-red);">
+                    <div class="px-lg-4 text-white">
+                        <h2 class="fw-bold mb-4 display-6">Aagaj Foundation – Bringing Change to Rural India</h2>
+                        <p class="mb-0" style="font-size: 1.15rem; line-height: 1.8; opacity: 0.95;">
+                            Through our programmes in skill development, healthcare, and education, Aagaj Foundation is dedicated to uplifting women and improving living conditions in villages and underserved areas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer mt-0">
+        <div class="container">
+            
+            <div class="newsletter-container">
+                <h3 class="newsletter-title">Get Our Newsletter</h3>
+                
+                <form action="#" class="newsletter-bar">
+                    <div class="newsletter-icon-box">
+                        <i class="fa-regular fa-envelope" style="color: var(--primary-yellow); font-size: 1.5rem;"></i>
+                    </div>
+    
+                    <div class="newsletter-separator"></div>
+    
+                    <input type="email" class="newsletter-input-custom" placeholder="Enter your email address here" required>
+    
+                    <button type="submit" class="newsletter-submit-btn">Submit Now</button>
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 mb-4 text-center text-lg-start">
+                    <img src="../public/logo.jpg" alt="Aagaz Foundation Logo" class="footer-logo">
+                    <h5 class="text-white fw-bold mb-3">Aagaz Foundation</h5>
+                    <p class="footer-brand-text">Aagaz Foundation Empowering communities through sustainable agriculture, health, livelihood, and education initiatives.</p>
+                </div>
+    
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3">Quick Links</h4>
+                    <ul class="ms-lg-3">
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="about.html">About Us</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="#">Gallery</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="#">Our Programmes</a></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+    
+                <div class="col-lg-3 mb-4">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Email: <br> Aagajfoundationpaliganj@gmail.com</span></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Phone: 6124065270, <br> 9431430464</span></li>
+                        <li><i class="fa-solid fa-arrow-right footer-arrow"></i> <span>Map: Surbhi Vihar Bhupatipur Near Krishi Anusandhan Kendra Patna 800020</span></li>
+                    </ul>
+                </div>
+    
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3 text-white fw-bold border-bottom d-inline-block pb-1" style="border-color: #666 !important;">Learn More</h4>
+                    <ul class="ms-lg-3 mt-3 list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Why Aagaz Foundation?</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">What We Do</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Where We Work</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Frequently Asked Questions</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-white-50">Charity Ratings</a></li>
+                    </ul>
+                    <div class="d-flex gap-3 align-items-center">
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-x-twitter"></i></a> 
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-linkedin-in"></i></a>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="copyright-bar">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div class="mb-2 mb-md-0">
+                &copy; 2026 <span>Aagaz Foundation</span>. All Rights Reserved.
+            </div>
+            <div class="legal-links">
+                <a href="#" class="text-dark text-decoration-none small">Privacy</a>
+                <span class="mx-1">|</span>
+                <a href="#" class="text-dark text-decoration-none small">Cookies Notice</a>
+                <span class="mx-1">|</span>
+                <a href="#" class="text-dark text-decoration-none small">Terms & Conditions</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    // 1. Fetch and Load Navbar
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar-placeholder').innerHTML = data;
+
+            // 2. Set Active Class (kaunsa page open hai)
+            const currentPage = window.location.pathname.split("/").pop();
+            if(currentPage === "about.html") document.getElementById('nav-about').classList.add('active');
+            if(currentPage === "gallery.html") document.getElementById('nav-gallery').classList.add('active');
+
+            // 3. User Login Logic (Dashboard Check)
+            const userName = sessionStorage.getItem('loggedInUser');
+            const adminBtn = document.getElementById('admin-action-btn');
+            const servicesMenu = document.getElementById('services-list');
+
+            if (userName && adminBtn) {
+                adminBtn.href = "admin-dashboard.html"; 
+                adminBtn.innerHTML = `<i class="fa-solid fa-gauge me-2"></i> Dashboard (${userName})`;
+                adminBtn.style.backgroundColor = 'var(--primary-red)';
+                adminBtn.style.color = 'white';
+
+                if (servicesMenu) {
+                    servicesMenu.innerHTML = `
+                        <li><a class="dropdown-item" href="silayi-yojana.html">Mahila Silayi Prasikshan Yojana</a></li>
+                        <li><a class="dropdown-item" href="swarojgaar-yojana.html">Mahila Swarojgaar Yojana</a></li>
+                        <li><a class="dropdown-item" href="swasthya-login.html">Swasthya Suraksha Yojana</a></li>
+                    `;
+                }
+            }
+        });
+});
+    </script>
+</body>
+</html>

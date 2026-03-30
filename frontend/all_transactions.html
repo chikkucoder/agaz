@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Transactions - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("⚠️ Unauthorized Access! Please Login first.");
+            window.location.href = "admin_login_employe.html";
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-red: #ED1C24;
+            --primary-yellow: #fdd831;
+            --sidebar-bg: #051630;
+            --text-light: #f8f9fa;
+        }
+
+        body { font-family: sans-serif; background-color: #f4f6f9; overflow-x: hidden; }
+
+        /* Sidebar Styling */
+        .sidebar { 
+            height: 100vh; background-color: var(--sidebar-bg); color: white; 
+            position: fixed; width: 250px; overflow-y: auto; z-index: 1050; 
+            transition: 0.3s; left: 0;
+        }
+        
+        .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { height: 60px; background: white; padding: 5px; border-radius: 5px; }
+        .sidebar ul { padding: 0; list-style: none; margin-top: 20px; }
+        .sidebar ul li a { display: block; padding: 15px 25px; color: #b8c7ce; text-decoration: none; transition: 0.3s; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { background-color: rgba(255,255,255,0.1); color: var(--primary-yellow); border-left: 4px solid var(--primary-red); }
+        
+        /* ✅ ADDED: Dropdown Arrow Styling (To match other pages) */
+        .sidebar ul li a[data-bs-toggle="collapse"] { position: relative; }
+        .sidebar ul li a[data-bs-toggle="collapse"]::after {
+            content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: 20px; font-size: 0.8rem; transition: 0.3s;
+        }
+        .sidebar ul li a[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+        .main-content { margin-left: 250px; padding: 20px; transition: 0.3s; width: auto; }
+
+        /* Stats Card */
+        .stat-card {
+            background: white; border-radius: 10px; padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 5px solid var(--primary-red);
+        }
+
+        /* Table Styling */
+        .table-container { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .txn-id { font-family: monospace; font-weight: bold; color: #555; }
+        .amount-text { color: #198754; font-weight: bold; }
+        
+        /* Badges */
+        .badge-ngo { background-color: #ffc107; color: #000; }
+        .badge-health { background-color: #0d6efd; color: #fff; }
+        .badge-scheme { background-color: #198754; color: #fff; }
+
+        /* Mobile Nav & Overlay */
+        .mobile-nav {
+            display: none;
+            background: var(--sidebar-bg);
+            color: white;
+            padding: 10px 20px;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        @media (max-width: 992px) {
+            .sidebar { left: -250px; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; }
+            .mobile-nav { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-nav">
+        <h5 class="mb-0 fw-bold">Aagaj Admin</h5>
+        <button class="btn btn-outline-light btn-sm" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex justify-content-between align-items-center d-lg-none mb-2">
+                <span class="text-white small">Menu</span>
+                <button class="btn btn-sm text-white" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <img src="../public/logo.jpg" alt="Logo"> 
+            <h5 class="mb-0 mt-2 fw-bold">Aagaj Admin</h5>
+        </div>
+        <ul>
+            <li><a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
+            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Jobs Data</a></li>
+            <li><a href="Normal_Jobs_Data.html"><i class="fa-solid fa-briefcase me-2"></i> Normal Jobs Data</a></li>
+            
+            <li>
+                <a href="#paymentSubmenu" data-bs-toggle="collapse" aria-expanded="true" class="active">
+                    <i class="fa-solid fa-money-bill me-2"></i> Payments
+                </a>
+                <ul class="collapse show list-unstyled" id="paymentSubmenu" style="background: rgba(0,0,0,0.2);">
+                    <li>
+                        <a href="all_transactions.html" class="active" style="padding-left: 50px; color: var(--primary-yellow);">
+                            <i class="fa-solid fa-receipt me-2"></i> All Transactions
+                        </a>
+                    </li>
+                    <li>
+                        <a href="donation_history.html" style="padding-left: 50px;">
+                            <i class="fa-solid fa-hand-holding-heart me-2"></i> Donation History
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="index.html" class="mt-5 border-top pt-3"><i class="fa-solid fa-house me-2"></i> Back to Website</a></li>
+            <li><a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold text-dark">Payment History</h3>
+            <button class="btn btn-dark btn-sm" onclick="fetchAllData()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <h6 class="text-muted">Total Collections</h6>
+                    <h3 class="fw-bold mb-0" id="totalRevenue">₹ 0</h3>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card" style="border-left-color: #0d6efd;">
+                    <h6 class="text-muted">Total Transactions</h6>
+                    <h3 class="fw-bold mb-0" id="totalTxn">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <select class="form-select" id="categoryFilter">
+                            <option value="All">All Categories</option>
+                            <option value="NGO Job">NGO Jobs</option>
+                            <option value="Normal Job">Normal Jobs</option>
+                            <option value="Health Card">Health Cards</option>
+                            <option value="Scheme">Schemes (Silai/Swarojgaar)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by Name, Mobile, or Transaction ID...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>User Details</th>
+                            <th>Category / Purpose</th>
+                            <th>Txn ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionBody">
+                        <tr><td colspan="7" class="text-center p-4">Loading Data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center" id="paginationControls"></ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="modal fade" id="receiptModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Payment Receipt</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="receiptContent">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="printReceipt()">Print</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let allTransactions = [];
+        let currentReceiptData = null; 
+        
+        // ✅ Pagination Variables 
+        let currentFilteredData = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchAllData();
+        });
+
+        async function fetchAllData() {
+            const token = localStorage.getItem("authToken");
+            const headers = { 'Authorization': 'Bearer ' + token };
+
+            try {
+                const jobsReq = fetch(CONFIG.API_URL + '/admin/get-all-applicants', { headers });
+                const healthReq = fetch(CONFIG.API_URL + '/api/healthcard/all');
+                const schemeReq = fetch(CONFIG.API_URL + '/admin/get-all-beneficiaries', { headers });
+
+                const [jobsRes, healthRes, schemeRes] = await Promise.all([jobsReq, healthReq, schemeReq]);
+
+                const jobsData = await jobsRes.json();
+                const healthData = await healthRes.json();
+                const schemeData = await schemeRes.json();
+
+                let combinedData = [];
+
+                if(Array.isArray(jobsData)) {
+                    jobsData.forEach(item => {
+                        if(item.paymentId) { 
+                            combinedData.push({
+                                date: item.date || item.createdAt,
+                                name: item.fullName,
+                                mobile: item.mobile,
+                                category: item.job_category === 'NGO' ? 'NGO Job' : 'Normal Job',
+                                subCategory: item.roleApplied,
+                                txnId: item.paymentId,
+                                amount: item.amount || 499,
+                                status: 'Success',
+                                original: item
+                            });
+                        }
+                    });
+                }
+
+                if(healthData.success && Array.isArray(healthData.data)) {
+                    healthData.data.forEach(item => {
+                        combinedData.push({
+                            date: item.createdAt,
+                            name: item.fullName,
+                            mobile: item.mobile,
+                            category: 'Health Card',
+                            subCategory: 'Smart Health ID',
+                            txnId: item.paymentId,
+                            amount: item.amount || 201, 
+                            status: item.paymentStatus || 'Success',
+                            original: item
+                        });
+                    });
+                } else if (Array.isArray(healthData)) { 
+                     healthData.forEach(item => {
+                        combinedData.push({
+                            date: item.createdAt,
+                            name: item.fullName,
+                            mobile: item.mobile,
+                            category: 'Health Card',
+                            subCategory: 'Smart Health ID',
+                            txnId: item.paymentId,
+                            amount: item.amount || 201, 
+                            status: item.paymentStatus || 'Success',
+                            original: item
+                        });
+                    });
+                }
+
+                if(Array.isArray(schemeData)) {
+                    schemeData.forEach(item => {
+                        let name = item.fullName || item.groupName || item.businessName || "Unknown";
+                        let cat = item.yojanaName || "Government Scheme";
+
+                        // ✅ Exclude Swasthya Suraksha Yojana (No Payment)
+                        if(cat === "Swasthya Suraksha Yojana") {
+                            return; 
+                        }
+
+                        let amt = item.amount || item.registrationFee || 0;
+                        if(cat.includes('Silai') && !amt) amt = 799;
+
+                        const firstMemberMobile = Array.isArray(item.members) && item.members[0] && item.members[0].mobileNumber
+                            ? item.members[0].mobileNumber
+                            : null;
+
+                        const displayMobile = cat === 'Mahila Swarojgaar Yojana'
+                            ? (firstMemberMobile || "N/A")
+                            : (item.mobile || item.mobileNumber || "N/A");
+
+                        combinedData.push({
+                            date: item.createdAt,
+                            name: name,
+                            mobile: displayMobile,
+                            category: 'Scheme',
+                            subCategory: cat,
+                            txnId: item.paymentId || 'Cash/Manual',
+                            amount: amt,
+                            status: 'Success',
+                            original: item
+                        });
+                    });
+                }
+
+                allTransactions = combinedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+                calculateTotal(allTransactions);
+                renderTable(allTransactions);
+
+            } catch (error) {
+                console.error("Error fetching transactions:", error);
+                document.getElementById('transactionBody').innerHTML = `<tr><td colspan="7" class="text-center text-danger">Server Connection Error. Ensure Backend is Running.</td></tr>`;
+            }
+        }
+
+        function calculateTotal(data) {
+            let total = data.reduce((sum, item) => sum + parseInt(item.amount || 0), 0);
+            document.getElementById('totalRevenue').innerText = "₹ " + total.toLocaleString('en-IN');
+            document.getElementById('totalTxn').innerText = data.length;
+        }
+
+        function renderTable(data) {
+            // ✅ Update global data reference for pagination
+            currentFilteredData = data;
+
+            const tbody = document.getElementById('transactionBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">No Transactions Found</td></tr>';
+                document.getElementById('paginationControls').innerHTML = ''; // Clear pagination
+                return;
+            }
+
+            // ✅ Pagination Logic
+            const totalPages = Math.ceil(data.length / itemsPerPage);
+            if (currentPage > totalPages) currentPage = 1;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedData = data.slice(start, end);
+
+            paginatedData.forEach((t, index) => {
+                const dateObj = new Date(t.date);
+                const dateStr = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                let badgeClass = 'bg-secondary';
+                if(t.category.includes('Job')) badgeClass = 'badge-ngo';
+                if(t.category.includes('Health')) badgeClass = 'badge-health';
+                if(t.category.includes('Scheme')) badgeClass = 'badge-scheme';
+
+                // NOTE: 'index' is loop index (0-19). 'start + index' gives the global index in currentFilteredData
+                const globalIndex = start + index;
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td>
+                            <div class="fw-bold">${t.name}</div>
+                            <small class="text-muted"><i class="fa-solid fa-phone me-1"></i>${t.mobile}</small>
+                        </td>
+                        <td>
+                            <span class="badge ${badgeClass}">${t.category}</span>
+                            <div class="small text-muted mt-1">${t.subCategory}</div>
+                        </td>
+                        <td class="txn-id small">${t.txnId}</td>
+                        <td class="amount-text">₹ ${t.amount}</td>
+                        <td><span class="badge bg-success rounded-pill">Success</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-dark" onclick="viewReceipt(${globalIndex})">
+                                <i class="fa-solid fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // ✅ Render Pagination Controls
+            renderPagination(totalPages);
+        }
+
+        // ✅ Function to Render Pagination Buttons (Same as Dashboard)
+        function renderPagination(totalPages) {
+            const nav = document.getElementById('paginationControls');
+            nav.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            // Prev Button
+            nav.innerHTML += `<li class="page-item ${currentPage===1?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage-1})">Prev</button></li>`;
+            
+            // Page Numbers (Smart Window)
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if(endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+
+            for(let i=startPage; i<=endPage; i++) {
+                nav.innerHTML += `<li class="page-item ${currentPage===i?'active':''}"><button class="page-link" onclick="changePage(${i})">${i}</button></li>`;
+            }
+
+            // Next Button
+            nav.innerHTML += `<li class="page-item ${currentPage===totalPages?'disabled':''}"><button class="page-link" onclick="changePage(${currentPage+1})">Next</button></li>`;
+        }
+
+        // ✅ Change Page Function (Same as Dashboard)
+        window.changePage = function(page) { 
+            currentPage = page; 
+            renderTable(currentFilteredData); 
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function viewReceipt(index) {
+            // ✅ Fix: Use currentFilteredData instead of allTransactions to support Filtering + Pagination
+            currentReceiptData = currentFilteredData[index]; 
+            const t = currentReceiptData;
+            
+            if(!t) return;
+
+            const html = `
+                <div class="text-center">
+                    <h5 class="fw-bold">AAGAJ FOUNDATION</h5>
+                    <p class="small text-muted">Payment Receipt</p>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Transaction ID:</span>
+                    <span class="fw-bold">${t.txnId}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Date:</span>
+                    <span>${new Date(t.date).toLocaleString()}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Payer Name:</span>
+                    <span class="fw-bold">${t.name}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Mobile:</span>
+                    <span>${t.mobile}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Category:</span>
+                    <span>${t.category}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold fs-5">Total Paid</span>
+                    <span class="fw-bold fs-5 text-success">₹ ${t.amount}</span>
+                </div>
+            `;
+            document.getElementById('receiptContent').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('receiptModal')).show();
+        }
+
+        function printReceipt() {
+            if (!currentReceiptData) return;
+            const t = currentReceiptData;
+            
+            const printContent = `
+                <html>
+                <head>
+                    <title>Payment Receipt - ${t.txnId}</title>
+                    <style>
+                        body { font-family: 'Helvetica', sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; color: #333; }
+                        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                        .logo { font-size: 26px; font-weight: bold; color: #ED1C24; text-transform: uppercase; letter-spacing: 1px; }
+                        .sub-logo { font-size: 12px; color: #555; margin-top: 5px; }
+                        .receipt-title { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 30px; text-decoration: underline; text-transform: uppercase; }
+                        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .info-table td { padding: 10px; border-bottom: 1px solid #eee; font-size: 14px; }
+                        .label { font-weight: bold; color: #555; width: 40%; }
+                        .value { font-weight: bold; color: #000; width: 60%; }
+                        .total-box { background: #f9f9f9; padding: 15px; border: 1px solid #ddd; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; }
+                        .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+                        .stamp { margin-top: 50px; text-align: right; font-size: 14px; font-weight: bold; }
+                    </style>
+                <\/head>
+                <body>
+                    <div class="header">
+                        <div class="logo">AAGAJ FOUNDATION</div>
+                        <div class="sub-logo">Registered Under Indian Trust Act 1882</div>
+                        <div class="sub-logo">Email: aagajfoundationpaliganj@gmail.com | Helpline: 9431430464</div>
+                    </div>
+
+                    <div class="receipt-title">PAYMENT RECEIPT</div>
+
+                    <table class="info-table">
+                        <tr><td class="label">Transaction ID:</td><td class="value">${t.txnId}</td></tr>
+                        <tr><td class="label">Date:</td><td class="value">${new Date(t.date).toLocaleString('en-IN')}</td></tr>
+                        <tr><td class="label">Payer Name:</td><td class="value">${t.name}</td></tr>
+                        <tr><td class="label">Mobile Number:</td><td class="value">${t.mobile}</td></tr>
+                        <tr><td class="label">Category:</td><td class="value">${t.category}</td></tr>
+                        <tr><td class="label">Purpose / Sub-Category:</td><td class="value">${t.subCategory}</td></tr>
+                        <tr><td class="label">Payment Status:</td><td class="value" style="color:green;">SUCCESS</td></tr>
+                    </table>
+
+                    <div class="total-box">
+                        <span>Total Amount Paid:</span>
+                        <span>₹ ${t.amount}</span>
+                    </div>
+
+                    <div class="stamp">
+                        <br><br>_______________________<br>Authorized Signature
+                    </div>
+
+                    <div class="footer">
+                        This is a computer-generated receipt. No physical signature is required.<br>
+                        Thank you for your contribution to Aagaj Foundation.
+                    </div>
+                <\/body>
+                <\/html>
+            `;
+
+            const win = window.open('', '', 'height=600,width=800');
+            win.document.write(printContent);
+            win.document.close();
+            win.focus();
+            setTimeout(() => { win.print(); }, 500);
+        }
+
+        // ✅ NEW: Download Receipt Function
+        function downloadReceipt() {
+            const element = document.getElementById('receiptContent');
+            html2canvas(element).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Receipt_${currentReceiptData.txnId}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        // Filtering Logic
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            const cat = this.value;
+            currentPage = 1; // ✅ Reset page on filter change
+            if (cat === 'All') renderTable(allTransactions);
+            else {
+                const filtered = allTransactions.filter(t => t.category.includes(cat) || t.category === cat);
+                calculateTotal(filtered);
+                renderTable(filtered);
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const term = this.value.toLowerCase();
+            currentPage = 1; // ✅ Reset page on search
+            const filtered = allTransactions.filter(t => 
+                t.name.toLowerCase().includes(term) || 
+                t.mobile.includes(term) || 
+                t.txnId.toLowerCase().includes(term)
+            );
+            calculateTotal(filtered);
+            renderTable(filtered);
+        });
+
+        function logout() { 
+            localStorage.removeItem("authToken");
+            sessionStorage.removeItem("loggedInUser");
+            sessionStorage.removeItem("loggedInUserEmail");
+            sessionStorage.removeItem("loggedInRole");
+            sessionStorage.removeItem("adminEmail");
+            window.location.href = 'index.html'; 
+        }
+    </script>
+    <script src="config.js"></script>
+</body>
+</html>

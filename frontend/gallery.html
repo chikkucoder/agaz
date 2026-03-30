@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation - Gallery</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-red: #ED1C24;   
+            --primary-yellow: #fdd831; 
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #fffdf5; 
+            --filter-purple: #8A56F7; /* Purple color for the buttons */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+            overflow-x: hidden;
+        }
+
+        /* --- Navbar Styles --- */
+        .navbar-nav .nav-item { margin: 0 5px; }
+        .navbar-brand img { height: 85px; width: auto; transition: transform 0.3s ease; }
+        .nav-link { font-weight: 600; color: var(--text-dark); padding: 10px 18px !important; border-radius: 8px; position: relative; transition: all 0.4s ease; overflow: hidden; }
+        .nav-link:hover { color: var(--primary-red) !important; background-color: rgba(253, 216, 49, 0.15); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .nav-link.active { color: var(--primary-red) !important; background-color: rgba(237, 28, 36, 0.05); }
+        .nav-link::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 3px; background-color: var(--primary-yellow); transition: width 0.3s ease; }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+
+        /* Admin Button Styling */
+        .admin-btn { display: flex; align-items: center; text-decoration: none; color: var(--text-dark); font-weight: 700; font-size: 1rem; padding: 8px 20px; border: 2px solid var(--text-dark); border-radius: 30px; transition: all 0.3s ease; margin-left: 15px; }
+        .admin-btn i { font-size: 1.2rem; }
+        .admin-btn:hover { background-color: var(--primary-red); color: white !important; border-color: var(--primary-red); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(237, 28, 36, 0.3); }
+        .admin-arrow { font-size: 0.8rem; margin-top: 2px; }
+        @media (max-width: 991px) { .admin-btn { margin-left: 0; margin-top: 15px; display: inline-flex; width: fit-content; } }
+        /* Dropdown */
+        .dropdown-menu { border-top: 3px solid var(--primary-red) !important; border-radius: 0 0 10px 10px; padding: 0; margin-top: 0; }
+        .dropdown-item { padding: 12px 20px; font-weight: 500; color: var(--text-dark); transition: all 0.3s ease; }
+        .dropdown-item:hover { background-color: var(--bg-light); color: var(--primary-red); padding-left: 25px; }
+
+        /* --- Page Header --- */
+        .page-header {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('../public/pic1.jpeg');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 0;
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .breadcrumb-custom {
+            justify-content: center;
+            background: transparent;
+        }
+        .breadcrumb-item a { color: var(--primary-yellow); text-decoration: none; font-weight: 600; }
+        .breadcrumb-item.active { color: white; }
+
+        /* --- Filter Buttons Styles --- */
+        .filter-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .filter-btn.active {
+            background-color: var(--filter-purple);
+            color: white;
+            box-shadow: 0 4px 10px rgba(138, 86, 247, 0.3);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background-color: rgba(138, 86, 247, 0.1);
+            color: var(--filter-purple);
+        }
+
+        /* --- Gallery Grid Styles --- */
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            height: 300px;
+            border-bottom: 4px solid var(--primary-yellow);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            border-bottom-color: var(--primary-red);
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to top, rgba(237, 28, 36, 0.8), rgba(253, 216, 49, 0.3));
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+            flex-direction: column;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .zoom-icon {
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .caption {
+            color: white;
+            font-weight: 700;
+            text-align: center;
+            padding: 0 15px;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        
+        /* Animation for Filtering */
+        .filter-item {
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- Footer (Same as Home) --- */
+        .footer { background-color: #051630; color: #d1d1d1; padding: 60px 0 30px; }
+        .footer h4 { color: white; margin-bottom: 25px; font-weight: 700; }
+        .footer ul { list-style: none; padding: 0; }
+        .footer ul li { margin-bottom: 12px; }
+        .footer ul li a { color: #d1d1d1; text-decoration: none; transition: 0.3s; }
+        .footer ul li a:hover { color: var(--primary-yellow); padding-left: 5px; }
+        .copyright-bar { background-color: var(--primary-yellow); color: #333; padding: 15px 0; font-weight: 600; text-align: center; }
+        
+        /* Modal for Image Preview */
+        #imagePreviewModal .modal-content { background-color: transparent; border: none; }
+        #imagePreviewModal .btn-close { filter: invert(1); opacity: 1; }
+        .modal-img-container { text-align: center; }
+        .modal-img-container img { max-width: 100%; max-height: 85vh; border-radius: 5px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+
+        /* Social Sidebar */
+        .social-sidebar {
+            position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 1030;
+            display: flex; flex-direction: column;
+        }
+        .social-sidebar a {
+            display: flex; justify-content: center; align-items: center;
+            width: 50px; height: 50px; color: white; font-size: 22px;
+            text-decoration: none; transition: all 0.3s ease;
+            margin-bottom: 2px;
+        }
+        .social-sidebar a:hover { width: 65px; padding-left: 10px; }
+        .facebook { background: #3b5998; }
+        .instagram { background: #E1306C; }
+        .twitter { background: #1DA1F2; }
+        .linkedin { background: #0077b5; }
+        .youtube { background: var(--primary-red); }
+
+        @media (max-width: 768px) {
+            .social-sidebar { display: none; }
+            .page-header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="social-sidebar">
+        <a href="https://www.facebook.com/aagajfoundation.org" class="facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="https://www.instagram.com/aagajfoundation/" class="instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="twitter"><i class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/company/aagaj-foundation/" class="linkedin"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" class="youtube"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+
+    <!-- <nav class="navbar navbar-expand-lg navbar-light sticky-top" style="background-color: #FFC0CB;">
+        <div class="container"> 
+            <a class="navbar-brand" href="index.html">
+                <img src="logo.png" alt="Aagaj Foundation Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><strong>Home</strong></a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html"><strong>About Us</strong></a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <strong>Services</strong>
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow">
+                            <li><a class="dropdown-item" href="employee-login.html">Employee Login</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link active" href="gallery.html"><strong>Gallery</strong></a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <strong>Careers</strong>
+                        </a>
+                        <ul class="dropdown-menu border-0 shadow">
+                            <li><a class="dropdown-item" href="NGO-jobs.html">NGO Jobs</a></li>
+                            <li><a class="dropdown-item" href="general.html">general Jobs</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="partners.html"><strong>Partners</strong></a></li>
+                    
+                    <li class="nav-item ms-2">
+                        <a class="nav-link" href="donate.html" 
+                           style="background-color: var(--primary-yellow); color: var(--text-dark) !important; padding: 10px 25px !important; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center;">
+                            <i class="fa-solid fa-hand-holding-heart me-2"></i> 
+                            <strong>Donate Us</strong>
+                        </a>
+                    </li>
+                </ul>
+    
+                <a href="admin-dashboard.html" class="admin-btn">
+                    <i class="fa-regular fa-circle-user me-2"></i> Admin 
+                    <i class="fa-solid fa-arrow-right admin-arrow ms-2"></i> 
+                </a>
+            </div>
+        </div>
+    </nav> -->
+    <div id="navbar-placeholder"></div>
+    <header class="page-header">
+        <div class="container">
+            <h1>Our Gallery</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-custom">
+                    <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Gallery</li>
+                </ol>
+            </nav>
+            <p class="mt-3 lead">Capturing moments of empowerment, training, and community transformation across Bihar.</p>
+        </div>
+    </header>
+
+    <section class="container mb-5 pb-5">
+        
+        <div class="row text-center mb-5">
+            <div class="col-lg-12 mx-auto">
+                <div class="d-flex justify-content-center flex-wrap gap-2">
+                    <button class="filter-btn active" data-filter="all">ALL</button>
+                    <button class="filter-btn" data-filter="silayi">MAHILA SILAYI PRASHIKSHAN YOJANA</button>
+                    <button class="filter-btn" data-filter="swarojgaar">MAHILA SWAROJGAAR YOJANA</button>
+                    <button class="filter-btn" data-filter="swasthya">MAHILA SWASTHYA SURAKSHA YOJANA</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/community.jpg')">
+                    <img src="../public/community.jpg" alt="Community Gathering">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Community Unity</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swasthya">
+                <div class="gallery-item" onclick="openImage('../public/health.jpg')">
+                    <img src="../public/health.jpg" alt="Health Kit Distribution">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Health Kit Distribution</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swasthya">
+                <div class="gallery-item" onclick="openImage('../public/h.jpg')">
+                    <img src="../public/h.jpg" alt="Healthcare Professionals">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Medical Support Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swasthya">
+                <div class="gallery-item" onclick="openImage('../public/mitra.jpeg')">
+                    <img src="../public/mitra.jpeg" alt="Mahila Mitra Team">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Mahila Mitra Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic1.jpeg')">
+                    <img src="../public/pic1.jpeg" alt="Foundation Rally">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Foundation Rally Event</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item silayi">
+                <div class="gallery-item" onclick="openImage('../public/pic2.jpg')">
+                    <img src="../public/pic2.jpg" alt="Block Coordinators">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Block Coordinators Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item silayi">
+                <div class="gallery-item" onclick="openImage('../public/pic3.jpg')">
+                    <img src="../public/pic3.jpg" alt="Block Coordinators">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Block Coordinators Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item silayi">
+                <div class="gallery-item" onclick="openImage('../public/pic4.jpg')">
+                    <img src="../public/pic4.jpg" alt="Block Coordinators">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Block Coordinators Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item silayi">
+                <div class="gallery-item" onclick="openImage('../public/pic5.jpg')">
+                    <img src="../public/pic5.jpg" alt="Block Coordinators">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Block Coordinators Team</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic6.jpeg')">
+                    <img src="../public/pic6.jpeg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic7.jpeg')">
+                    <img src="../public/pic7.jpeg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic8.jpeg')">
+                    <img src="../public/pic8.jpeg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic9.jpeg')">
+                    <img src="../public/pic9.jpeg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic10.jpeg')">
+                    <img src="../public/pic10.jpeg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swarojgaar">
+                <div class="gallery-item" onclick="openImage('../public/pic11.png')">
+                    <img src="../public/pic11.png" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item silayi">
+                <div class="gallery-item" onclick="openImage('../public/district.jpg')">
+                    <img src="../public/district.jpg" alt="District Team">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">District Level Drive</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swasthya">
+                <div class="gallery-item" onclick="openImage('../public/panch.jpeg')">
+                    <img src="../public/panch.jpeg" alt="Panchayat Meeting">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Panchayat Awareness Camp</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 filter-item swasthya">
+                <div class="gallery-item" onclick="openImage('../public/l.jpg')">
+                    <img src="../public/l.jpg" alt="Livelihood Discussion">
+                    <div class="gallery-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus zoom-icon"></i>
+                        <span class="caption">Livelihood Discussion</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 mb-4 text-center text-lg-start">
+                    <img src="../public/logo.jpg" alt="Aagaj Foundation Logo" style="width: 150px; margin-bottom: 20px;">
+                    <h5 class="text-white fw-bold mb-3">Aagaj Foundation</h5>
+                    <p style="line-height: 1.6;">Aagaj Foundation Empowering communities through sustainable agriculture, health, livelihood, and education initiatives.</p>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3">Quick Links</h4>
+                    <ul class="ms-lg-3">
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> <a href="index.html">Home</a></li>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> <a href="about.html">About Us</a></li>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> <a href="gallery.html">Gallery</a></li>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> <a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> Email: Aagajfoundationpaliganj@gmail.com</li>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> Phone: 9431430464</li>
+                        <li><i class="fa-solid fa-arrow-right" style="color: var(--primary-red); margin-right: 10px;"></i> Location: Patna, Bihar 800020</li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 mb-4">
+                    <h4 class="ms-lg-3 text-white fw-bold border-bottom pb-1 d-inline-block">Follow Us</h4>
+                    <div class="d-flex gap-3 align-items-center ms-lg-3 mt-3">
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="text-white fs-4"><i class="fa-brands fa-youtube"></i></a>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="copyright-bar">
+        <div class="container">
+            &copy; 2026 <span>Aagaj Foundation</span>. All Rights Reserved.
+        </div>
+    </div>
+
+    <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body modal-img-container">
+                    <img id="lightboxImage" src="" alt="Full Screen View">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    // 1. Fetch and Load Navbar
+    fetch('navbar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('navbar-placeholder').innerHTML = data;
+
+            // 2. Set Active Class (kaunsa page open hai)
+            const currentPage = window.location.pathname.split("/").pop();
+            if(currentPage === "about.html") document.getElementById('nav-about').classList.add('active');
+            if(currentPage === "gallery.html") document.getElementById('nav-gallery').classList.add('active');
+
+            // 3. User Login Logic (Dashboard Check)
+            const userName = sessionStorage.getItem('loggedInUser');
+            const adminBtn = document.getElementById('admin-action-btn');
+            const servicesMenu = document.getElementById('services-list');
+
+            if (userName && adminBtn) {
+                adminBtn.href = "admin-dashboard.html"; 
+                adminBtn.innerHTML = `<i class="fa-solid fa-gauge me-2"></i> Dashboard (${userName})`;
+                adminBtn.style.backgroundColor = 'var(--primary-red)';
+                adminBtn.style.color = 'white';
+
+                if (servicesMenu) {
+                    servicesMenu.innerHTML = `
+                        <li><a class="dropdown-item" href="silayiyojna_description.html">Mahila Silayi Prasikshan Yojana</a></li>
+                        <li><a class="dropdown-item" href="swarojgaar_description.html">Mahila Swarojgaar Yojana</a></li>
+                        <li><a class="dropdown-item" href="swasthyasurksha_register.html">Swasthya Suraksha Yojana</a></li>
+                    `;
+                }
+            }
+        });
+});
+        // Simple script to handle opening images in the modal
+        function openImage(src) {
+            document.getElementById('lightboxImage').src = src;
+            var myModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+            myModal.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // Check if user is logged in
+            const userName = sessionStorage.getItem('loggedInUser');
+            const adminBtn = document.querySelector('.admin-btn');
+            const servicesMenu = document.querySelector('.nav-item.dropdown .dropdown-menu');
+    
+            if (userName) {
+                // Change Admin button to Dashboard
+                if (adminBtn) {
+                    adminBtn.removeAttribute('data-bs-toggle');
+                    adminBtn.removeAttribute('data-bs-target');
+                    adminBtn.href = "admin-dashboard.html"; 
+                    adminBtn.innerHTML = `<i class="fa-solid fa-gauge me-2"></i> Dashboard (${userName})`;
+                    adminBtn.style.borderColor = 'var(--primary-red)';
+                    adminBtn.style.backgroundColor = 'var(--primary-red)';
+                    adminBtn.style.color = 'white';
+                }
+    
+                // Update Services Menu for Logged In User
+                if (servicesMenu) {
+                    servicesMenu.innerHTML = `
+                        <li><a class="dropdown-item" href="silayiyojna_description.html.html">Mahila Silayi Prasikshan Yojana</a></li>
+                        <li><a class="dropdown-item" href="swarojgaar_description.html">Mahila Swarojgaar Yojana</a></li>
+                        <li><a class="dropdown-item" href="swasthyasurksha_register.html">Swasthya Suraksha Yojana</a></li>
+                    `;
+                }
+            }
+
+            // Filtering Logic
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const filterItems = document.querySelectorAll('.filter-item');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    button.classList.add('active');
+
+                    const filterValue = button.getAttribute('data-filter');
+
+                    filterItems.forEach(item => {
+                        if (filterValue === 'all' || item.classList.contains(filterValue)) {
+                            item.style.display = 'block';
+                            // Short timeout to allow display:block to apply before opacity transition
+                            setTimeout(() => {
+                                item.style.opacity = '1';
+                                item.style.transform = 'scale(1)';
+                            }, 10);
+                        } else {
+                            item.style.display = 'none';
+                            item.style.opacity = '0';
+                            item.style.transform = 'scale(0.95)';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

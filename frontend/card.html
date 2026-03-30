@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aagaj Foundation - ID Card</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        .id-card-container {
+            width: 350px;
+            height: 520px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #ddd;
+        }
+
+        /* Header */
+        .card-header {
+            background: #000080;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-bottom: 5px solid #ED1C24;
+        }
+        .card-header h3 { margin: 0; font-size: 18px; font-weight: bold; }
+        .card-header p { margin: 2px 0 0; font-size: 10px; opacity: 0.8; }
+
+        /* Photo Section */
+        .photo-section {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .photo-frame {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid #ED1C24;
+            object-fit: cover;
+            padding: 3px;
+            background: white;
+        }
+
+        /* Unique ID Badge - Moved below photo */
+        .unique-id {
+            background: #ED1C24;
+            color: white;
+            padding: 4px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 20px;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Body */
+        .card-body {
+            padding: 10px 25px 15px 25px;
+            text-align: center;
+        }
+        .name { color: #000080; font-size: 20px; font-weight: bold; text-transform: uppercase; margin: 5px 0; }
+        .designation { color: #ED1C24; font-size: 14px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; }
+
+        .details-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #333;
+        }
+        .details-box strong { color: #000080; display: inline-block; width: 60px; }
+
+        /* Footer */
+        .card-footer {
+            background: #000080;
+            color: white;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 8px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        /* Note & Buttons */
+        .note-box {
+            margin-top: 20px;
+            background-color: #fff3f3;
+            border: 1px dashed #ED1C24;
+            color: #ED1C24;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            width: 330px;
+        }
+
+        .btn-download {
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: #ED1C24;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="id-card-container" id="idCard">
+        
+        <div class="card-header">
+            <h3>Aagaj Foundation</h3>
+            <p>Registered Under Indian Trust Act 1882</p>
+        </div>
+
+        <div class="photo-section">
+            <img src="" id="displayPhoto" class="photo-frame" alt="User Photo">
+            <div class="unique-id" id="displayId">ID: 0000</div>
+        </div>
+
+        <div class="card-body">
+            <div class="name" id="displayName">Loading...</div>
+            
+            <!-- <div class="designation" id="jobTypeLabel">NGO Job</div> -->
+
+            <div class="details-box">
+                <div><strong>DOB:</strong> <span id="displayDob">--/--/----</span></div>
+                <div><strong>Mobile:</strong> <span id="displayMobile">----------</span></div>
+                <div><strong>Email:</strong> <span id="displayEmail">---</span></div>
+                <div><strong>District:</strong> <span id="displayDistrict">---</span></div>
+                <div><strong>State:</strong> <span id="displayState">---</span></div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            www.aagajfoundation.com | Helpline: 9431430464
+        </div>
+    </div>
+    
+    <div class="note-box">
+        NOTE: Your User ID and Password will be generated after 24 hours.
+    </div>
+
+    <button class="btn-download" onclick="downloadCard()">Download ID Card</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // ✅ Get data from URL params (passed from application.html after payment success)
+            const params = new URLSearchParams(window.location.search);
+            
+            const name = decodeURIComponent(params.get('name') || '');
+            const mobile = params.get('mobile') || 'N/A';
+            const email = decodeURIComponent(params.get('email') || '');
+            const dob = params.get('dob') || 'N/A';
+            const district = decodeURIComponent(params.get('district') || '');
+            const state = decodeURIComponent(params.get('state') || '');
+            const uniqueId = params.get('unique_id') || '0000';
+            const photoPath = decodeURIComponent(params.get('photo') || '');
+            
+            // ✅ Extract Category for General Job vs NGO Job
+            const category = params.get('category') || 'NGO'; 
+            
+            if (name) {
+                document.getElementById('displayName').innerText = name;
+                document.getElementById('displayMobile').innerText = mobile;
+                document.getElementById('displayEmail').innerText = email.length > 20 ? email.substring(0,18)+'...' : email;
+                document.getElementById('displayDob').innerText = dob;
+                document.getElementById('displayDistrict').innerText = district;
+                document.getElementById('displayState').innerText = state;
+                document.getElementById('displayId').innerText = "ID: " + uniqueId; // Show exact unique ID (NOR-26-0001)
+                
+                // ✅ Update Job Type Label based on category
+                const jobTypeLabel = document.getElementById('jobTypeLabel');
+                if(jobTypeLabel) {
+                    if(category === 'Normal') {
+                        jobTypeLabel.innerText = "General Job";
+                    } else {
+                        jobTypeLabel.innerText = "NGO Job";
+                    }
+                }
+                
+                // ✅ Load photo from server if available
+                if (photoPath && photoPath !== 'undefined' && photoPath !== 'null') {
+                    const photoUrl = photoPath.startsWith('http') ? photoPath : CONFIG.API_URL + photoPath;
+                    console.log("Loading photo from:", photoUrl);
+                    document.getElementById('displayPhoto').src = photoUrl;
+                } else {
+                    document.getElementById('displayPhoto').src = 'https://via.placeholder.com/120?text=Photo';
+                }
+            } else {
+                alert("No data found! Please apply first.");
+            }
+        });
+
+        function downloadCard() {
+            const card = document.getElementById('idCard');
+            
+            // Generate Image
+            html2canvas(card, { scale: 3, useCORS: true }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'Aagaj_Employee_ID.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+    <script src="config.js"></script>
+
+</body>
+</html>
