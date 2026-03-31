@@ -51,6 +51,21 @@ const healthPartnerSchema = new mongoose.Schema({
     registeredBy: {
         type: String,
         default: 'Admin/Self'
+    },
+    // ✅ Authentication Fields
+    email: { 
+        type: String, 
+        unique: true, 
+        sparse: true, 
+        trim: true, 
+        lowercase: true 
+    },
+    password: { 
+        type: String 
+    },
+    isActive: { 
+        type: Boolean, 
+        default: true 
     }
 });
 

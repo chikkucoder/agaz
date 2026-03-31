@@ -20,10 +20,27 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-light);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 20px;
+        }
+
+        .back-btn-top {
+            position: absolute; top: 20px; left: 20px;
+            text-decoration: none; color: var(--primary-red); font-weight: bold;
+            font-size: 14px; background: white; padding: 8px 15px;
+            border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s; z-index: 100;
+        }
+        .back-btn-top:hover { transform: translateY(-2px); color: #b0151b; }
+
+        @media (max-width: 480px) {
+            .back-btn-top { top: 10px; left: 10px; font-size: 12px; }
+            .login-card { padding: 0; }
+            .login-header { padding: 15px; }
+            h5 { font-size: 1rem; }
         }
 
         /* Card Styling to match Modal look */
@@ -91,6 +108,8 @@
     </style>
 </head>
 <body>
+
+    <a href="index.html" class="back-btn-top"><i class="fa-solid fa-arrow-left"></i> Home</a>
 
     <div class="login-card">
         <div class="login-header d-flex justify-content-between align-items-center">
