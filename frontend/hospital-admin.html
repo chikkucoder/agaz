@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Master Admin - Aagaj Foundation</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            alert("⚠️ Unauthorized Access! Please Login first.");
+            window.location.href = "admin_login_employe.html";
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #ED1C24;
+            --primary-yellow: #fdd831;
+            --sidebar-bg: #051630;
+            --bg-light: #f4f6f9;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg-light); overflow-x: hidden; margin: 0; }
+
+        /* --- Custom Tags Input UI --- */
+        .tags-wrapper {
+            border: 1px solid #ced4da; border-radius: 0.375rem; padding: 5px;
+            display: flex; flex-wrap: wrap; gap: 5px; background: #fff; align-items: center;
+        }
+        .tags-container { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+        .tag-badge {
+            background-color: var(--primary); color: white; padding: 4px 10px;
+            border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
+        }
+        .tag-remove { cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; }
+        .tag-remove:hover { color: #fdd831; }
+        .tag-input { border: none; outline: none; flex: 1; min-width: 150px; padding: 4px; font-size: 0.9rem; background: transparent; }
+        .tag-dropdown {
+            display: none; position: absolute; background: white; border: 1px solid #ced4da;
+            border-radius: 0.375rem; max-height: 200px; overflow-y: auto; width: 100%;
+            z-index: 1050; box-shadow: 0 4px 6px rgba(0,0,0,0.1); top: calc(100% + 2px);
+        }
+        .tag-dropdown.show { display: block; }
+        .tag-option { padding: 8px 12px; cursor: pointer; transition: background 0.2s; font-size: 0.9rem; }
+        .tag-option:hover { background: #f8f9fa; }
+
+        /* --- Sidebar & Layout --- */
+        .sidebar { 
+            height: 100vh; background-color: var(--sidebar-bg); color: white; 
+            position: fixed; top: 0; left: 0; width: 250px; overflow-y: auto; z-index: 1050; transition: left 0.3s;
+        }
+        
+        .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header img { height: 65px; background: white; padding: 5px; border-radius: 8px; }
+        
+        /* Desktop main content always offset by sidebar width */
+        .main-content { 
+            margin-left: 250px; 
+            padding: 30px 35px; 
+            min-height: 100vh;
+            transition: margin-left 0.3s;
+        }
+
+        /* Mobile: sidebar hidden off-screen, no margin */
+        @media (max-width: 992px) {
+            .sidebar { left: -250px; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0 !important; padding: 15px; }
+            .mobile-toggle { display: flex !important; }
+            .desktop-header-subtitle { display: none !important; }
+        }
+
+        .mobile-toggle {
+            display: none; 
+            align-items: center; justify-content: center;
+            background: var(--primary); color: white;
+            border: none; padding: 10px 15px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(237, 28, 36, 0.3);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        /* Sidebar overlay on mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); z-index: 1040;
+        }
+        .sidebar-overlay.active { display: block; }
+
+        .sidebar ul { padding: 0; list-style: none; margin-top: 20px; }
+        .sidebar ul li a { display: block; padding: 14px 25px; color: #b8c7ce; text-decoration: none; transition: 0.3s; font-size: 0.92rem; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { background-color: rgba(255,255,255,0.1); color: var(--primary-yellow); border-left: 4px solid var(--primary); }
+
+        /* --- Page Header --- */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .page-header-left h2 { font-size: 1.75rem; font-weight: 700; color: #1a1a2e; margin: 0; }
+        .page-header-left p { color: #6c757d; margin: 4px 0 0 0; font-size: 0.875rem; }
+        .page-header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .page-header-actions .btn { padding: 9px 18px; font-size: 0.875rem; font-weight: 600; border-radius: 8px; white-space: nowrap; }
+
+        /* --- Stats Cards --- */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        @media (max-width: 1100px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 576px) { .stats-row { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+
+        .stat-card { 
+            background: white; border-radius: 15px; padding: 22px 20px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
+            position: relative; overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .stat-card::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; 
+            background: var(--primary);
+        }
+        .stat-card.yellow::after { background: var(--primary-yellow); }
+        .stat-card.blue::after { background: #0d6efd; }
+        .stat-card.green::after { background: #198754; }
+
+        .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #999; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: #1a1a2e; line-height: 1; }
+        .stat-icon { 
+            position: absolute; right: 16px; top: 16px; font-size: 2.2rem; 
+            opacity: 0.08; color: var(--sidebar-bg); 
+        }
+        @media (max-width: 576px) {
+            .stat-value { font-size: 1.4rem; }
+            .stat-card { padding: 16px 14px; }
+        }
+
+        /* --- Tabs --- */
+        .nav-tabs { border-bottom: 2px solid #e9ecef; margin-bottom: 20px; }
+        .nav-tabs .nav-link { 
+            border: none; color: #888; font-weight: 600; padding: 12px 20px; 
+            background: none; transition: 0.3s; font-size: 0.9rem;
+        }
+        .nav-tabs .nav-link.active { 
+            color: var(--primary); border-bottom: 3px solid var(--primary); 
+            background: none; margin-bottom: -2px;
+        }
+        .nav-tabs .nav-link:hover { color: var(--primary); }
+
+        /* --- Table Container --- */
+        .premium-table-container { 
+            background: white; border-radius: 15px; padding: 25px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06); 
+        }
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .table-toolbar h6 { margin: 0; font-size: 0.95rem; font-weight: 700; }
+        .table-toolbar .search-box { min-width: 220px; max-width: 300px; }
+        @media (max-width: 576px) {
+            .premium-table-container { padding: 15px; }
+            .table-toolbar .search-box { min-width: 100%; max-width: 100%; }
+        }
+
+        .table { margin: 0; }
+        .table thead th { 
+            background-color: #f8f9fa; border: none; text-transform: uppercase; 
+            font-size: 0.72rem; letter-spacing: 0.8px; padding: 13px 12px;
+            white-space: nowrap; color: #555; font-weight: 700;
+        }
+        .table tbody td { padding: 14px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr:hover { background-color: #fafbff; }
+
+        .btn-premium { 
+            background: var(--primary); color: white; border: none; 
+            border-radius: 8px; padding: 10px 20px; font-weight: 600; 
+            transition: 0.3s;
+        }
+        .btn-premium:hover { background: #b0151b; color: white; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar Integration -->
+    <nav class="sidebar" id="sidebar" style="z-index: 1040;">
+        <div class="sidebar-header">
+            <img src="../public/logo.jpg" alt="Aagaj Logo">
+            <h5 class="mt-3 fw-bold text-white">Foundation Owner</h5>
+            <small class="text-warning">Hospital Master Admin</small>
+        </div>
+        <ul class="nav flex-column">
+            <li><a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high me-2"></i> Admin Dashboard</a></li>
+            <li><a href="hospital-admin.html" class="active"><i class="fa-solid fa-hospital-user me-2"></i> Hospital Master</a></li>
+            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Data Room</a></li>
+            <li><a href="index.html" class="mt-5 border-top pt-3 text-warning"><i class="fa-solid fa-house me-2"></i> Back to Home</a></li>
+            <li><a href="#" onclick="logout()" class="text-danger"><i class="fa-solid fa-power-off me-2"></i> Exit Account</a></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex align-items-center gap-3">
+                <button class="mobile-toggle" id="sidebarToggle">
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </button>
+                <div class="page-header-left">
+                    <h2>Master Controller</h2>
+                    <p class="desktop-header-subtitle">Analyze hospital performance &amp; patient reports</p>
+                </div>
+            </div>
+            <div class="page-header-actions">
+                <button class="btn btn-outline-secondary" onclick="fetchEverything()">
+                    <i class="fa-solid fa-rotate me-1"></i> Sync
+                </button>
+                <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#registerHospModal">
+                    <i class="fa-solid fa-plus me-1"></i> Add Hospital
+                </button>
+                <button class="btn btn-premium" onclick="exportToExcel()">
+                    <i class="fa-solid fa-file-excel me-1"></i> Export Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Hospitals</div>
+                <div class="stat-value" id="stat-hospitals">0</div>
+                <i class="fa-solid fa-hospital stat-icon"></i>
+            </div>
+            <div class="stat-card yellow">
+                <div class="stat-label">Treatments</div>
+                <div class="stat-value" id="stat-treatments">0</div>
+                <i class="fa-solid fa-stethoscope stat-icon"></i>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-label">Appointments</div>
+                <div class="stat-value" id="stat-appts">0</div>
+                <i class="fa-solid fa-calendar-check stat-icon"></i>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-label">Total Billing</div>
+                <div class="stat-value" id="stat-billing">₹0</div>
+                <i class="fa-solid fa-coins stat-icon"></i>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs border-0" id="masterTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="hosp-tab" data-bs-toggle="tab" data-bs-target="#hosp-content" type="button">Partner Management</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports-content" type="button">Global Patient Reports</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="masterTabsContent">
+            <!-- Hospital Management Tab -->
+            <div class="tab-pane fade show active" id="hosp-content">
+                <div class="premium-table-container">
+                    <div class="table-toolbar">
+                        <h6><i class="fa-solid fa-building-circle-check me-2 text-danger"></i> Hospital Partners List</h6>
+                        <input type="text" id="hospSearch" class="form-control form-control-sm search-box" placeholder="Search hospital...">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Hospital Code</th>
+                                    <th>Business Name</th>
+                                    <th>Specialization</th>
+                                    <th>Patient Flow</th>
+                                    <th>Total Collections</th>
+                                    <th>Bookings</th>
+                                    <th>Status</th>
+                                    <th>Access Control</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hospitalTableBody">
+                                <tr><td colspan="7" class="text-center p-5"><i class="fa-solid fa-cog fa-spin me-2"></i> Loading Partner Data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Patient Reports Tab -->
+            <div class="tab-pane fade" id="reports-content">
+                <div class="premium-table-container">
+                    <div class="table-toolbar">
+                        <h6><i class="fa-solid fa-file-invoice-dollar me-2 text-danger"></i> Foundation Master Billing Report</h6>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="reportSearch" class="form-control form-control-sm search-box" placeholder="Search records...">
+                            <button class="btn btn-sm btn-dark" onclick="exportToExcel()" title="Export Excel"><i class="fa-solid fa-file-excel"></i></button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="masterReportTable" style="min-width: 900px;">
+                            <thead class="table-light">
+                                <tr style="font-size: 11px;">
+                                    <th>Date</th>
+                                    <th>Hospital</th>
+                                    <th>Patient & ID</th>
+                                    <th>Mobile</th>
+                                    <th>Treatment</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th class="text-center">FILE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="globalReportTableBody">
+                                <tr><td colspan="8" class="text-center p-5"><i class="fa-solid fa-cog fa-spin me-2"></i> Aggregating Global Records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Hospital Modal -->
+    <div class="modal fade" id="registerHospModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title fw-bold">Register New Hospital Partner</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="regHospForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Business Name (Hospital Name)</label>
+                                <input type="text" id="reg-biz" class="form-control" required placeholder="Aagaj Hospital" oninput="vAlphaNumSlash(this)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">License Number</label>
+                                <input type="text" id="reg-license" class="form-control" required placeholder="LIC/2026/01" oninput="vAlphaNumSlash(this)">
+                            </div>
+                            <div class="col-md-12 position-relative">
+                                <label class="small fw-bold text-muted">Specialization / Categories (Add multiple)</label>
+                                <div class="tags-wrapper">
+                                    <div class="tags-container" id="reg-tags-container"></div>
+                                    <input type="text" id="reg-spec-input" class="tag-input" placeholder="Select or type to add custom..." autocomplete="off">
+                                </div>
+                                <div class="tag-dropdown" id="reg-spec-dropdown"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Owner Name</label>
+                                <input type="text" id="reg-owner" class="form-control" required placeholder="Full Name" oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">WhatsApp Number</label>
+                                <input type="tel" id="reg-phone" class="form-control" required maxlength="10" placeholder="10 digit number" oninput="vNum(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">City</label>
+                                <input type="text" id="reg-city" class="form-control" required oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">State</label>
+                                <input type="text" id="reg-state" class="form-control" required value="Bihar" oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">Pincode</label>
+                                <input type="text" id="reg-pin" class="form-control" required maxlength="6" oninput="vNum(this)">
+                            </div>
+                            
+                            <hr class="my-4">
+                            <h6 class="fw-bold mb-3 text-danger">Set Partner Login Access</h6>
+                            
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Login ID (Email Address)</label>
+                                <input type="email" id="reg-email" class="form-control" required placeholder="hospital@foundation.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Set Secure Password</label>
+                                <div class="input-group">
+                                    <input type="text" id="reg-pass" class="form-control" required minlength="6" placeholder="Min 6 chars">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="genRegPass()">Gen</button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 mt-4 py-2 fw-bold" id="regSubBtn">COMPLETE REGISTRATION</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Hospital Modal -->
+    <div class="modal fade" id="editHospModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">Edit Hospital Partner</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editHospForm">
+                        <input type="hidden" id="edit-hid">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Business Name (Hospital Name)</label>
+                                <input type="text" id="edit-biz" class="form-control" required placeholder="Aagaj Hospital" oninput="vAlphaNumSlash(this)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">License Number</label>
+                                <input type="text" id="edit-license" class="form-control" required placeholder="LIC/2026/01" oninput="vAlphaNumSlash(this)">
+                            </div>
+                            <div class="col-md-12 position-relative">
+                                <label class="small fw-bold text-muted">Specialization / Categories (Add multiple)</label>
+                                <div class="tags-wrapper">
+                                    <div class="tags-container" id="edit-tags-container"></div>
+                                    <input type="text" id="edit-spec-input" class="tag-input" placeholder="Select or type to add custom..." autocomplete="off">
+                                </div>
+                                <div class="tag-dropdown" id="edit-spec-dropdown"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">Owner Name</label>
+                                <input type="text" id="edit-owner" class="form-control" required placeholder="Full Name" oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small fw-bold text-muted">WhatsApp Number</label>
+                                <input type="tel" id="edit-phone" class="form-control" required maxlength="10" placeholder="10 digit number" oninput="vNum(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">City</label>
+                                <input type="text" id="edit-city" class="form-control" required oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">State</label>
+                                <input type="text" id="edit-state" class="form-control" required value="Bihar" oninput="vAlpha(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small fw-bold text-muted">Pincode</label>
+                                <input type="text" id="edit-pin" class="form-control" required maxlength="6" oninput="vNum(this)">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="small fw-bold text-muted">Login ID (Email Address)</label>
+                                <input type="email" id="edit-email" class="form-control" required placeholder="hospital@foundation.com">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-dark w-100 mt-4 py-2 fw-bold" id="editSubBtn">UPDATE HOSPITAL</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Credentials Modal (Update Existing) -->
+    <div class="modal fade" id="credModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title fw-bold">Update Access Credentials</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="credForm">
+                        <input type="hidden" id="modal-hid">
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Hospital Facility</label>
+                            <input type="text" id="modal-hname" class="form-control bg-light border-0" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small fw-bold text-muted">Update Login ID (Email)</label>
+                            <input type="email" id="modal-email" class="form-control" required placeholder="name@hospital.com">
+                        </div>
+                        <div class="mb-4">
+                            <label class="small fw-bold text-muted">New Password</label>
+                            <div class="input-group">
+                                <input type="text" id="modal-pass" class="form-control" required placeholder="Minimum 6 characters">
+                                <button class="btn btn-dark" type="button" onclick="generatePass()">Auto-Gen</button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-premium w-100 py-2">UPDATE ACCESS</button>
+                    </form>
+                    <div id="modalSuccess" class="alert alert-success mt-3 py-2 small border-0 d-none">
+                        <i class="fa-solid fa-circle-check"></i> Credentials updated successfully!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js"></script>
+    <script>
+        let hospitalsData = [];
+        let reportsData = [];
+
+        async function fetchEverything() {
+            try {
+                // 1. Fetch Stats
+                const sRes = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/stats', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const s = await sRes.json();
+                if(s.success) {
+                    document.getElementById('stat-hospitals').innerText = s.stats.totalHospitals;
+                    document.getElementById('stat-treatments').innerText = s.stats.totalTreatments;
+                    document.getElementById('stat-appts').innerText = s.stats.totalAppointments;
+                    document.getElementById('stat-billing').innerText = '₹' + s.stats.totalBilling.toLocaleString();
+                }
+
+                // 2. Fetch Hospitals
+                const hRes = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/hospitals', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const h = await hRes.json();
+                if(h.success) {
+                    hospitalsData = h.data;
+                    renderHospitals(hospitalsData);
+                }
+
+                // 3. Fetch Master Reports
+                const rRes = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/global-reports', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const r = await rRes.json();
+                if(r.success) {
+                    reportsData = r.data;
+                    renderReports(reportsData);
+                }
+
+            } catch (err) { console.error("Sync Error:", err); }
+        }
+
+        function renderHospitals(data) {
+            const tb = document.getElementById('hospitalTableBody');
+            tb.innerHTML = data.map(h => {
+                let specs = (h.specialization || ['General Medicine']);
+                if(!Array.isArray(specs)) specs = [specs];
+                const specBadges = specs.map(s => `<span class="badge bg-info text-dark me-1" style="font-size:10px;">${s}</span>`).join('');
+                
+                return `
+                <tr>
+                    <td class="fw-bold text-primary">${h.uniqueId}</td>
+                    <td>${h.businessName}</td>
+                    <td style="max-width:200px; flex-wrap:wrap;">${specBadges}</td>
+                    <td><span class="badge bg-warning text-dark">${h.treatmentCount} Patients</span></td>
+                    <td class="fw-bold">₹${h.totalBilling.toLocaleString()}</td>
+                    <td><span class="badge bg-primary">${h.appointmentCount} Bookings</span></td>
+                    <td><span class="badge ${h.isActive?'bg-success':'bg-danger'}" style="cursor:pointer" onclick="toggleStatus('${h.uniqueId}')" title="Click to ${h.isActive?'Disable':'Enable'}">
+                        <i class="fa-solid ${h.isActive?'fa-toggle-on':'fa-toggle-off'} me-1"></i> ${h.isActive?'Active':'Disabled'}
+                    </span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary me-1" onclick='openEdit(${JSON.stringify(h).replace(/'/g, "&apos;")})' title="Edit Hospital">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button class="btn btn-sm ${h.hasCredentials?'btn-dark':'btn-outline-danger'}" onclick="openCred('${h.uniqueId}', '${h.businessName}', '${h.email||''}')">
+                            <i class="fa-solid fa-key"></i> ${h.hasCredentials?'Manage':'Assign'}
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function renderReports(data) {
+            const tb = document.getElementById('globalReportTableBody');
+            if(data.length === 0) { tb.innerHTML = '<tr><td colspan="8" class="text-center p-5 text-muted">No records registered across any hospital.</td></tr>'; return; }
+            tb.innerHTML = data.map(r => `
+                <tr style="font-size: 12px;">
+                    <td class="small text-muted">${new Date(r.date).toLocaleDateString()}</td>
+                    <td class="fw-bold text-danger" style="font-size: 11px;">${r.hospitalName}</td>
+                    <td class="fw-bold">${r.patientName} <br><small class="text-primary fw-bold">ID: ${r.healthId || 'General'}</small></td>
+                    <td>${r.patientMobile}</td>
+                    <td class="small text-muted" style="max-width:150px; white-space:normal;">${r.treatmentDetails}</td>
+                    <td class="fw-bold text-success">₹${r.billAmount}</td>
+                    <td><span class="badge ${r.status==='Paid'?'bg-success':'bg-danger'}" style="font-size: 10px;">${r.status}</span></td>
+                    <td class="text-center">
+                        ${r.billPhoto ? `<button class="btn btn-sm btn-outline-danger p-1" onclick="viewPhoto('${r.billPhoto}')" title="View Bill" style="font-size: 10px;"><i class="fa-solid fa-image"></i></button>` : '❌'}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openCred(id, name, email) {
+            document.getElementById('modal-hid').value = id;
+            document.getElementById('modal-hname').value = name;
+            document.getElementById('modal-email').value = email;
+            document.getElementById('modalSuccess').classList.add('d-none');
+            new bootstrap.Modal(document.getElementById('credModal')).show();
+        }
+
+        // --- 🧼 Validation Helpers (Strict Character Filtering) ---
+        function vAlpha(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
+        function vNum(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
+        function vAlphaNumSlash(el) { el.value = el.value.replace(/[^a-zA-Z0-9\s/-]/g, ''); }
+
+        function generatePass() { document.getElementById('modal-pass').value = Math.random().toString(36).slice(-8).toUpperCase(); }
+        function genRegPass() { document.getElementById('reg-pass').value = Math.random().toString(36).slice(-8).toUpperCase(); }
+
+        document.getElementById('credForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            try {
+                const res = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/generate-credentials', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify({
+                        uniqueId: document.getElementById('modal-hid').value,
+                        email: document.getElementById('modal-email').value,
+                        password: document.getElementById('modal-pass').value
+                    })
+                });
+                const d = await res.json();
+                if(d.success) { document.getElementById('modalSuccess').classList.remove('d-none'); fetchEverything(); }
+            } catch (err) { alert("Failed to grant access."); }
+            finally { btn.disabled = false; }
+        });
+
+        document.getElementById('regHospForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('regSubBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Registering...';
+
+            const payload = {
+                biz: document.getElementById('reg-biz').value,
+                license: document.getElementById('reg-license').value,
+                specialization: regTagsSys.getTags(),
+                owner: document.getElementById('reg-owner').value,
+                phone: document.getElementById('reg-phone').value,
+                city: document.getElementById('reg-city').value,
+                state: document.getElementById('reg-state').value,
+                pin: document.getElementById('reg-pin').value,
+                email: document.getElementById('reg-email').value,
+                hashPass: document.getElementById('reg-pass').value
+            };
+
+            try {
+                const res = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/register-hospital', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+                const d = await res.json();
+                if(d.success) {
+                    alert("✅ Hospital Registered Successfully!");
+                    location.reload();
+                } else { alert(d.message); }
+            } catch (err) { alert("Registration failed."); }
+            finally { btn.disabled = false; btn.innerHTML = 'COMPLETE REGISTRATION'; }
+        });
+
+        // Search Filters
+        document.getElementById('hospSearch').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            renderHospitals(hospitalsData.filter(h => h.businessName.toLowerCase().includes(val) || h.uniqueId.includes(val)));
+        });
+        document.getElementById('reportSearch').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            renderReports(reportsData.filter(r => r.patientName.toLowerCase().includes(val) || r.hospitalName.toLowerCase().includes(val)));
+        });
+
+        function openEdit(hospital) {
+            document.getElementById('edit-hid').value = hospital.uniqueId;
+            document.getElementById('edit-biz').value = hospital.businessName;
+            document.getElementById('edit-license').value = hospital.licenseNumber;
+            document.getElementById('edit-owner').value = hospital.contact ? hospital.contact.ownerName : '';
+            document.getElementById('edit-phone').value = hospital.contact ? hospital.contact.whatsappNumber : '';
+            document.getElementById('edit-city').value = hospital.address ? hospital.address.city : '';
+            document.getElementById('edit-state').value = hospital.address ? hospital.address.state : '';
+            document.getElementById('edit-pin').value = hospital.address ? hospital.address.pincode : '';
+            document.getElementById('edit-email').value = hospital.email || '';
+
+            const hSpecs = Array.isArray(hospital.specialization) ? hospital.specialization : [hospital.specialization];
+            editTagsSys.setTags(hSpecs.filter(Boolean)); // Fill custom tags UI
+
+            new bootstrap.Modal(document.getElementById('editHospModal')).show();
+        }
+
+        document.getElementById('editHospForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('editSubBtn');
+            btn.disabled = true;
+            btn.innerHTML = 'Updating...';
+
+            const id = document.getElementById('edit-hid').value;
+
+            const payload = {
+                biz: document.getElementById('edit-biz').value,
+                license: document.getElementById('edit-license').value,
+                specialization: editTagsSys.getTags(),
+                owner: document.getElementById('edit-owner').value,
+                phone: document.getElementById('edit-phone').value,
+                city: document.getElementById('edit-city').value,
+                state: document.getElementById('edit-state').value,
+                pin: document.getElementById('edit-pin').value,
+                email: document.getElementById('edit-email').value
+            };
+
+            try {
+                const res = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/edit-hospital/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(payload)
+                });
+                const d = await res.json();
+                if(d.success) {
+                    alert("✅ Hospital Updated Successfully!");
+                    location.reload();
+                } else { alert(d.message); }
+            } catch (err) { alert("Update failed."); }
+            finally { btn.disabled = false; btn.innerHTML = 'UPDATE HOSPITAL'; }
+        });
+
+        async function toggleStatus(id) {
+            try {
+                const res = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/admin/toggle-status/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await res.json();
+                if(d.success) fetchEverything();
+            } catch (err) { alert("Failed to toggle status."); }
+        }
+
+        function exportToExcel() {
+            if(reportsData.length === 0) return alert("No data to export!");
+            const wb = XLSX.utils.book_new();
+            const wsData = reportsData.map(r => ({
+                'Date': new Date(r.date).toLocaleDateString(),
+                'Hospital': r.hospitalName,
+                'Patient': r.patientName,
+                'Mobile': r.patientMobile,
+                'Treatment': r.treatmentDetails,
+                'Amount': r.billAmount,
+                'Status': r.status
+            }));
+            const ws = XLSX.utils.json_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Master Report");
+            XLSX.writeFile(wb, "Foundation_Master_Hospital_Report.xlsx");
+        }
+
+        function logout() { localStorage.removeItem('authToken'); window.location.href = 'index.html'; }
+
+        function viewPhoto(data) {
+            const win = window.open();
+            win.document.write(`<img src="${data}" style="max-width:100%;">`);
+        }
+
+        // Sidebar toggle with overlay
+        function openSidebar() {
+            document.getElementById('sidebar').classList.add('active');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        }
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar.classList.contains('active')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        // ============================================
+        // 🏷️ Custom Tags Specialization UI Logic
+        // ============================================
+        const defaultSpecializations = [
+            "General Medicine", "Cardiology ❤️", "Orthopedics 🦴",
+            "Neurology 🧠", "Pediatrics 👶", "Dermatology ✨",
+            "Gynecology 🤰", "Patholab 🔬", "Chemist Shop 💊"
+        ];
+
+        function initTagsSystem(inputId, containerId, dropdownId, getTagsFn, setTagsFn) {
+            const input = document.getElementById(inputId);
+            const container = document.getElementById(containerId);
+            const dropdown = document.getElementById(dropdownId);
+            const wrapper = container.parentElement;
+
+            let tags = getTagsFn() || [];
+
+            function renderTags() {
+                container.innerHTML = tags.map((t, idx) => `
+                    <span class="tag-badge">
+                        ${t} <span class="tag-remove" data-idx="${idx}">×</span>
+                    </span>
+                `).join('');
+                setTagsFn(tags);
+
+                container.querySelectorAll('.tag-remove').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const idx = parseInt(e.target.dataset.idx);
+                        tags.splice(idx, 1);
+                        renderTags();
+                    });
+                });
+            }
+
+            function renderDropdown(filterText = '') {
+                const available = defaultSpecializations.filter(s =>
+                    !tags.includes(s) && s.toLowerCase().includes(filterText.toLowerCase())
+                );
+                
+                if (filterText && !available.includes(filterText) && !tags.includes(filterText)) {
+                   available.push(`Add "${filterText}"...`);
+                }
+
+                if (available.length === 0) {
+                    dropdown.classList.remove('show');
+                    return;
+                }
+
+                dropdown.innerHTML = available.map(s => {
+                    if (s.startsWith('Add "')) {
+                        return `<div class="tag-option text-danger fw-bold" data-val="${filterText}">+ ${s}</div>`;
+                    }
+                    return `<div class="tag-option" data-val="${s}">${s}</div>`;
+                }).join('');
+                
+                dropdown.classList.add('show');
+                
+                dropdown.querySelectorAll('.tag-option').forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        const val = opt.dataset.val;
+                        if (!tags.includes(val)) tags.push(val);
+                        input.value = '';
+                        dropdown.classList.remove('show');
+                        renderTags();
+                    });
+                });
+            }
+
+            input.addEventListener('focus', () => renderDropdown(input.value));
+            input.addEventListener('input', (e) => renderDropdown(e.target.value));
+            
+            input.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter') {
+                    e.preventDefault();
+                    const val = input.value.trim();
+                    if(val && !tags.includes(val)) {
+                        tags.push(val);
+                        input.value = '';
+                        dropdown.classList.remove('show');
+                        renderTags();
+                    }
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!wrapper.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            renderTags();
+            return {
+                setTags: (newTags) => { tags = newTags || []; renderTags(); },
+                getTags: () => tags
+            };
+        }
+
+        let regTags = [];
+        const regTagsSys = initTagsSystem('reg-spec-input', 'reg-tags-container', 'reg-spec-dropdown', () => regTags, (t) => regTags = t);
+
+        let editTags = [];
+        const editTagsSys = initTagsSystem('edit-spec-input', 'edit-tags-container', 'edit-spec-dropdown', () => editTags, (t) => editTags = t);
+
+        fetchEverything();
+    </script>
+</body>
+</html>

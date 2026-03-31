@@ -23,35 +23,53 @@
 
         /* Navbar and Logo Adjustments */
         nav { 
-            background: white; padding: 0 30px; display: flex; justify-content: space-between; 
-            align-items: center; height: 80px; position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            background: white; padding: 12px 20px; display: flex; justify-content: space-between; 
+            align-items: center; position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            flex-wrap: wrap; gap: 10px;
         }
-        .brand-container { display: flex; align-items: center; gap: 15px; }
+        .brand-container { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
         
         /* Logo Image Style */
         .main-logo {
-            height: 55px; 
+            height: 45px; 
             width: auto;
             object-fit: contain;
         }
 
-        .brand { font-size: 22px; font-weight: 800; color: var(--primary); line-height: 1.1; }
+        .brand { font-size: 18px; font-weight: 800; color: var(--primary); line-height: 1.1; }
         .brand span { color: var(--dark); }
-        .yojna-tag { font-size: 14px; color: #dc2626; font-weight: 700; display: block; margin-top: 2px; }
+        .yojna-tag { font-size: 11px; color: #dc2626; font-weight: 700; display: block; margin-top: 2px; }
+
+        .nav-tabs-row { display: flex; gap: 8px; flex-shrink: 0; }
+
+        @media (max-width: 480px) {
+            nav { padding: 10px 15px; justify-content: center; }
+            .brand-container { width: 100%; justify-content: flex-start; }
+            .main-logo { height: 38px; }
+            .brand { font-size: 15px; }
+            .yojna-tag { font-size: 10px; }
+            .nav-tabs-row { width: 100%; }
+            .btn-nav { flex: 1; text-align: center; font-size: 13px; padding: 9px 8px; }
+        }
 
         .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
         .glass-card { background: white; border-radius: var(--radius-lg); padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        @media (max-width: 480px) {
+            .container { margin: 15px auto; padding: 0 12px; }
+            .glass-card { padding: 20px 15px; border-radius: 15px; }
+        }
 
         .section-view { display: none; }
         .section-view.active { display: block; animation: fadeIn 0.4s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .form-header { margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
-        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .health-id-row { display: flex; gap: 15px; margin-bottom: 15px; align-items: end; }
-        .health-input-wrap { width: 250px; } 
-        .upload-input-wrap { width: 180px; }
+        .grid-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .health-id-row { display: flex; gap: 12px; margin-bottom: 15px; align-items: end; flex-wrap: wrap; }
+        .health-input-wrap { flex: 1; min-width: 160px; } 
+        .upload-input-wrap { width: auto; flex-shrink: 0; }
 
         label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--slate); text-transform: uppercase; }
         input, select { 
@@ -72,17 +90,22 @@
         .btn-nav.active { background: var(--primary); color: white; }
 
         .search-filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        @media (max-width: 480px) { .search-filter-row { grid-template-columns: 1fr; } }
+
         .excel-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; font-size: 16px; border: 1px solid #e2e8f0; }
         .excel-table th { background: #f1f5f9; color: var(--slate); text-align: left; padding: 12px; font-weight: 700; text-transform: uppercase; font-size: 12px; border-bottom: 2px solid #e2e8f0; }
         .excel-table td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; color: var(--dark); vertical-align: middle; }
         .excel-table tr:hover { background: #fffbeb; }
         .excel-table strong { font-size: 18px; color: var(--dark); }
+        
+        /* Mobile table scroll */
+        .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
 
         .placeholder-msg { text-align: center; padding: 40px; color: var(--slate); font-weight: 600; background: #f8fafc; border-radius: 15px; border: 2px dashed #e2e8f0; }
 
         #print-area { display: none; background: white; padding: 25px; border-radius: 15px; border: 1px solid #ddd;}
         .receipt-header { display: flex; align-items: center; gap: 15px; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 15px; }
-        .receipt-body { display: flex; gap: 20px; }
+        .receipt-body { display: flex; gap: 20px; flex-wrap: wrap; }
         #receipt-img { width: 140px; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
 
         @media print { .no-print { display: none !important; } #print-area { display: block !important; } }
@@ -94,11 +117,11 @@
     <div class="brand-container">
         <img src="../public/logo.jpg" alt="Logo" class="main-logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2864/2864323.png'">
         <div class="brand">
-            AAGAJ <br><span>FOUNDATION</span>
+            AAGAJ <span>FOUNDATION</span>
             <small class="yojna-tag">SWASTH SURAKSHA YOJNA</small>
         </div>
     </div>
-    <div style="display:flex; gap:10px;">
+    <div class="nav-tabs-row">
         <button class="btn btn-nav active" onclick="switchTab('reg-tab', this)">Registration</button>
         <button class="btn btn-nav" onclick="switchTab('net-tab', this)">Network</button>
     </div>
@@ -179,7 +202,7 @@
 
                 <div class="grid-row" style="margin-top:20px;">
                     <div><label>Specialization</label>
-                        <select id="p-spec" name="department">
+                        <select id="p-spec" name="department" onchange="renderPartnersDropdown()">
                             <option>General Medicine</option>
                             <option>Cardiology ❤️</option>
                             <option>Orthopedics 🦴</option>
@@ -187,6 +210,8 @@
                             <option>Pediatrics 👶</option>
                             <option>Dermatology ✨</option>
                             <option>Gynecology 🤰</option>
+                            <option>Patholab 🔬</option>
+                            <option>Chemist Shop 💊</option>
                         </select>
                     </div>
                     <div><label>Tie-up Facility</label>
@@ -217,7 +242,7 @@
     <div id="net-tab" class="section-view">
         <div class="glass-card">
             <h3><i class="fas fa-network-wired"></i> Official Partner Network</h3>
-            <div class="search-filter-row">
+            <div class="search-filter-row" style="grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                 <div>
                     <label>Select Category</label>
                     <select id="net-category" onchange="filterNetwork()">
@@ -225,6 +250,21 @@
                         <option value="Hospital">Hospitals</option>
                         <option value="Lab">Diagnostic Labs</option>
                         <option value="Pharmacy">Pharmacy</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Specialization</label>
+                    <select id="net-spec" onchange="filterNetwork()">
+                        <option value="">-- Any Specialization --</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology ❤️">Cardiology ❤️</option>
+                        <option value="Orthopedics 🦴">Orthopedics 🦴</option>
+                        <option value="Neurology 🧠">Neurology 🧠</option>
+                        <option value="Pediatrics 👶">Pediatrics 👶</option>
+                        <option value="Dermatology ✨">Dermatology ✨</option>
+                        <option value="Gynecology 🤰">Gynecology 🤰</option>
+                        <option value="Patholab 🔬">Patholab 🔬</option>
+                        <option value="Chemist Shop 💊">Chemist Shop 💊</option>
                     </select>
                 </div>
                 <div>
@@ -282,14 +322,24 @@
     function filterNetwork() {
         const catFilter = document.getElementById('net-category').value;
         const stateFilter = document.getElementById('net-state').value;
+        const specFilter = document.getElementById('net-spec').value;
         const resultDiv = document.getElementById('network-results');
         if(!catFilter || !stateFilter) return;
 
         // ✅ Filter from Database Data
-        const filtered = partnersData.filter(item => 
-            item.category === catFilter && 
-            (item.address && item.address.state && item.address.state.toLowerCase().includes(stateFilter.toLowerCase()))
-        );
+        const filtered = partnersData.filter(item => {
+            const matchesCat = item.category === catFilter;
+            const matchesState = (item.address && item.address.state && item.address.state.toLowerCase().includes(stateFilter.toLowerCase()));
+            
+            let matchesSpec = true;
+            if (specFilter) {
+                let itemSpecs = item.specialization || ['General Medicine'];
+                if (!Array.isArray(itemSpecs)) itemSpecs = [itemSpecs];
+                matchesSpec = itemSpecs.includes(specFilter);
+            }
+            
+            return matchesCat && matchesState && matchesSpec;
+        });
 
         let html = `<table class="excel-table"><thead><tr><th>Partner Name</th><th>Location</th></tr></thead><tbody>`;
         
@@ -319,16 +369,25 @@
 
     function renderPartnersDropdown() {
         const select = document.getElementById('p-hosp');
+        const selectedSpec = document.getElementById('p-spec').value;
+        
         if (partnersData.length === 0) {
             select.innerHTML = '<option value="">Loading...</option>';
             document.getElementById('facility-services-section').style.display = 'none';
             return;
         }
 
+        // Filter partners by selected specialization
+        const filteredPartners = partnersData.filter(p => {
+            let specs = p.specialization || ['General Medicine'];
+            if (!Array.isArray(specs)) specs = [specs];
+            return specs.includes(selectedSpec);
+        });
+
         const optionsHtml = [
             '<option value="">-- Select Tie-up Facility --</option>',
-            ...partnersData.map((p, idx) =>
-                `<option value="${p.businessName}" data-index="${idx}">${p.businessName}</option>`
+            ...filteredPartners.map((p, idx) =>
+                `<option value="${p.businessName}" data-index="${partnersData.indexOf(p)}" data-hid="${p.uniqueId}">${p.businessName} (${p.uniqueId})</option>`
             )
         ].join('');
 
@@ -436,6 +495,13 @@
         
         const form = document.getElementById('appointmentForm');
         const formData = new FormData(form);
+        
+        // ✅ Get Hospital ID (uniqueId) from selected option
+        const hospSelect = document.getElementById('p-hosp');
+        const selectedOption = hospSelect.options[hospSelect.selectedIndex];
+        const hospitalId = selectedOption.dataset.hid;
+        if(hospitalId) formData.append("hospitalId", hospitalId);
+
         const btn = form.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
 

@@ -127,7 +127,43 @@ app.use('/public', express.static(path.join(__dirname, "../frontend/public")));
 
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Connected"))
+  .then(async () => {
+      console.log("✅ MongoDB Connected");
+      
+      // ✅ Seed Test Hospital if it doesn't exist
+      try {
+          const HealthPartner = require('./schemas/SwasthyaSurkshaSchema');
+          const bcrypt = require('bcryptjs');
+          const testEmail = process.env.TEST_HOSPITAL_EMAIL;
+          if (testEmail) {
+              const existingHosp = await HealthPartner.findOne({ email: testEmail });
+              if (!existingHosp) {
+                  const hashedPassword = await bcrypt.hash(process.env.TEST_HOSPITAL_PASS || 'Aagaj@123', 10);
+                  const newHosp = new HealthPartner({
+                      uniqueId: "HOSP-TEST-01",
+                      category: "Hospital",
+                      businessName: "Test Foundation Hospital",
+                      email: testEmail,
+                      password: hashedPassword,
+                      licenseNumber: "TEST-LIC-001",
+                      address: {
+                          fullAddress: "Main Street, Patna",
+                          city: "Patna",
+                          state: "Bihar",
+                          pincode: "800001"
+                      },
+                      contact: {
+                          ownerName: "Vivek Kumar",
+                          whatsappNumber: "9431430464"
+                      },
+                      isActive: true
+                  });
+                  await newHosp.save();
+                  console.log("🏥 Test Hospital Seeded: " + testEmail);
+              }
+          }
+      } catch (err) { console.error("Seeding Error:", err); }
+  })
   .catch(err => console.log("❌ DB Error:", err));
 
 
@@ -485,6 +521,10 @@ app.use('/donation',donationRoutes);
 
 //Admin Register Routes
 app.use('/admin-register', require('./routes/AdminRegisterRoutes'));
+
+// ✅ Hospital Admin & Billing Routes
+const HospitalAdminRoutes = require('./routes/HospitalAdminRoutes');
+app.use('/api/hospital-admin-system', HospitalAdminRoutes);
 
 // Routes Import
 const healthCardRoutes = require('./routes/HealthCardRoutes'); 

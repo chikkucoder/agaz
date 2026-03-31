@@ -56,7 +56,7 @@
         @media (max-width: 992px) {
             .sidebar { left: -250px; }
             .sidebar.active { left: 0; }
-            .main-content { margin-left: 0 !important; }
+            .main-content { margin-left: 0 !important; padding-top: 20px; }
             .sidebar-overlay {
                 display: none;
                 position: fixed;
@@ -66,7 +66,17 @@
                 z-index: 1040;
             }
             .sidebar-overlay.active { display: block; }
+            .mobile-toggle { display: block !important; }
         }
+
+        .mobile-toggle {
+            display: none; background: var(--sidebar-bg); color: white;
+            border: none; padding: 10px 15px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+
+        .nav-link.back-site-link { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 20px; color: var(--primary-yellow) !important; }
 
         .sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .sidebar-header img { height: 60px; background: white; padding: 5px; border-radius: 5px; }
@@ -84,16 +94,10 @@
         
         .main-content { margin-left: 250px; padding: 20px; transition: 0.3s; width: auto; }
 
-        /* --- Mobile Toggle Button --- */
-        .mobile-toggle {
-            display: none;
-            background: var(--sidebar-bg);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        @media (max-width: 992px) { .mobile-toggle { display: inline-block; } }
+        /* --- Table Responsive Optimization --- */
+        .table-responsive { border-radius: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table th, .table td { white-space: nowrap; vertical-align: middle; }
+        .table td.wrap-details { white-space: normal; min-width: 150px; font-size: 11px; color: #666; }
 
         /* --- Stats & Table --- */
         .stat-card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-bottom: 4px solid transparent; height: 100%; }
@@ -151,71 +155,64 @@
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <img src="../public/logo.jpg" alt="Logo"> 
-            <h5 class="mb-0 mt-2 fw-bold">Aagaj Admin</h5>
+            <h5 class="mb-0 mt-2 fw-bold text-white">Aagaj Admin</h5>
+            <small class="text-warning" style="font-size: 10px;">Employee Management Panel</small>
         </div>
-        <ul>
-            <li><a href="admin-dashboard.html"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
-            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Jobs Data</a></li>
-            <li><a href="Normal_Jobs_Data.html"><i class="fa-solid fa-briefcase me-2"></i> Normal Jobs Data</a></li>
-            
-            <li>
-                <a href="#paymentSubmenu" data-bs-toggle="collapse" aria-expanded="false">
-                    <i class="fa-solid fa-money-bill me-2"></i> Payments
-                </a>
-                <ul class="collapse list-unstyled" id="paymentSubmenu" style="background: rgba(0,0,0,0.2);">
-                    <li>
-                        <a href="all_transactions.html" style="padding-left: 50px; font-size: 0.9rem;">
-                            <i class="fa-solid fa-receipt me-2"></i> All Transactions
-                        </a>
-                    </li>
-                    <li>
-                        <a href="donation_history.html" style="padding-left: 50px; font-size: 0.9rem;">
-                            <i class="fa-solid fa-hand-holding-heart me-2"></i> Donation History
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li><a href="index.html" class="mt-5 border-top pt-3"><i class="fa-solid fa-house me-2"></i> Back to Website</a></li>
-            <li><a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+        <ul class="nav flex-column">
+            <li><a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge-high me-2"></i> Dashboard</a></li>
+            <li><a href="hospital-admin.html"><i class="fa-solid fa-hotel me-2"></i> Hospital Master</a></li>
+            <li><a href="NGO_Jobs_Data.html"><i class="fa-solid fa-users me-2"></i> NGO Jobs</a></li>
+            <li><a href="Normal_Jobs_Data.html"><i class="fa-solid fa-briefcase me-2"></i> Normal Jobs</a></li>
+            <li><a href="index.html" class="back-site-link"><i class="fa-solid fa-house me-2"></i> Back to Website</a></li>
+            <li><a href="#" onclick="logout()" class="text-danger mt-5"><i class="fa-solid fa-power-off me-2"></i> Logout session</a></li>
         </ul>
     </nav>
 
     <div class="main-content">
-        <div class="d-md-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex align-items-center mb-3 mb-md-0">
-                <div class="mobile-toggle me-3" onclick="toggleSidebar()">
+        <!-- Dashboard Header -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div class="d-flex align-items-center">
+                <button class="mobile-toggle me-3" onclick="toggleSidebar()">
                     <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0">Employee Management</h3>
+                    <p class="text-muted small m-0 d-none d-md-block">Central Control for Foundation Activities</p>
                 </div>
-                <h3 class="fw-bold text-dark mb-0">Employee Management</h3>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-dark btn-sm" onclick="fetchData()"><i class="fa-solid fa-rotate"></i> Refresh</button>
-                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
-                    <i class="fa-solid fa-key"></i> Create Password
-                </button>
-                <a href="performance_report.html" class="btn btn-primary btn-sm">
-                 <i class="fa-solid fa-chart-line"></i> Report
-                </a>
+                <button class="btn btn-dark btn-sm flex-fill" onclick="fetchData()"><i class="fa-solid fa-rotate"></i> Sync</button>
+                <button class="btn btn-danger btn-sm flex-fill" data-bs-toggle="modal" data-bs-target="#addEmployeeModal"><i class="fa-solid fa-key"></i> Pass</button>
+                <a href="performance_report.html" class="btn btn-primary btn-sm flex-fill text-center"><i class="fa-solid fa-chart-line"></i> Report</a>
             </div>
         </div>
 
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6 col-lg-4">
-                <div class="stat-card red d-flex justify-content-between align-items-center">
-                    <div><h6 class="text-muted small">Total Applicants</h6><h2 class="fw-bold mb-0" id="totalCount">0</h2></div>
-                    <i class="fa-solid fa-users fa-2x text-danger opacity-25"></i>
+        <div class="row g-2 g-md-3 mb-4 text-center">
+            <div class="col-6 col-lg-4">
+                <div class="stat-card red p-2 p-md-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted small fw-bold" style="font-size: 10px;">Candidates</h6>
+                        <h3 class="fw-bold mb-0" id="totalCount" style="font-size: 1.4rem;">0</h3>
+                    </div>
+                    <i class="fa-solid fa-users fa-2x text-danger opacity-25 d-none d-md-block"></i>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-                <div class="stat-card yellow d-flex justify-content-between align-items-center">
-                    <div><h6 class="text-muted small">NGO Jobs</h6><h2 class="fw-bold mb-0" id="ngoCount">0</h2></div>
-                    <i class="fa-solid fa-handshake fa-2x text-warning opacity-25"></i>
+            <div class="col-6 col-lg-4">
+                <div class="stat-card yellow p-2 p-md-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted small fw-bold" style="font-size: 10px;">NGO Jobs</h6>
+                        <h3 class="fw-bold mb-0" id="ngoCount" style="font-size: 1.4rem;">0</h3>
+                    </div>
+                    <i class="fa-solid fa-handshake fa-2x text-warning opacity-25 d-none d-md-block"></i>
                 </div>
             </div>
-            <div class="col-sm-12 col-lg-4">
-                <div class="stat-card blue d-flex justify-content-between align-items-center">
-                    <div><h6 class="text-muted small">Generated IDs</h6><h2 class="fw-bold mb-0" id="idCount">0</h2></div>
-                    <i class="fa-solid fa-id-card fa-2x text-primary opacity-25"></i>
+            <div class="col-12 col-lg-4">
+                <div class="stat-card blue p-2 p-md-3 d-flex flex-column flex-md-row justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted small fw-bold" style="font-size: 10px;">Generated IDs</h6>
+                        <h3 class="fw-bold mb-0" id="idCount" style="font-size: 1.4rem;">0</h3>
+                    </div>
+                    <i class="fa-solid fa-id-card fa-2x text-primary opacity-25 d-none d-md-block"></i>
                 </div>
             </div>
         </div>
@@ -717,11 +714,13 @@
             renderTable(filtered);
         });
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
         function logout() { 
-            sessionStorage.removeItem('loggedInUser');
-            sessionStorage.removeItem('loggedInUserEmail');
-            sessionStorage.removeItem('loggedInRole');
-            sessionStorage.removeItem('adminEmail');
+            sessionStorage.clear();
             localStorage.removeItem('authToken');
             window.location.href = 'index.html'; 
         }
