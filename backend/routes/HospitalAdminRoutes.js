@@ -111,7 +111,7 @@ router.post('/admin/generate-credentials', verifyAdmin, async (req, res) => {
 // 6. Admin Register New Hospital (Full Control)
 router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
     try {
-        const { biz, hashPass, license, city, state, pin, owner, phone, email } = req.body;
+        const { biz, hashPass, license, city, state, pin, owner, phone, email, specialization } = req.body;
         
         // --- 🩺 Robust Validation ---
         if (!biz || !license || !owner || !phone || !city || !state || !pin || !email || !hashPass) {
@@ -176,6 +176,7 @@ router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
             category: 'Hospital',
             businessName: biz,
             licenseNumber: license,
+            specialization: specialization ? (Array.isArray(specialization) ? specialization : [specialization]) : ['General Medicine'],
             address: { city, state, pincode: pin, fullAddress: `${city}, ${state}` },
             contact: { ownerName: owner, whatsappNumber: phone },
             email: email.toLowerCase(),
@@ -199,6 +200,53 @@ router.patch('/admin/toggle-status/:uniqueId', verifyAdmin, async (req, res) => 
         hospital.isActive = !hospital.isActive;
         await hospital.save();
         res.json({ success: true, message: `Hospital is now ${hospital.isActive?'Active':'Disabled'}`, isActive: hospital.isActive });
+    } catch (error) { res.status(500).json({ success: false, message: error.message }); }
+});
+
+// 8. Admin Edit Hospital
+router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, async (req, res) => {
+    try {
+        const { biz, license, city, state, pin, owner, phone, email, specialization } = req.body;
+        
+        // Basic validation
+        if (!biz || !license || !owner || !phone || !city || !state || !pin || !email) {
+            return res.status(400).json({ success: false, message: "All fields are required!" });
+        }
+
+        // Check for duplicate license
+        const existingLicense = await HealthPartner.findOne({ licenseNumber: license, uniqueId: { $ne: req.params.uniqueId } });
+        if (existingLicense) return res.status(400).json({ success: false, message: "Hospital with this license already exists!" });
+
+        // Check for duplicate email
+        const existingEmail = await HealthPartner.findOne({ email: email.toLowerCase(), uniqueId: { $ne: req.params.uniqueId } });
+        if (existingEmail) return res.status(400).json({ success: false, message: "This email is already in use by another hospital!" });
+
+        let updateFields = {
+            businessName: biz,
+            licenseNumber: license,
+            'address.city': city,
+            'address.state': state,
+            'address.pincode': pin,
+            'address.fullAddress': `${city}, ${state}`,
+            'contact.ownerName': owner,
+            'contact.whatsappNumber': phone,
+            email: email.toLowerCase()
+        };
+
+        if (specialization) {
+            updateFields.specialization = Array.isArray(specialization) ? specialization : [specialization];
+        } else {
+            updateFields.specialization = [];
+        }
+
+        const updated = await HealthPartner.findOneAndUpdate(
+            { uniqueId: req.params.uniqueId },
+            { $set: updateFields },
+            { new: true }
+        );
+
+        if (!updated) return res.status(404).json({ success: false, message: "Hospital not found" });
+        res.json({ success: true, message: "Hospital updated successfully!", data: updated });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 

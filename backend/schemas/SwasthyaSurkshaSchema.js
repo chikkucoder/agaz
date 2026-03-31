@@ -23,6 +23,7 @@ const healthPartnerSchema = new mongoose.Schema({
     nablStatus: { type: String, trim: true },        // For Lab
     drugLicenseExpiry: { type: String, trim: true }, // For Pharmacy
     numberOfBeds: { type: String, trim: true },      // For Hospital
+    specialization: { type: [String], default: ['General Medicine'] }, // Hospital specialization type
 
     licenseNumber: {
         type: String,

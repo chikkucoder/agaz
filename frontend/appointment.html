@@ -202,7 +202,7 @@
 
                 <div class="grid-row" style="margin-top:20px;">
                     <div><label>Specialization</label>
-                        <select id="p-spec" name="department">
+                        <select id="p-spec" name="department" onchange="renderPartnersDropdown()">
                             <option>General Medicine</option>
                             <option>Cardiology ❤️</option>
                             <option>Orthopedics 🦴</option>
@@ -210,6 +210,8 @@
                             <option>Pediatrics 👶</option>
                             <option>Dermatology ✨</option>
                             <option>Gynecology 🤰</option>
+                            <option>Patholab 🔬</option>
+                            <option>Chemist Shop 💊</option>
                         </select>
                     </div>
                     <div><label>Tie-up Facility</label>
@@ -240,7 +242,7 @@
     <div id="net-tab" class="section-view">
         <div class="glass-card">
             <h3><i class="fas fa-network-wired"></i> Official Partner Network</h3>
-            <div class="search-filter-row">
+            <div class="search-filter-row" style="grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                 <div>
                     <label>Select Category</label>
                     <select id="net-category" onchange="filterNetwork()">
@@ -248,6 +250,21 @@
                         <option value="Hospital">Hospitals</option>
                         <option value="Lab">Diagnostic Labs</option>
                         <option value="Pharmacy">Pharmacy</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Specialization</label>
+                    <select id="net-spec" onchange="filterNetwork()">
+                        <option value="">-- Any Specialization --</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Cardiology ❤️">Cardiology ❤️</option>
+                        <option value="Orthopedics 🦴">Orthopedics 🦴</option>
+                        <option value="Neurology 🧠">Neurology 🧠</option>
+                        <option value="Pediatrics 👶">Pediatrics 👶</option>
+                        <option value="Dermatology ✨">Dermatology ✨</option>
+                        <option value="Gynecology 🤰">Gynecology 🤰</option>
+                        <option value="Patholab 🔬">Patholab 🔬</option>
+                        <option value="Chemist Shop 💊">Chemist Shop 💊</option>
                     </select>
                 </div>
                 <div>
@@ -305,14 +322,24 @@
     function filterNetwork() {
         const catFilter = document.getElementById('net-category').value;
         const stateFilter = document.getElementById('net-state').value;
+        const specFilter = document.getElementById('net-spec').value;
         const resultDiv = document.getElementById('network-results');
         if(!catFilter || !stateFilter) return;
 
         // ✅ Filter from Database Data
-        const filtered = partnersData.filter(item => 
-            item.category === catFilter && 
-            (item.address && item.address.state && item.address.state.toLowerCase().includes(stateFilter.toLowerCase()))
-        );
+        const filtered = partnersData.filter(item => {
+            const matchesCat = item.category === catFilter;
+            const matchesState = (item.address && item.address.state && item.address.state.toLowerCase().includes(stateFilter.toLowerCase()));
+            
+            let matchesSpec = true;
+            if (specFilter) {
+                let itemSpecs = item.specialization || ['General Medicine'];
+                if (!Array.isArray(itemSpecs)) itemSpecs = [itemSpecs];
+                matchesSpec = itemSpecs.includes(specFilter);
+            }
+            
+            return matchesCat && matchesState && matchesSpec;
+        });
 
         let html = `<table class="excel-table"><thead><tr><th>Partner Name</th><th>Location</th></tr></thead><tbody>`;
         
@@ -342,16 +369,25 @@
 
     function renderPartnersDropdown() {
         const select = document.getElementById('p-hosp');
+        const selectedSpec = document.getElementById('p-spec').value;
+        
         if (partnersData.length === 0) {
             select.innerHTML = '<option value="">Loading...</option>';
             document.getElementById('facility-services-section').style.display = 'none';
             return;
         }
 
+        // Filter partners by selected specialization
+        const filteredPartners = partnersData.filter(p => {
+            let specs = p.specialization || ['General Medicine'];
+            if (!Array.isArray(specs)) specs = [specs];
+            return specs.includes(selectedSpec);
+        });
+
         const optionsHtml = [
             '<option value="">-- Select Tie-up Facility --</option>',
-            ...partnersData.map((p, idx) =>
-                `<option value="${p.businessName}" data-index="${idx}" data-hid="${p.uniqueId}">${p.businessName} (${p.uniqueId})</option>`
+            ...filteredPartners.map((p, idx) =>
+                `<option value="${p.businessName}" data-index="${partnersData.indexOf(p)}" data-hid="${p.uniqueId}">${p.businessName} (${p.uniqueId})</option>`
             )
         ].join('');
 
