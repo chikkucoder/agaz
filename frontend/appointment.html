@@ -70,6 +70,37 @@
         .health-id-row { display: flex; gap: 12px; margin-bottom: 15px; align-items: end; flex-wrap: wrap; }
         .health-input-wrap { flex: 1; min-width: 160px; } 
         .upload-input-wrap { width: auto; flex-shrink: 0; }
+        .verify-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+            align-items: center;
+        }
+        .verify-row input {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+        .verify-btn {
+            border: none;
+            border-radius: 10px;
+            background: #0f172a;
+            color: #fff;
+            font-weight: 700;
+            padding: 0 12px;
+            height: 42px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .verify-status { font-size: 11px; margin-top: 6px; display: block; }
+        @media (max-width: 480px) {
+            .verify-row {
+                grid-template-columns: 1fr;
+            }
+            .verify-btn {
+                width: 100%;
+            }
+        }
 
         label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 6px; color: var(--slate); text-transform: uppercase; }
         input, select { 
@@ -180,7 +211,11 @@
                 <div class="health-id-row">
                     <div class="health-input-wrap">
                         <label>Health ID (6 Digit)</label>
-                        <input type="text" id="p-health-id" name="healthId" maxlength="6" oninput="vNum(this)" placeholder="123456" required>
+                        <div class="verify-row">
+                            <input type="text" id="p-health-id" name="healthId" maxlength="10" oninput="vHealthId(this)" placeholder="123456 or MC-123456" required>
+                            <button type="button" class="verify-btn" onclick="verifyHealthId()">Verify</button>
+                        </div>
+                        <small id="health-verify-status" class="verify-status" style="color:#dc2626;">Verify Health ID before booking appointment.</small>
                     </div>
                     <div class="upload-input-wrap">
                         <label>Upload Card</label>
@@ -215,7 +250,7 @@
                         </select>
                     </div>
                     <div><label>Tie-up Facility</label>
-                        <select id="p-hosp" name="doctor" style="border-color:#f59e0b;" onchange="displayFacilityServices()"></select>
+                        <select id="p-hosp" name="doctor" style="border-color:#f59e0b;" onchange="displayFacilityServices()" required></select>
                     </div>
                     <div><label>Appt. Date</label><input type="date" id="p-date" name="date" required></div>
                 </div>
@@ -291,8 +326,58 @@
     let imgData = "";
     function vNum(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
     function vPureText(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
+    function vHealthId(el) { el.value = el.value.replace(/[^a-zA-Z0-9-]/g, '').toUpperCase(); }
     
     let partnersData = []; // ✅ Store fetched data
+    const verifiedHealthState = { ok: false, healthId: '', card: null };
+
+    function resetHealthVerification() {
+        verifiedHealthState.ok = false;
+        verifiedHealthState.healthId = '';
+        verifiedHealthState.card = null;
+        const statusEl = document.getElementById('health-verify-status');
+        statusEl.style.color = '#dc2626';
+        statusEl.innerText = 'Verify Health ID before booking appointment.';
+    }
+
+    async function verifyHealthId() {
+        const healthInput = document.getElementById('p-health-id');
+        const healthId = (healthInput.value || '').trim();
+        const statusEl = document.getElementById('health-verify-status');
+
+        if (!healthId) {
+            resetHealthVerification();
+            alert('Please enter Health ID first.');
+            return;
+        }
+
+        statusEl.style.color = '#2563eb';
+        statusEl.innerText = 'Verifying Health ID...';
+
+        try {
+            const res = await fetch(`${CONFIG.API_URL}/appointment/verify-health/${encodeURIComponent(healthId)}`);
+            const result = await res.json();
+
+            if (!res.ok || !result.success) {
+                resetHealthVerification();
+                alert(result.message || 'Health ID not verified.');
+                return;
+            }
+
+            verifiedHealthState.ok = true;
+            verifiedHealthState.healthId = healthId.toUpperCase();
+            verifiedHealthState.card = result.data;
+
+            if (result.data.fullName) document.getElementById('p-name').value = result.data.fullName;
+            if (result.data.mobile) document.getElementById('p-phone').value = result.data.mobile;
+
+            statusEl.style.color = '#16a34a';
+            statusEl.innerText = `Verified: ${result.data.healthId} (${result.data.fullName || 'Card Holder'})`;
+        } catch (error) {
+            resetHealthVerification();
+            alert('Verification failed. Please try again.');
+        }
+    }
 
     function switchTab(id, btn) {
         document.querySelectorAll('.section-view').forEach(v => v.classList.remove('active'));
@@ -490,8 +575,16 @@
 
     fetchPartners(); // ✅ Load data on page load
 
+    document.getElementById('p-health-id').addEventListener('input', resetHealthVerification);
+
     async function handleAppointmentSubmit(event) {
         event.preventDefault();
+
+        const currentHealthId = (document.getElementById('p-health-id').value || '').trim().toUpperCase();
+        if (!verifiedHealthState.ok || verifiedHealthState.healthId !== currentHealthId) {
+            alert('Please verify valid Health ID before booking appointment.');
+            return;
+        }
         
         const form = document.getElementById('appointmentForm');
         const formData = new FormData(form);
@@ -499,8 +592,14 @@
         // ✅ Get Hospital ID (uniqueId) from selected option
         const hospSelect = document.getElementById('p-hosp');
         const selectedOption = hospSelect.options[hospSelect.selectedIndex];
-        const hospitalId = selectedOption.dataset.hid;
-        if(hospitalId) formData.append("hospitalId", hospitalId);
+        const hospitalId = selectedOption ? selectedOption.dataset.hid : '';
+
+        if (!hospitalId) {
+            alert("Please select a tie-up hospital before booking appointment.");
+            return;
+        }
+
+        formData.set("hospitalId", hospitalId);
 
         const btn = form.querySelector('button[type="submit"]');
         const originalText = btn.innerHTML;
@@ -517,9 +616,8 @@
             const result = await response.json();
 
             if (result.success) {
-                alert("Registered Successfully!");
-                form.reset();
-                document.getElementById('file-done').style.display = 'none';
+                alert('Appointment booked successfully! Redirecting to Home Page...');
+                window.location.href = 'index.html';
             } else {
                 alert("Error: " + result.message);
             }

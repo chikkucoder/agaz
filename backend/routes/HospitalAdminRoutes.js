@@ -6,6 +6,17 @@ const Appointment = require('../schemas/AppointmentSchema');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const HealthCard = require('../schemas/HealthCardSchema');
+const rateLimit = require('express-rate-limit');
+const AuditLog = require('../models/AuditLog');
+const { validateRequest } = require('../middlewares/requestValidation');
+const {
+    hospitalLoginSchema,
+    generateCredentialsSchema,
+    registerHospitalSchema,
+    editHospitalSchema,
+    hospitalIdQuerySchema,
+    addBillSchema
+} = require('../validators/routeSchemas');
 
 // ============================================
 // ✅ MIDDLEWARE: VERIFY SUPER ADMIN
@@ -18,6 +29,45 @@ const verifyAdmin = (req, res, next) => {
         req.user = verified;
         next();
     } catch (err) { res.status(400).json({ success: false, message: "Invalid Token" }); }
+};
+
+const hospitalAuthLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 15,
+    skipSuccessfulRequests: true,
+    message: { success: false, message: 'Too many failed login attempts. Try again after 15 minutes.' }
+});
+
+const verifyHospital = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token) return res.status(401).json({ success: false, message: 'Access Denied' });
+
+    try {
+        const verified = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
+        if (verified.role !== 'hospital' || !verified.uniqueId) {
+            return res.status(403).json({ success: false, message: 'Invalid hospital token' });
+        }
+        req.hospitalUser = verified;
+        next();
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Invalid Token' });
+    }
+};
+
+const enforceHospitalScope = (req, res, next) => {
+    const requestedHospitalId = String(
+        req.query.hospitalId || req.body.hospitalId || req.params.hospitalId || ''
+    ).trim();
+
+    if (!requestedHospitalId) {
+        return res.status(400).json({ success: false, message: 'hospitalId is required' });
+    }
+
+    if (requestedHospitalId !== req.hospitalUser.uniqueId) {
+        return res.status(403).json({ success: false, message: 'Forbidden: hospital scope mismatch' });
+    }
+
+    next();
 };
 
 // ============================================
@@ -68,14 +118,47 @@ router.get('/admin/hospitals', verifyAdmin, async (req, res) => {
             };
         }));
 
-        res.json({ success: true, data: hospitalData });
+        const sanitizedHospitalData = hospitalData.map((h) => {
+            const { password, ...safeHospital } = h;
+            return {
+                ...safeHospital,
+                hasCredentials: Boolean(h.hasCredentials)
+            };
+        });
+
+        res.json({ success: true, data: sanitizedHospitalData });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
 // 4. Global Reports: List ALL patient treatments and bills across ALL hospitals
 router.get('/admin/global-reports', verifyAdmin, async (req, res) => {
     try {
-        const bills = await PatientBill.find().sort({ date: -1 }).lean();
+        const { fromDate, toDate, hospitalId } = req.query;
+        const filter = {};
+
+        if (hospitalId) {
+            filter.hospitalId = String(hospitalId).trim();
+        }
+
+        if (fromDate || toDate) {
+            filter.date = {};
+            if (fromDate) {
+                const from = new Date(fromDate);
+                if (!isNaN(from.getTime())) filter.date.$gte = from;
+            }
+            if (toDate) {
+                const to = new Date(toDate);
+                if (!isNaN(to.getTime())) {
+                    to.setHours(23, 59, 59, 999);
+                    filter.date.$lte = to;
+                }
+            }
+            if (Object.keys(filter.date).length === 0) {
+                delete filter.date;
+            }
+        }
+
+        const bills = await PatientBill.find(filter).sort({ date: -1 }).lean();
         
         // Link hospital names to bills for better reporting
         const detailedReports = await Promise.all(bills.map(async (b) => {
@@ -90,16 +173,55 @@ router.get('/admin/global-reports', verifyAdmin, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
-// 5. Generate/Update Credentials for a Hospital
-router.post('/admin/generate-credentials', verifyAdmin, async (req, res) => {
+// 4.1 Audit Logs for sensitive write actions
+router.get('/admin/audit-logs', verifyAdmin, async (req, res) => {
     try {
-        const { uniqueId, email, password } = req.body;
+        const { limit = 100, role, action, fromDate, toDate } = req.query;
+        const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 100, 1), 500);
+
+        const filter = {};
+        if (role) filter['actor.role'] = String(role).trim();
+        if (action) filter.action = { $regex: String(action).trim(), $options: 'i' };
+
+        if (fromDate || toDate) {
+            filter.createdAt = {};
+            if (fromDate) {
+                const from = new Date(fromDate);
+                if (!isNaN(from.getTime())) filter.createdAt.$gte = from;
+            }
+            if (toDate) {
+                const to = new Date(toDate);
+                if (!isNaN(to.getTime())) {
+                    to.setHours(23, 59, 59, 999);
+                    filter.createdAt.$lte = to;
+                }
+            }
+            if (Object.keys(filter.createdAt).length === 0) delete filter.createdAt;
+        }
+
+        const logs = await AuditLog.find(filter).sort({ createdAt: -1 }).limit(parsedLimit).lean();
+        res.json({ success: true, data: logs });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// 5. Generate/Update Credentials for a Hospital
+router.post('/admin/generate-credentials', verifyAdmin, validateRequest({ body: generateCredentialsSchema }), async (req, res) => {
+    try {
+        const { uniqueId, email, password, loginId } = req.body;
         if (!email || !password) return res.status(400).json({ success: false, message: "Email and Password are required" });
+
+        const cleanedEmail = String(email).trim().toLowerCase();
+        const resolvedLoginId = String(loginId || uniqueId || '').trim().toUpperCase();
+        if (!resolvedLoginId) {
+            return res.status(400).json({ success: false, message: "Login ID is required" });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const updated = await HealthPartner.findOneAndUpdate(
             { uniqueId },
-            { email: email.toLowerCase(), password: hashedPassword },
+            { email: cleanedEmail, loginId: resolvedLoginId, password: hashedPassword },
             { new: true }
         );
 
@@ -109,7 +231,7 @@ router.post('/admin/generate-credentials', verifyAdmin, async (req, res) => {
 });
 
 // 6. Admin Register New Hospital (Full Control)
-router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
+router.post('/admin/register-hospital', verifyAdmin, validateRequest({ body: registerHospitalSchema }), async (req, res) => {
     try {
         const { biz, hashPass, license, city, state, pin, owner, phone, email, specialization } = req.body;
         
@@ -147,8 +269,10 @@ router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
         const existingLicense = await HealthPartner.findOne({ licenseNumber: license });
         if (existingLicense) return res.status(400).json({ success: false, message: "Hospital with this license already exists!" });
 
+        const cleanedEmail = String(email).trim().toLowerCase();
+
         // Check for duplicate email
-        const existingEmail = await HealthPartner.findOne({ email: email.toLowerCase() });
+        const existingEmail = await HealthPartner.findOne({ email: cleanedEmail });
         if (existingEmail) return res.status(400).json({ success: false, message: "This email is already in use by another hospital!" });
 
         // 1. Generate Unique ID (Format: 100026 -> Counter + YearSuffix)
@@ -166,6 +290,12 @@ router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
             if (!isNaN(lastCounter)) counter = lastCounter + 1;
         }
         const newUniqueId = `${counter}${yearSuffix}`;
+        const defaultLoginId = `HOSP-${newUniqueId}`;
+
+        const existingLoginId = await HealthPartner.findOne({ loginId: defaultLoginId });
+        if (existingLoginId) {
+            return res.status(400).json({ success: false, message: "Auto-generated hospital login ID already exists. Please retry." });
+        }
 
         // 2. Hash Password
         const hashedPassword = await bcrypt.hash(hashPass, 10);
@@ -179,14 +309,17 @@ router.post('/admin/register-hospital', verifyAdmin, async (req, res) => {
             specialization: specialization ? (Array.isArray(specialization) ? specialization : [specialization]) : ['General Medicine'],
             address: { city, state, pincode: pin, fullAddress: `${city}, ${state}` },
             contact: { ownerName: owner, whatsappNumber: phone },
-            email: email.toLowerCase(),
+            email: cleanedEmail,
+            loginId: defaultLoginId,
             password: hashedPassword,
             isActive: true,
             registeredBy: 'Master Admin'
         });
 
         await newHospital.save();
-        res.status(201).json({ success: true, message: "Hospital Registered Successfully!", data: newHospital });
+        const safeHospital = newHospital.toObject();
+        delete safeHospital.password;
+        res.status(201).json({ success: true, message: "Hospital Registered Successfully!", data: safeHospital });
 
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
@@ -204,7 +337,7 @@ router.patch('/admin/toggle-status/:uniqueId', verifyAdmin, async (req, res) => 
 });
 
 // 8. Admin Edit Hospital
-router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, async (req, res) => {
+router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, validateRequest({ body: editHospitalSchema }), async (req, res) => {
     try {
         const { biz, license, city, state, pin, owner, phone, email, specialization } = req.body;
         
@@ -246,7 +379,9 @@ router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, async (req, res) => {
         );
 
         if (!updated) return res.status(404).json({ success: false, message: "Hospital not found" });
-        res.json({ success: true, message: "Hospital updated successfully!", data: updated });
+        const safeHospital = updated.toObject();
+        delete safeHospital.password;
+        res.json({ success: true, message: "Hospital updated successfully!", data: safeHospital });
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
@@ -255,12 +390,25 @@ router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, async (req, res) => {
 // ============================================
 
 // 1. Hospital Login
-router.post('/hospital/login', async (req, res) => {
+router.post('/hospital/login', hospitalAuthLimiter, validateRequest({ body: hospitalLoginSchema }), async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const hospital = await HealthPartner.findOne({ email: email.toLowerCase(), category: 'Hospital' });
+        const { email, password, identifier } = req.body;
+        const loginInput = String(identifier || email || '').trim();
 
-        if (!hospital || !hospital.password) {
+        if (!loginInput || !password) {
+            return res.status(400).json({ success: false, message: "Login ID/Email and password are required" });
+        }
+
+        const hospital = await HealthPartner.findOne({
+            category: 'Hospital',
+            $or: [
+                { email: loginInput.toLowerCase() },
+                { loginId: loginInput.toUpperCase() },
+                { uniqueId: loginInput }
+            ]
+        });
+
+        if (!hospital || !hospital.password || hospital.isActive === false) {
             return res.status(401).json({ success: false, message: "Invalid Credentials" });
         }
 
@@ -275,6 +423,7 @@ router.post('/hospital/login', async (req, res) => {
             hospital: { 
                 name: hospital.businessName, 
                 uniqueId: hospital.uniqueId,
+                loginId: hospital.loginId || hospital.uniqueId,
                 email: hospital.email
             } 
         });
@@ -282,7 +431,7 @@ router.post('/hospital/login', async (req, res) => {
 });
 
 // 2. Fetch Bills for a Hospital
-router.get('/hospital/bills', async (req, res) => {
+router.get('/hospital/bills', verifyHospital, validateRequest({ query: hospitalIdQuerySchema }), enforceHospitalScope, async (req, res) => {
     try {
         const { hospitalId } = req.query;
         const bills = await PatientBill.find({ hospitalId }).sort({ date: -1 });
@@ -291,9 +440,13 @@ router.get('/hospital/bills', async (req, res) => {
 });
 
 // 3. Add/Update Patient Bill
-router.post('/hospital/add-bill', async (req, res) => {
+router.post('/hospital/add-bill', verifyHospital, validateRequest({ body: addBillSchema }), enforceHospitalScope, async (req, res) => {
     try {
         const { hospitalId, healthId, patientName, patientMobile, treatmentDetails, billAmount, status, billPhoto } = req.body;
+
+        if (!patientName || !patientMobile || !treatmentDetails || !billAmount) {
+            return res.status(400).json({ success: false, message: 'Missing required billing fields' });
+        }
         
         const billId = 'BILL-' + Date.now();
         const newBill = new PatientBill({
@@ -306,7 +459,7 @@ router.post('/hospital/add-bill', async (req, res) => {
 });
 
 // 4. Verify Patient (Fetch Name & Mobile from Health Card ID)
-router.get('/hospital/verify-patient/:healthId', async (req, res) => {
+router.get('/hospital/verify-patient/:healthId', verifyHospital, async (req, res) => {
     try {
         const patient = await HealthCard.findOne({ healthId: req.params.healthId });
         if (!patient) return res.status(404).json({ success: false, message: "Patient not found. Re-check Health ID." });
@@ -322,7 +475,7 @@ router.get('/hospital/verify-patient/:healthId', async (req, res) => {
 });
 
 // 4. Fetch Appointments for a Hospital
-router.get('/hospital/appointments', async (req, res) => {
+router.get('/hospital/appointments', verifyHospital, validateRequest({ query: hospitalIdQuerySchema }), enforceHospitalScope, async (req, res) => {
     try {
         const { hospitalId } = req.query;
         const appointments = await Appointment.find({ hospitalId }).sort({ date: -1 });

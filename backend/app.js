@@ -18,11 +18,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { validate } = require('./validators/validators');
 const PaymentLog = require('./models/PaymentLog');
+const { createAuditTrailMiddleware } = require('./middlewares/auditTrail');
 
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+app.disable('x-powered-by');
+app.set('etag', false);
 
 // ============================================
 // ✅ RATE LIMITING CONFIGURATION
@@ -59,8 +62,20 @@ const paymentLimiter = rateLimit({
 });
 
 // --- Middleware ---
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+
+app.use(createAuditTrailMiddleware({
+    excludePaths: ['/health', '/appointment/test-notify']
+}));
+
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/appointment') || req.path.startsWith('/swasthya') || req.path.startsWith('/schemes') || req.path.startsWith('/swarojgaar') || req.path.startsWith('/application') || req.path.startsWith('/donation')) {
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('Pragma', 'no-cache');
+    }
+    next();
+});
 
 // ✅ SECURITY MIDDLEWARE (MUST BE FIRST)
 app.use(helmet({
@@ -564,6 +579,13 @@ app.post('/employee/login', authLimiter, async (req, res) => {
         else res.json({ success: false, message: "Invalid Credentials" });
 
     } catch (error) { console.error("Login Error:", error); res.status(500).json({ success: false, message: "Server error during login." }); }
+});
+
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api/') || req.path.startsWith('/appointment') || req.path.startsWith('/swasthya') || req.path.startsWith('/schemes') || req.path.startsWith('/swarojgaar') || req.path.startsWith('/application') || req.path.startsWith('/donation')) {
+        return res.status(404).json({ success: false, message: 'Route not found' });
+    }
+    return next();
 });
 
 // ✅ Global Error Handler (Prevents Multer/Server Crashes)

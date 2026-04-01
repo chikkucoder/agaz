@@ -61,6 +61,13 @@ const healthPartnerSchema = new mongoose.Schema({
         trim: true, 
         lowercase: true 
     },
+    loginId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        trim: true,
+        uppercase: true
+    },
     password: { 
         type: String 
     },
