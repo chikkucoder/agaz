@@ -27,7 +27,8 @@
     "node-fetch": "^2.7.0",
     "nodemailer": "^8.0.3",
     "pdfkit": "^0.17.2",
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "twilio": "^5.13.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

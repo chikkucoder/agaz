@@ -102,7 +102,7 @@
                 <label class="form-label small fw-bold">Hospital Email / User ID</label>
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
-                    <input type="email" id="email" class="form-control border-start-0 ps-0" placeholder="Enter email" required>
+                    <input type="text" id="email" class="form-control border-start-0 ps-0" placeholder="Enter email or hospital login ID" required>
                 </div>
             </div>
             <div class="mb-3">
@@ -138,7 +138,7 @@
             btn.disabled = true;
 
             const payload = {
-                email: document.getElementById('email').value,
+                identifier: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
 

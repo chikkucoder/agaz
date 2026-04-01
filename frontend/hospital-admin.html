@@ -170,9 +170,27 @@
         }
         .table-toolbar h6 { margin: 0; font-size: 0.95rem; font-weight: 700; }
         .table-toolbar .search-box { min-width: 220px; max-width: 300px; }
+        .report-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .report-actions .date-box {
+            min-width: 140px;
+            max-width: 160px;
+        }
+        .report-actions .search-box {
+            min-width: 220px;
+            max-width: 280px;
+        }
         @media (max-width: 576px) {
             .premium-table-container { padding: 15px; }
             .table-toolbar .search-box { min-width: 100%; max-width: 100%; }
+            .report-actions { width: 100%; }
+            .report-actions .date-box,
+            .report-actions .search-box,
+            .report-actions .btn { width: 100%; max-width: 100%; }
         }
 
         .table { margin: 0; }
@@ -308,7 +326,11 @@
                 <div class="premium-table-container">
                     <div class="table-toolbar">
                         <h6><i class="fa-solid fa-file-invoice-dollar me-2 text-danger"></i> Foundation Master Billing Report</h6>
-                        <div class="d-flex gap-2">
+                        <div class="report-actions">
+                            <input type="date" id="reportFromDate" class="form-control form-control-sm date-box" title="From Date">
+                            <input type="date" id="reportToDate" class="form-control form-control-sm date-box" title="To Date">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="applyReportFilters()" title="Apply Date Filter"><i class="fa-solid fa-filter"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="resetReportFilters()" title="Reset Date Filter"><i class="fa-solid fa-rotate-left"></i></button>
                             <input type="text" id="reportSearch" class="form-control form-control-sm search-box" placeholder="Search records...">
                             <button class="btn btn-sm btn-dark" onclick="exportToExcel()" title="Export Excel"><i class="fa-solid fa-file-excel"></i></button>
                         </div>
@@ -508,6 +530,25 @@
     <script>
         let hospitalsData = [];
         let reportsData = [];
+        let reportFilters = { fromDate: '', toDate: '' };
+
+        async function fetchReports() {
+            const query = new URLSearchParams();
+            if (reportFilters.fromDate) query.append('fromDate', reportFilters.fromDate);
+            if (reportFilters.toDate) query.append('toDate', reportFilters.toDate);
+
+            const queryString = query.toString();
+            const reportUrl = CONFIG.API_URL + '/api/hospital-admin-system/admin/global-reports' + (queryString ? `?${queryString}` : '');
+
+            const rRes = await fetch(reportUrl, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            const r = await rRes.json();
+            if (r.success) {
+                reportsData = r.data;
+                renderReports(reportsData);
+            }
+        }
 
         async function fetchEverything() {
             try {
@@ -534,16 +575,22 @@
                 }
 
                 // 3. Fetch Master Reports
-                const rRes = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/admin/global-reports', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                const r = await rRes.json();
-                if(r.success) {
-                    reportsData = r.data;
-                    renderReports(reportsData);
-                }
+                await fetchReports();
 
             } catch (err) { console.error("Sync Error:", err); }
+        }
+
+        function applyReportFilters() {
+            reportFilters.fromDate = document.getElementById('reportFromDate').value;
+            reportFilters.toDate = document.getElementById('reportToDate').value;
+            fetchReports();
+        }
+
+        function resetReportFilters() {
+            reportFilters = { fromDate: '', toDate: '' };
+            document.getElementById('reportFromDate').value = '';
+            document.getElementById('reportToDate').value = '';
+            fetchReports();
         }
 
         function renderHospitals(data) {
@@ -672,7 +719,11 @@
         });
         document.getElementById('reportSearch').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
-            renderReports(reportsData.filter(r => r.patientName.toLowerCase().includes(val) || r.hospitalName.toLowerCase().includes(val)));
+            renderReports(reportsData.filter(r =>
+                r.patientName.toLowerCase().includes(val) ||
+                r.hospitalName.toLowerCase().includes(val) ||
+                String(r.healthId || '').toLowerCase().includes(val)
+            ));
         });
 
         function openEdit(hospital) {

@@ -249,11 +249,17 @@
         // --- 🧼 Validation Helpers (Strict Character Filtering) ---
         function vAlpha(el) { el.value = el.value.replace(/[^a-zA-Z\s]/g, ''); }
         function vNum(el) { el.value = el.value.replace(/[^0-9]/g, ''); }
+        const hospitalAuthHeaders = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + hToken
+        };
 
         async function fetchDashboard() {
             try {
                 // Fetch Bills
-                const billRes = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/bills?hospitalId=${hInfo.uniqueId}`);
+                const billRes = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/bills?hospitalId=${hInfo.uniqueId}`, {
+                    headers: { 'Authorization': 'Bearer ' + hToken }
+                });
                 const billData = await billRes.json();
                 if(billData.success) {
                     renderBills(billData.data);
@@ -263,7 +269,9 @@
                 }
 
                 // Fetch Appointments
-                const apptRes = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/appointments?hospitalId=${hInfo.uniqueId}`);
+                const apptRes = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/appointments?hospitalId=${hInfo.uniqueId}`, {
+                    headers: { 'Authorization': 'Bearer ' + hToken }
+                });
                 const apptData = await apptRes.json();
                 if(apptData.success) {
                     renderAppts(apptData.data);
@@ -326,7 +334,7 @@
             try {
                 const res = await fetch(CONFIG.API_URL + '/api/hospital-admin-system/hospital/add-bill', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: hospitalAuthHeaders,
                     body: JSON.stringify(payload)
                 });
                 const d = await res.json();
@@ -353,7 +361,9 @@
             st.className = 'text-primary';
 
             try {
-                const res = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/verify-patient/${hId}`);
+                const res = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/hospital/verify-patient/${hId}`, {
+                    headers: { 'Authorization': 'Bearer ' + hToken }
+                });
                 const d = await res.json();
                 if(d.success) {
                     document.getElementById('patientName').value = d.data.name;

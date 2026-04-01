@@ -1,7 +1,47 @@
 const express = require('express');
 const router = express.Router();
 const Appointment = require('../schemas/AppointmentSchema');
+const HealthPartner = require('../schemas/SwasthyaSurkshaSchema');
+const HealthCard = require('../schemas/HealthCardSchema');
 const multer = require('multer');
+const { sendSMS, sendWhatsApp } = require('../services/twilioService');
+const { validateRequest } = require('../middlewares/requestValidation');
+const { appointmentBookSchema, testNotifySchema } = require('../validators/routeSchemas');
+
+const buildHealthIdCandidates = (rawHealthId) => {
+    const input = String(rawHealthId || '').trim();
+    const upper = input.toUpperCase();
+    const candidates = new Set([input, upper]);
+
+    if (/^\d{6}$/.test(input)) {
+        candidates.add(`MC-${input}`);
+    }
+
+    const match = upper.match(/^MC-(\d{6})$/);
+    if (match) {
+        candidates.add(match[1]);
+    }
+
+    return Array.from(candidates).filter(Boolean);
+};
+
+// Verify that a Health ID exists before appointment booking
+router.get('/verify-health/:healthId', async (req, res) => {
+    try {
+        const candidates = buildHealthIdCandidates(req.params.healthId);
+        const card = await HealthCard.findOne({ healthId: { $in: candidates } })
+            .select('healthId fullName mobile bloodGroup')
+            .lean();
+
+        if (!card) {
+            return res.status(404).json({ success: false, message: 'Health ID not found. Please generate health card first.' });
+        }
+
+        return res.json({ success: true, data: card });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
 
 // ✅ मेमोरी स्टोरेज सेटअप (फाइल फोल्डर में नहीं जाएगी)
 const storage = multer.memoryStorage();
@@ -11,17 +51,47 @@ const upload = multer({
 });
 
 // Route: Register & Upload to DB
-router.post('/book', upload.single('healthCard'), async (req, res) => {
+router.post('/book', upload.single('healthCard'), validateRequest({ body: appointmentBookSchema }), async (req, res) => {
     try {
         const { 
             name, gender, age, aadhar, phone, bloodGroup, 
-            healthId, street, city, pin, department, doctor, date, message 
+            healthId, street, city, pin, department, doctor, date, message, hospitalId
         } = req.body;
+
+        if (!name || !aadhar || !phone || !healthId || !date || !hospitalId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Required fields missing. Please select a hospital and fill all required details.'
+            });
+        }
+
+        const healthIdCandidates = buildHealthIdCandidates(healthId);
+        const verifiedCard = await HealthCard.findOne({ healthId: { $in: healthIdCandidates } })
+            .select('healthId fullName mobile')
+            .lean();
+
+        if (!verifiedCard) {
+            return res.status(400).json({
+                success: false,
+                message: 'Health ID not verified. Please verify valid Health ID before booking appointment.'
+            });
+        }
+
+        const partner = await HealthPartner.findOne({ uniqueId: hospitalId, category: 'Hospital' }).lean();
+        if (!partner) {
+            return res.status(400).json({ success: false, message: 'Invalid hospital selected. Please choose a valid hospital.' });
+        }
 
         const newAppointment = new Appointment({
             name, gender, age, aadhar, phone, bloodGroup,
-            healthId, street, city, pincode: pin,
-            department, doctor, date, message
+            healthId: verifiedCard.healthId,
+            street, city, pincode: pin,
+            department,
+            doctor: doctor || partner.businessName,
+            hospitalId,
+            hospitalName: partner.businessName,
+            date,
+            message
         });
 
         // ✅ फाइल को डेटाबेस बफर में डालना
@@ -32,7 +102,33 @@ router.post('/book', upload.single('healthCard'), async (req, res) => {
         }
 
         await newAppointment.save();
-        res.status(200).json({ success: true, message: "Registered Successfully in Database!" });
+
+        // 🟢 Send SMS & WhatsApp Notification
+        let notificationResults = null;
+        const appointmentMsg = `Hello ${name}, your appointment with ${doctor || 'the doctor'} at ${department || 'the clinic'} on ${date} has been successfully requested. Thank you for choosing us!`;
+        
+        if (phone) {
+            const [smsResult, waResult] = await Promise.all([
+                sendSMS(phone, appointmentMsg),
+                sendWhatsApp(phone, appointmentMsg)
+            ]);
+            notificationResults = {
+                sms: smsResult,
+                whatsapp: waResult
+            };
+            console.log('Appointment notification results:', {
+                phone,
+                sms: smsResult,
+                whatsapp: waResult
+            });
+        }
+
+        const responsePayload = { success: true, message: "Registered Successfully in Database!" };
+        if (process.env.NODE_ENV !== 'production') {
+            responsePayload.notificationResults = notificationResults;
+        }
+
+        res.status(200).json(responsePayload);
 
     } catch (error) {
         console.error("Booking Error:", error);
@@ -59,6 +155,38 @@ router.get('/all', async (req, res) => {
     } catch (error) {
         console.error("Fetch Appointments Error:", error);
         res.status(500).json({ success: false, message: "Error fetching appointments" });
+    }
+});
+
+// Debug route to validate SMS/WhatsApp delivery without booking flow
+router.post('/test-notify', validateRequest({ body: testNotifySchema }), async (req, res) => {
+    try {
+        if (process.env.NODE_ENV === 'production') {
+            return res.status(404).json({ success: false, message: 'Not found' });
+        }
+
+        const { phone, message, sendSms = true, sendWhatsapp = true } = req.body;
+
+        if (!phone) {
+            return res.status(400).json({ success: false, message: 'Phone is required' });
+        }
+
+        const text = message || 'Aagaj test notification from appointment system.';
+        const results = {};
+
+        if (sendSms) {
+            const smsRes = await sendSMS(phone, text);
+            results.sms = smsRes;
+        }
+
+        if (sendWhatsapp) {
+            const waRes = await sendWhatsApp(phone, text);
+            results.whatsapp = waRes;
+        }
+
+        return res.json({ success: true, message: 'Notification attempt completed', results });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 });
 

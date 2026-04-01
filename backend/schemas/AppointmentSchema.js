@@ -19,6 +19,7 @@ const AppointmentSchema = new mongoose.Schema({
     department: { type: String },
     doctor: { type: String }, // Facility Name
     hospitalId: { type: String }, // ✅ Unique ID of the HealthPartner
+    hospitalName: { type: String },
     date: { type: String, required: true },
     message: { type: String }, // Patient Problem
 

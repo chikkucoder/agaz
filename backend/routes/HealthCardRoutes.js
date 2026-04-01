@@ -7,6 +7,13 @@ const HealthCard = require('../schemas/HealthCardSchema');
 const PendingPayment = require('../models/PendingPayment');
 const PaymentLog = require('../models/PaymentLog');
 const crypto = require('crypto');
+const { sendSMS, sendWhatsApp } = require('../services/twilioService');
+const { validateRequest } = require('../middlewares/requestValidation');
+const {
+    healthCardCheckExistsSchema,
+    healthCardCreateOrderSchema,
+    healthCardVerifyPaymentSchema
+} = require('../validators/routeSchemas');
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -41,7 +48,7 @@ const upload = multer({
 });
 
 // ✅ API to Check if User Already Exists
-router.post('/check-exists', async (req, res) => {
+router.post('/check-exists', validateRequest({ body: healthCardCheckExistsSchema }), async (req, res) => {
     try {
         const { mobile, aadhar } = req.body;
         
@@ -68,7 +75,7 @@ router.post('/check-exists', async (req, res) => {
 });
 
 // ✅ API to Create Payment Order (RAZORPAY)
-router.post('/create-order', upload.single('photo'), async (req, res) => {
+router.post('/create-order', upload.single('photo'), validateRequest({ body: healthCardCreateOrderSchema }), async (req, res) => {
     try {
         if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
             return res.status(500).json({ success: false, message: 'Payment gateway not configured. Please contact administrator.' });
@@ -133,7 +140,7 @@ router.post('/create-order', upload.single('photo'), async (req, res) => {
 });
 
 // ✅ API to Verify Payment Callback (RAZORPAY)
-router.post('/verify-payment', async (req, res) => {
+router.post('/verify-payment', validateRequest({ body: healthCardVerifyPaymentSchema }), async (req, res) => {
     try {
         const {
             razorpay_order_id,
@@ -202,6 +209,25 @@ router.post('/verify-payment', async (req, res) => {
 
         await newCard.save();
 
+        // 🟢 Send SMS & WhatsApp Notification for Health Card
+        let notificationResults = null;
+        const healthCardMsg = `Dear ${pendingCardData.fullName}, your payment was successful! Your Health Card ID is ${healthId}. It is valid until ${expiryDate.toLocaleDateString('en-IN')}. Thank you!`;
+        if (pendingCardData.mobile) {
+            const [smsResult, waResult] = await Promise.all([
+                sendSMS(pendingCardData.mobile, healthCardMsg),
+                sendWhatsApp(pendingCardData.mobile, healthCardMsg)
+            ]);
+            notificationResults = {
+                sms: smsResult,
+                whatsapp: waResult
+            };
+            console.log('Health card notification results:', {
+                phone: pendingCardData.mobile,
+                sms: smsResult,
+                whatsapp: waResult
+            });
+        }
+
         try {
             await PaymentLog.create({
                 orderId: pendingOrderId,
@@ -224,12 +250,18 @@ router.post('/verify-payment', async (req, res) => {
         // 7. Clean up pending record from MongoDB
         await PendingPayment.deleteOne({ orderId: pendingOrderId });
 
-        return res.json({
+        const responsePayload = {
             success: true,
             orderId: pendingOrderId,
             paymentId: razorpay_payment_id,
             redirectUrl: `${process.env.FRONTEND_URL}/healthcard.html?status=success&orderId=${encodeURIComponent(pendingOrderId)}&paymentId=${encodeURIComponent(razorpay_payment_id)}`
-        });
+        };
+
+        if (process.env.NODE_ENV !== 'production') {
+            responsePayload.notificationResults = notificationResults;
+        }
+
+        return res.json(responsePayload);
 
     } catch (error) {
         console.error("Verify Payment Error:", error);
