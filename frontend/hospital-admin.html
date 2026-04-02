@@ -615,6 +615,9 @@
                         <button class="btn btn-sm btn-outline-secondary me-1" onclick='openEdit(${JSON.stringify(h).replace(/'/g, "&apos;")})' title="Edit Hospital">
                             <i class="fa-solid fa-pen"></i>
                         </button>
+                        <button class="btn btn-sm btn-outline-danger me-1" onclick="deleteHospital('${h.uniqueId}', '${String(h.businessName || '').replace(/'/g, "\\'")}')" title="Delete Hospital">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                         <button class="btn btn-sm ${h.hasCredentials?'btn-dark':'btn-outline-danger'}" onclick="openCred('${h.uniqueId}', '${h.businessName}', '${h.email||''}')">
                             <i class="fa-solid fa-key"></i> ${h.hasCredentials?'Manage':'Assign'}
                         </button>
@@ -787,6 +790,29 @@
                 const d = await res.json();
                 if(d.success) fetchEverything();
             } catch (err) { alert("Failed to toggle status."); }
+        }
+
+        async function deleteHospital(id, name) {
+            const confirmed = window.confirm(`Delete hospital "${name}"? This will permanently remove the hospital and all its bills/appointments.`);
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch(`${CONFIG.API_URL}/api/hospital-admin-system/admin/delete-hospital/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const d = await res.json();
+
+                if (d.success) {
+                    alert('✅ Hospital deleted from database successfully.');
+                    fetchEverything();
+                    return;
+                }
+
+                alert(d.message || 'Failed to delete hospital.');
+            } catch (err) {
+                alert('Failed to delete hospital.');
+            }
         }
 
         function exportToExcel() {
