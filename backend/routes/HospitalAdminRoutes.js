@@ -385,6 +385,40 @@ router.put('/admin/edit-hospital/:uniqueId', verifyAdmin, validateRequest({ body
     } catch (error) { res.status(500).json({ success: false, message: error.message }); }
 });
 
+// 9. Admin Delete Hospital (with related records)
+router.delete('/admin/delete-hospital/:uniqueId', verifyAdmin, async (req, res) => {
+    try {
+        const uniqueId = String(req.params.uniqueId || '').trim();
+        if (!uniqueId) {
+            return res.status(400).json({ success: false, message: 'Hospital ID is required' });
+        }
+
+        const hospital = await HealthPartner.findOne({ uniqueId, category: 'Hospital' });
+        if (!hospital) {
+            return res.status(404).json({ success: false, message: 'Hospital not found' });
+        }
+
+        const [billsDeleted, appointmentsDeleted] = await Promise.all([
+            PatientBill.deleteMany({ hospitalId: uniqueId }),
+            Appointment.deleteMany({ hospitalId: uniqueId })
+        ]);
+
+        await HealthPartner.deleteOne({ uniqueId, category: 'Hospital' });
+
+        return res.json({
+            success: true,
+            message: 'Hospital deleted successfully',
+            deleted: {
+                hospitalId: uniqueId,
+                bills: billsDeleted.deletedCount || 0,
+                appointments: appointmentsDeleted.deletedCount || 0
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 // ============================================
 // ✅ HOSPITAL PARTNER ROUTES
 // ============================================
