@@ -12,9 +12,10 @@ const CONFIG = {
             return 'http://localhost:5000';
         }
 
-        // Production - Auto-detect
-        // AWS Nginx internally routes to 5000, so we just return the base URL
-        return protocol + '//' + hostname ; 
+        // Production - use explicit backend host to avoid calling the
+        // frontend origin (which returns 404 when API isn't hosted there).
+        // Change this value if your backend is hosted somewhere else.
+        return 'https://aagajfoundation.com';
     })(),
     
     // Frontend URL (same logic)
