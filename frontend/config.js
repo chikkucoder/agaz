@@ -5,17 +5,21 @@ const CONFIG = {
     // ✅ Automatically detect environment based on hostname
     API_URL: (() => {
         const hostname = window.location.hostname;
-        const protocol = window.location.protocol;
+        const origin = window.location.origin;
         
         // Development/Localhost
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
             return 'http://localhost:5000';
         }
 
-        // Production - use explicit backend host to avoid calling the
-        // frontend origin (which returns 404 when API isn't hosted there).
-        // Change this value if your backend is hosted somewhere else.
-        return 'https://aagajfoundation.com';
+        // Production primary domains use canonical backend.
+        if (hostname === 'aagajfoundation.com' || hostname === 'www.aagajfoundation.com') {
+            return 'https://aagajfoundation.com';
+        }
+
+        // For preview/dev hosts (e.g. Codespaces/app.github.dev), use same origin
+        // so API requests hit the currently running backend.
+        return origin;
     })(),
     
     // Frontend URL (same logic)

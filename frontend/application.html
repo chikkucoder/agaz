@@ -11,6 +11,7 @@
        
         /* === Global Fixes === */
         *, *::before, *::after { box-sizing: border-box; }
+        html, body { max-width: 100%; overflow-x: hidden; }
 
         body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
 
@@ -363,6 +364,7 @@
 
         <p style="color: #e31e24; font-weight: bold; margin-bottom: 5px;" data-key="qualification">Qualification:</p>
         
+        <div class="table-responsive">
         <table class="qual-table">
     <thead>
         <tr>
@@ -408,7 +410,8 @@
             <td><input type="text" id="g_rem" class="percent-input"></td>
         </tr>
     </tbody>
-</table>
+    </table>
+    </div>
 
     <!-- <div class="post-choice">
         <span data-key="choose_post">Choose option of the post:</span> <br>
@@ -453,7 +456,7 @@
         Note: Fee once paid is not refundable.
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
+    <div class="helpline-section" style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px;">
         <span style="font-weight: bold; color: #000080;"><span data-key="helpline">📞 Helpline:</span> 06124065270, 8507355085</span>
         <span class="red-text" style="font-size: 20px;" data-key="sig_officer">Officer Signature</span>
     </div>

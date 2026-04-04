@@ -83,11 +83,11 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://checkout.razorpay.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com", "https://checkout.razorpay.com", "https://cdn.razorpay.com"],
             scriptSrcAttr: ["'unsafe-inline'"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
-            connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://api.postalpincode.in"],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://api.postalpincode.in", "https://aagajfoundation.com", "https://www.aagajfoundation.com"],
             frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
             formAction: ["'self'"],
             mediaSrc: ["'self'", "blob:"]
@@ -98,28 +98,33 @@ app.use(helmet({
 }));
 
 // ✅ CORS CONFIGURATION (RESTRICTED)
-const allowedOrigins = process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL]
-    : ['http://localhost:5000', 'http://127.0.0.1:5000'];
+const allowedOrigins = [
+    "https://aagajfoundation.com",
+    "https://www.aagajfoundation.com",
+    "http://localhost:5000"
+];
 
 app.use(cors({
     origin: function(origin, callback) {
-        // Allow same-origin requests and local-file/sandbox contexts in development.
-        if (!origin || (origin === 'null' && process.env.NODE_ENV !== 'production')) {
-            return callback(null, true);
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn("❌ CORS BLOCKED:", origin);
+            callback(new Error("CORS policy: Access denied"));
         }
-        
-        if (allowedOrigins.indexOf(origin) === -1) {
-            console.warn(`⚠️ CORS BLOCKED: ${origin}`);
-            return callback(new Error('CORS policy: Access denied'), false);
-        }
-        return callback(null, true);
     },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    credentials: true
 }));
 
+// ✅ Safe OPTIONS handler
+app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
 // ✅ APPLY RATE LIMITING
 app.use('/api/', apiLimiter);
 app.use('/schemes/create-order', paymentLimiter);
@@ -130,13 +135,6 @@ app.use('/donation/create-donation-order', paymentLimiter);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); 
 
-
-
-// 👇👇👇 यहाँ पेस्ट करें (Paste Here) 👇👇👇
-app.use(express.static(path.join(__dirname, "../frontend")));
-
-// ✅ Naye public folder ko access karne ke liye ye line add karein
-app.use('/public', express.static(path.join(__dirname, "../frontend/public")));
 
 // 👆👆👆 यह लाइन HTML फाइल्स (card.html, form.html) को लोड करने के लिए जरूरी है
 
@@ -488,9 +486,6 @@ app.get('/api/healthcard/all', async (req, res) => {
 });
 //healthcard
 
-// 5. Admin Routes (Connected)
-app.use('/admin', verifyAdmin, require('./routes/ApplicationRoutes'));
-
 // ✅ Connect New Employee Route
 app.use('/admin', verifyAdmin, require('./routes/AddNewEmployeeRoutes'));
 
@@ -581,6 +576,10 @@ app.post('/employee/login', authLimiter, async (req, res) => {
     } catch (error) { console.error("Login Error:", error); res.status(500).json({ success: false, message: "Server error during login." }); }
 });
 
+// ✅ STATIC SHOULD BE LAST (IMPORTANT)
+app.use(express.static(path.join(__dirname, "../frontend")));
+app.use('/public', express.static(path.join(__dirname, "../frontend/public")));
+
 app.use((req, res, next) => {
     if (req.path.startsWith('/api/') || req.path.startsWith('/appointment') || req.path.startsWith('/swasthya') || req.path.startsWith('/schemes') || req.path.startsWith('/swarojgaar') || req.path.startsWith('/application') || req.path.startsWith('/donation')) {
         return res.status(404).json({ success: false, message: 'Route not found' });
@@ -591,7 +590,7 @@ app.use((req, res, next) => {
 // ✅ Global Error Handler (Prevents Multer/Server Crashes)
 app.use((err, req, res, next) => {
     console.error("🔥 Unhandled Error:", err);
-    res.status(500).json({ success: false, message: "Internal Server Error: " + err.message });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
 });
 
 // app.listen(5000, () => console.log("🚀 Server running on port 5000"));
