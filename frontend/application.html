@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aagaj Foundation - Application Form</title>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; } */
        
@@ -1045,10 +1044,17 @@
                     body: formData
                 });
 
-                const result = await response.json();
+                const rawResponse = await response.text();
+                let result = null;
 
-                if (!result.success) {
-                    throw new Error(result.message || 'Failed to create payment order');
+                try {
+                    result = rawResponse ? JSON.parse(rawResponse) : {};
+                } catch (parseErr) {
+                    throw new Error('Unexpected server response while creating payment order.');
+                }
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || `Failed to create payment order (HTTP ${response.status}).`);
                 }
 
                 const options = {
@@ -1098,8 +1104,8 @@
             } catch (error) {
                 console.error('Connection Error:', error);
                 const errorMsg = isHindi 
-                    ? 'सर्वर कनेक्शन विफल। कृपया सुनिश्चित करें कि सर्वर पोर्ट 5000 पर चल रहा है।'
-                    : 'Server Connection Failed. Please ensure the backend is running on port 5000.';
+                    ? 'भुगतान शुरू नहीं हो पाया। कृपया दोबारा प्रयास करें या कुछ समय बाद कोशिश करें।'
+                    : 'Unable to start payment right now. Please try again in a moment.';
 
                 alert(errorMsg + "\n\nError: " + error.message);
                 payBtn.innerHTML = originalBtnText;

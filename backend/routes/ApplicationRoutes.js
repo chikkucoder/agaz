@@ -17,15 +17,29 @@ const razorpay = new Razorpay({
 
 // ✅ FILE FILTER - Images and PDF (for CV/Resume)
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|pdf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = /jpeg|jpg|png|gif|pdf|application\/pdf/.test(file.mimetype);
-    
-    if (extname && mimetype) {
+    const extension = path.extname(file.originalname || '').toLowerCase();
+    const allowedExts = new Set(['.jpeg', '.jpg', '.png', '.gif', '.pdf', '.heic', '.heif']);
+    const allowedMimes = new Set([
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/gif',
+        'application/pdf',
+        'image/heic',
+        'image/heif',
+        'image/heic-sequence',
+        'image/heif-sequence'
+    ]);
+
+    const mimeType = (file.mimetype || '').toLowerCase();
+    const extAllowed = allowedExts.has(extension);
+    const mimeAllowed = allowedMimes.has(mimeType);
+
+    if (extAllowed && mimeAllowed) {
         return cb(null, true);
-    } else {
-        cb(new Error('Only image files (JPEG, JPG, PNG, GIF) and PDF are allowed!'));
     }
+
+    cb(new Error('Only image files (JPEG, JPG, PNG, GIF, HEIC, HEIF) and PDF are allowed!'));
 };
 
 // Multer Setup for Photo Upload
@@ -41,6 +55,28 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max (larger for PDFs)
     fileFilter: fileFilter
 });
+
+const handlePhotoUpload = (req, res, next) => {
+    upload.single('photo')(req, res, (err) => {
+        if (!err) {
+            return next();
+        }
+
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({
+                success: false,
+                message: err.code === 'LIMIT_FILE_SIZE'
+                    ? 'Photo size must be less than or equal to 5MB.'
+                    : `Photo upload error: ${err.message}`
+            });
+        }
+
+        return res.status(400).json({
+            success: false,
+            message: err.message || 'Photo upload failed.'
+        });
+    });
+};
 
 // ✅ PROFESSIONAL PDF GENERATOR (With Async/Await & Education Details)
 function generatePDF(applicant, filename) {
@@ -118,7 +154,7 @@ function generatePDF(applicant, filename) {
     });
 }
 // ✅ 1. CREATE ORDER - Store data temporarily, don't save to DB yet
-router.post('/create-order', upload.single('photo'), async (req, res) => {
+router.post('/create-order', handlePhotoUpload, async (req, res) => {
     try {
         if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
             console.error("RAZORPAY configuration missing in .env file");

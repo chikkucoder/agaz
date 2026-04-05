@@ -87,7 +87,7 @@ app.use(helmet({
             scriptSrcAttr: ["'unsafe-inline'"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
             imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
-            connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://api.postalpincode.in", "https://aagajfoundation.com", "https://www.aagajfoundation.com"],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net", "https://api.razorpay.com", "https://checkout.razorpay.com", "https://cdn.razorpay.com", "https://lumberjack.razorpay.com", "https://api.postalpincode.in", "https://aagajfoundation.com", "https://www.aagajfoundation.com"],
             frameSrc: ["'self'", "https://api.razorpay.com", "https://checkout.razorpay.com"],
             formAction: ["'self'"],
             mediaSrc: ["'self'", "blob:"]
