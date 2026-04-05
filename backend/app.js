@@ -27,6 +27,16 @@ const app = express();
 app.disable('x-powered-by');
 app.set('etag', false);
 
+// Required for AWS/proxy deployments so rate limiting uses real client IP from X-Forwarded-For.
+const trustProxySetting = process.env.TRUST_PROXY;
+if (trustProxySetting === 'true') {
+    app.set('trust proxy', true);
+} else if (trustProxySetting && !Number.isNaN(Number(trustProxySetting))) {
+    app.set('trust proxy', Number(trustProxySetting));
+} else {
+    app.set('trust proxy', 1);
+}
+
 // ============================================
 // ✅ RATE LIMITING CONFIGURATION
 // ============================================

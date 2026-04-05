@@ -150,7 +150,7 @@
 </head>
 <body>
 
-    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -715,8 +715,15 @@
         });
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.toggle('active');
+            }
         }
 
         function logout() { 
